@@ -11,7 +11,7 @@ import { normalizeSupabaseImageUrl, formatCurrency, getApiBaseUrl } from '../cor
 import { shareLink } from '../core/share';
 import { Store, Share2, Star, Heart } from 'lucide-react';
 
-function ProductCard({ product }) {
+export default function ProductCard({ product }) {
   const { addToCart, setCartOpen } = useCart();
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const showToast = useToast();
@@ -335,8 +335,3 @@ function ProductCard({ product }) {
     </article>
   );
 }
-
-// Mémoïsation : évite les re-renders inutiles quand le parent change d'état
-export default React.memo(ProductCard);
-
-

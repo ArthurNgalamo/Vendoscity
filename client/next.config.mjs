@@ -1,10 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    // unoptimized retiré → Next.js compresse en WebP automatiquement
-    deviceSizes: [360, 480, 640, 750, 828, 1080, 1200],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256],
-    formats: ['image/webp'],
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: 'https',
@@ -16,7 +13,6 @@ const nextConfig = {
       }
     ],
   },
-
   async rewrites() {
     return [
       {
@@ -29,37 +25,6 @@ const nextConfig = {
       },
     ];
   },
-
-  // Cache HTTP longue durée pour les assets statiques
-  async headers() {
-    return [
-      {
-        source: '/assets/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
-      {
-        source: '/_next/static/:path*',
-        headers: [
-          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
-        ],
-      },
-      {
-        source: '/:path*.png',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
-      },
-      {
-        source: '/:path*.jpg',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
-      },
-      {
-        source: '/:path*.webp',
-        headers: [{ key: 'Cache-Control', value: 'public, max-age=86400' }],
-      },
-    ];
-  },
-
   async redirects() {
     return [
       { source: '/pages/Boutique.html', destination: '/boutique', permanent: true },
@@ -81,5 +46,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
-
 

@@ -49,14 +49,6 @@ export default function Header() {
 
   const currentUserId = user?.id || user?.sub || user?.uid || user?.user_id;
 
-  // Keep-alive : réveille le backend Render (plan gratuit) dès le montage
-  // pour éviter le cold start quand l'utilisateur navigue
-  useEffect(() => {
-    const base = getApiBaseUrl();
-    // Ping discret, on ignore la réponse
-    fetch(`${base}/api/products?page=0&limit=1`, { method: 'GET' }).catch(() => {});
-  }, []);
-
   // Poll unread messages count periodically
   useEffect(() => {
     if (!user || !currentUserId) {
@@ -65,8 +57,6 @@ export default function Header() {
     }
 
     const loadUnreadCount = async () => {
-      // Ne pas poller si l'onglet est en arrière-plan (économie réseau)
-      if (typeof document !== 'undefined' && document.visibilityState === 'hidden') return;
       try {
         const res = await authFetch('/api/messages');
         if (res.ok) {
@@ -82,14 +72,10 @@ export default function Header() {
       }
     };
 
-    // Délai initial de 5s avant le premier poll (laisse la page se charger d'abord)
-    const initialTimeout = setTimeout(loadUnreadCount, 5000);
-    // Intervalle réduit à 30s (était 8s) pour limiter les requêtes réseau
-    const interval = setInterval(loadUnreadCount, 30000);
-    return () => {
-      clearTimeout(initialTimeout);
-      clearInterval(interval);
-    };
+    loadUnreadCount();
+    // Poll every 8 seconds to stay reasonably fresh
+    const interval = setInterval(loadUnreadCount, 8000);
+    return () => clearInterval(interval);
   }, [user, currentUserId, authFetch]);
 
   const [searchVal, setSearchVal] = useState('');
