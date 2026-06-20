@@ -152,8 +152,10 @@ export default function SellerPublicPage({ params }) {
             <div className="seller-avatar-large">
               {initialLetter}
             </div>
-            <h2 className="seller-sidebar-title">{shopName}</h2>
-            <p className="seller-sidebar-subtitle">Boutique Vérifiée</p>
+            <div className="seller-profile-header-text">
+              <h2 className="seller-sidebar-title">{shopName}</h2>
+              <p className="seller-sidebar-subtitle">Boutique Vérifiée</p>
+            </div>
           </div>
 
           <div className="seller-bio-section">
@@ -198,21 +200,21 @@ export default function SellerPublicPage({ params }) {
                 <ShoppingBag width="18" height="18" style={{ color: 'var(--primary-blue)' }} />
                 {products.length}
               </span>
-              <span className="seller-stat-lbl">Articles en vente</span>
+              <span className="seller-stat-lbl">Articles</span>
             </div>
             <div className="seller-stat-widget">
               <span className="seller-stat-val" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <Star width="18" height="18" style={{ color: '#ff9e00' }} fill="#ff9e00" />
                 4.8
               </span>
-              <span className="seller-stat-lbl">Évaluation vendeur</span>
+              <span className="seller-stat-lbl">Note</span>
             </div>
             <div className="seller-stat-widget">
               <span className="seller-stat-val" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
                 <Truck width="18" height="18" style={{ color: '#22c55e' }} />
                 Directe
               </span>
-              <span className="seller-stat-lbl">Mode de livraison</span>
+              <span className="seller-stat-lbl">Livraison</span>
             </div>
           </div>
 

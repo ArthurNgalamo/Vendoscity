@@ -3380,6 +3380,11 @@ img {
     letter-spacing: 0.5px;
     font-weight: 700;
 }
+.seller-profile-header-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
 .seller-bio-section h4,
 .seller-contact-section h4 {
@@ -3475,24 +3480,118 @@ img {
 @media (max-width: 900px) {
     .seller-split-layout {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 24px;
         margin-top: -30px;
     }
     .seller-info-sidebar {
         position: static;
         width: 100%;
+        padding: 20px;
     }
     .seller-hero {
-        padding: 40px 15px 60px 15px;
+        padding: 40px 20px 60px 20px;
     }
     .seller-hero-inner {
         flex-direction: column;
         align-items: flex-start;
-        gap: 15px;
+        gap: 16px;
+    }
+    .seller-title {
+        font-size: 1.8rem;
+    }
+    .seller-subtitle {
+        font-size: 0.88rem;
     }
     .seller-actions {
         width: 100%;
         justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .seller-profile-card-header {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        text-align: left;
+        border-bottom: 1px solid #f1f5f9;
+        padding-bottom: 16px;
+        gap: 16px;
+        width: 100%;
+    }
+    .seller-profile-header-text {
+        align-items: flex-start;
+    }
+    .seller-avatar-large {
+        width: 64px;
+        height: 64px;
+        font-size: 1.6rem;
+        margin-top: 0;
+        margin-bottom: 0;
+        border: 2px solid white;
+        box-shadow: 0 4px 12px rgba(255, 106, 0, 0.2);
+    }
+}
+
+@media (max-width: 600px) {
+    .seller-actions {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        width: 100%;
+        gap: 8px;
+    }
+    .seller-actions button,
+    .seller-actions a {
+        width: 100%;
+        margin: 0;
+        padding: 10px 4px;
+        font-size: 0.8rem;
+        gap: 4px;
+        justify-content: center;
+    }
+    .seller-stats-summary {
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+        margin-bottom: 20px;
+    }
+    .seller-stat-widget {
+        padding: 10px 6px !important;
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+    }
+    .seller-stat-val {
+        font-size: 1.1rem !important;
+        justify-content: center;
+    }
+    .seller-stat-lbl {
+        font-size: 0.68rem !important;
+    }
+    .seller-contact-list {
+        flex-direction: row !important;
+        width: 100% !important;
+        gap: 10px !important;
+    }
+    .seller-contact-link {
+        flex: 1 !important;
+        justify-content: center !important;
+        padding: 12px 10px !important;
+        font-size: 0.85rem !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .seller-title {
+        font-size: 1.5rem;
+    }
+    .seller-title-wrapper {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .seller-hero {
+        padding: 30px 15px 50px 15px;
+    }
+    .seller-split-layout {
+        padding: 0 15px 60px 15px;
     }
 }
 /* ============================================================
