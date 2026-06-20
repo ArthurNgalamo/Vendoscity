@@ -1,0 +1,64 @@
+  <header>
+    <!-- 
+      NAV - Barre de navigation principale
+      role="navigation" : Aide les lecteurs d'écran à identifier la navigation
+      aria-label : Label pour l'accessibilité
+    -->
+    <nav class="header-nav" role="navigation" aria-label="Navigation principale">
+      
+      <!-- 
+        LOGO - Lien retournant à l'accueil
+        Modern: logo image + texte accessible
+      -->
+      <a href="/" class="logo" aria-label="Vendoscity - Accueil" title="Retour à l'accueil">
+        <img class="logo-icon" src="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3" alt="Vendoscity" width="44" height="44" loading="eager" decoding="async">
+        <span class="logo-wordmark" aria-hidden="true">Vendoscity</span>
+      </a>
+
+      <!-- Right-side controls: PWA install icon + hamburger + nav links -->
+      <div class="header-right" aria-label="Actions">
+        <!-- PWA install icon: visible when relevant (Android prompt available, or iOS guidance) -->
+        <button type="button" id="pwa-install-btn" class="nav-install-btn pwa-install-btn" aria-label="Installer l'application" title="Installer l'application" hidden>
+          <i data-lucide="download"></i>
+        </button>
+
+      <!-- 
+        BOUTON HAMBURGER - Menu mobile
+        aria-expanded : Indique si le menu est ouvert (false = fermé)
+        aria-controls : Lie ce bouton au menu (#nav-bar)
+        aria-label : Description pour les lecteurs d'écran
+        Ce bouton est visible seulement en mobile (voir CSS @media)
+      -->
+      <button 
+        class="hamburger" 
+        id="hamburger" 
+        aria-expanded="false" 
+        aria-controls="nav-bar"
+        aria-label="Afficher navigation">
+        <!-- 3 barres pour l'icône hamburger -->
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- 
+        MENU NAVIGATION - Liens principaux
+        id="nav-bar" : Identifiant unique pour JavaScript et accessibility
+        Cette liste se convertit en menu vertical sur mobile
+      -->
+      <ul class="nav-bar" id="nav-bar">
+        <li><a href="/">Accueil</a></li>
+        <li><a href="/pages/Boutique.html">Boutique</a></li>
+        <li><a href="/pages/Services.html">Services</a></li>
+        <li><a href="/pages/Contacts.html">Contacts</a></li>
+        <li><a href="/pages/Apropos.html">A propos</a></li>
+        <li class="nav-auth"><a href="/pages/Connexion.html" class="nav-cta"><i data-lucide="log-in"></i> Entrer</a></li>
+      </ul>
+      </div>
+    </nav>
+
+    <!-- Optional page-specific tools (e.g. Boutique filters). Populated by component-loader.js -->
+    <div id="header-tools-slot" class="header-tools" role="region" aria-label="Outils de page"></div>
+  </header>
+
+

@@ -1,0 +1,160 @@
+﻿<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Connexion - Vendoscity</title>
+  <meta name="description" content="Connectez-vous pour publier vos articles sur Vendoscity.">
+  <link rel="canonical" href="https://vendoscity.com/pages/Connexion">
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .auth-wrap {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .auth-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.08);
+    }
+    .auth-card h1 {
+      color: var(--primary-blue);
+      font-size: 1.6rem;
+      margin: 0 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .auth-sub {
+      color: #666;
+      margin-bottom: 14px;
+    }
+    .auth-form {
+      display: grid;
+      gap: 12px;
+    }
+    .auth-form label {
+      font-weight: 700;
+      color: var(--primary-blue);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .auth-form input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font: inherit;
+      outline: none;
+    }
+    .auth-form input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(18,18,147,0.12);
+    }
+    .auth-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--color-yellow);
+      color: var(--primary-blue);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.12);
+    }
+    .auth-side {
+      background: linear-gradient(135deg, rgba(18,18,147,0.08), rgba(255,204,0,0.10));
+      border: 1px solid rgba(18,18,147,0.16);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .auth-side h2 {
+      margin: 0 0 8px 0;
+      color: var(--primary-blue);
+      font-size: 1.1rem;
+    }
+    .auth-side p {
+      margin: 0;
+      color: #444;
+    }
+    .auth-link {
+      color: var(--primary-blue);
+      font-weight: 900;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(18,18,147,0.35);
+    }
+    .auth-link:hover { border-bottom-color: rgba(18,18,147,0.9); }
+    @media (max-width: 860px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main id="main-content" role="main">
+    <div class="auth-wrap">
+      <section class="auth-card">
+        <h1><i data-lucide="log-in"></i> Connexion vendeur</h1>
+        <p class="auth-sub">Accédez à votre espace vendeur pour publier et gérer vos articles.</p>
+
+        <form id="seller-login-form" class="auth-form">
+          <div>
+            <label for="login-email">Email</label>
+            <input type="email" id="login-email" required autocomplete="email">
+          </div>
+          <div>
+            <label for="login-password">Mot de passe</label>
+            <input type="password" id="login-password" minlength="6" required autocomplete="current-password">
+          </div>
+          <button class="auth-btn" type="submit"><i data-lucide="log-in"></i> Entrer</button>
+        </form>
+
+        <p style="margin-top: 14px; color:#666;">
+          Pas encore de compte ? <a class="auth-link" href="/pages/Inscription.html">Créer un compte vendeur</a>
+        </p>
+      </section>
+
+      <aside class="auth-side" aria-label="Infos">
+        <h2>Comment ça marche</h2>
+        <p>Vendoscity met en relation directe vendeur et acheteur. Le paiement ne se fait pas sur la plateforme: on commande et on discute via WhatsApp.</p>
+      </aside>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+  <script src="/script/seller.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+

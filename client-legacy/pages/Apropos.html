@@ -1,0 +1,491 @@
+﻿<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>À Propos - Vendoscity</title>
+  <meta name="description" content="Découvrez Vendoscity: marketplace de mise en relation directe entre acheteurs et vendeurs, basée a Yaounde.">
+  <meta name="keywords" content="vendoscity, qui sommes nous, mission, valeurs, histoire">
+  <link rel="canonical" href="https://vendoscity.com/pages/Apropos">
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .about-hero {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2));
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+    .about-hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+    .about-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      margin-bottom: 50px;
+    }
+    .about-section {
+      margin: 50px 0;
+      line-height: 1.8;
+    }
+    .about-section h2 {
+      color: var(--primary-blue);
+      font-size: 2rem;
+      margin-bottom: 20px;
+      border-bottom: 3px solid var(--color-yellow);
+      padding-bottom: 15px;
+    }
+    .about-section h3 {
+      color: #333;
+      font-size: 1.3rem;
+      margin-top: 20px;
+      margin-bottom: 15px;
+    }
+    .about-section p {
+      color: #666;
+      margin-bottom: 15px;
+      text-align: justify;
+    }
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      margin: 30px 0;
+    }
+    .value-card {
+      background: #f9f9f9;
+      padding: 25px;
+      border-left: 5px solid var(--primary-blue);
+      border-radius: 5px;
+      text-align: center;
+    }
+    .value-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+    .value-card h4 {
+      color: var(--primary-blue);
+      margin-bottom: 10px;
+    }
+    .value-card p {
+      text-align: center;
+      margin: 0;
+    }
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 30px;
+      margin: 30px 0;
+    }
+    .team-member {
+      background: white;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .team-member:hover {
+      transform: translateY(-5px);
+      border-color: var(--primary-blue);
+    }
+    .member-avatar {
+      width: 100%;
+      height: 250px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      color: white;
+    }
+    .member-info {
+      padding: 20px;
+    }
+    .member-info h4 {
+      color: var(--primary-blue);
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+    }
+    .member-info .role {
+      color: var(--color-yellow);
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .member-info p {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 0;
+    }
+    .timeline {
+      margin: 40px 0;
+      position: relative;
+      padding: 20px 0;
+    }
+    .timeline-item {
+      margin-bottom: 30px;
+      padding-left: 40px;
+      position: relative;
+    }
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 20px;
+      height: 20px;
+      background: var(--primary-blue);
+      border-radius: 50%;
+    }
+    .timeline-item::after {
+      content: '';
+      position: absolute;
+      left: 9px;
+      top: 20px;
+      width: 2px;
+      height: 30px;
+      background: var(--color-yellow);
+    }
+    .timeline-item:last-child::after {
+      display: none;
+    }
+    .timeline-year {
+      font-weight: 700;
+      color: var(--primary-blue);
+      font-size: 1.1rem;
+    }
+    .timeline-text {
+      color: #666;
+      margin-top: 5px;
+    }
+    
+    /* ========== SVG ICONS STYLING ========== */
+    
+    /* Section Icons (titres) */
+    .section-icon {
+      width: 35px;
+      height: 35px;
+      display: inline-block;
+      margin-right: 12px;
+      margin-bottom: -5px;
+      color: var(--primary-blue);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: color 0.3s ease;
+    }
+    
+    .about-section h2 {
+      display: flex;
+      align-items: center;
+    }
+    
+    .about-section h2:hover .section-icon {
+      color: var(--color-yellow);
+    }
+    
+    /* Value Card Icons */
+    .value-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 60px;
+      width: 100%;
+    }
+    
+    .value-card .icon svg {
+      width: 50px;
+      height: 50px;
+      color: var(--primary-blue);
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      transition: transform 0.3s ease, color 0.3s ease;
+    }
+    
+    .value-card:hover .icon svg {
+      transform: scale(1.15) rotate(-5deg);
+      color: var(--color-yellow);
+    }
+    
+    @media (max-width: 768px) {
+      .about-hero h1 {
+        font-size: 1.8rem;
+      }
+      
+      .section-icon {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main id="main-content" role="main">
+    <div class="about-hero">
+      <h1>À Propos de Vendoscity</h1>
+      <p>Mise en relation directe acheteur-vendeur, basée a Yaounde</p>
+    </div>
+
+    <div class="about-container">
+      <!-- Notre Histoire -->
+      <section class="about-section">
+        <h2>
+          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+            <line x1="10" y1="7" x2="14" y2="7"></line>
+            <line x1="10" y1="11" x2="14" y2="11"></line>
+          </svg>
+          Notre Histoire
+        </h2>
+        <p>Vendoscity a été fondée le <strong>10 janvier 2026</strong> à Yaoundé, au Cameroun, avec une mission simple: <strong>mettre en relation directe vendeurs et acheteurs</strong> pour discuter et conclure une vente.</p>
+        
+        <p>Notre approche est volontairement pragmatique: la plateforme facilite la decouverte des produits et la mise en relation, mais <strong>n'intervient pas dans le processus</strong> (paiement, remise) sauf si le vendeur souhaite une aide specifique, par exemple pour la livraison.</p>
+
+        <p>Notre succès est fondé sur trois piliers fondamentaux: <strong>innovation technologique</strong>, <strong>accessibilité universelle</strong>, et <strong>confiance inébranlable</strong>. Nous écoutons attentivement nos utilisateurs et nous adaptons continuellement pour mieux les servir et dépasser leurs attentes.</p>
+      </section>
+
+      <!-- Notre Mission -->
+      <section class="about-section">
+        <h2>
+          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <circle cx="12" cy="12" r="6"></circle>
+            <circle cx="12" cy="12" r="2"></circle>
+          </svg>
+          Notre Mission
+        </h2>
+        <p>Démocratiser le commerce électronique en Afrique en fournissant une plateforme sécure, abordable et innovative où commercants et consommateurs peuvent se rencontrer et prospérer ensemble.</p>
+
+        <p>Nous nous efforçons de:</p>
+        <ul style="list-style: none; padding: 0;">
+          <li><i class="inline-icon" data-lucide="check-circle"></i> Simplifier le processus d'achat et de vente</li>
+          <li><i class="inline-icon" data-lucide="check-circle"></i> Assurer la confiance et la sécurité des transactions</li>
+          <li><i class="inline-icon" data-lucide="check-circle"></i> Offrir des prix compétitifs et accessibles</li>
+          <li><i class="inline-icon" data-lucide="check-circle"></i> Soutenir les petits entrepreneurs</li>
+          <li><i class="inline-icon" data-lucide="check-circle"></i> Utiliser la technologie pour créer l'impact social</li>
+        </ul>
+      </section>
+
+      <!-- Nos Valeurs -->
+      <section class="about-section">
+        <h2>
+          <svg class="section-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          Nos Valeurs
+        </h2>
+        
+        <div class="values-grid">
+          <div class="value-card">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h4>Confiance</h4>
+            <p>Nous plaçons la confiance au coeur de nos relations avec nos utilisateurs.</p>
+          </div>
+
+          <div class="value-card">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+              </svg>
+            </div>
+            <h4>Innovation</h4>
+            <p>Nous innovons constamment pour offrir les meilleures expériences possibles.</p>
+          </div>
+
+          <div class="value-card">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="2" y1="12" x2="22" y2="12"></line>
+                <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+              </svg>
+            </div>
+            <h4>Accessibilité</h4>
+            <p>Nous croyons que le e-commerce doit être accessible à tous.</p>
+          </div>
+
+          <div class="value-card">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 2L11 13M22 2l-7 20-5-9-9-5 20-7z"></path>
+              </svg>
+            </div>
+            <h4>Excellence</h4>
+            <p>Nous nous efforçons d'excellence dans tout ce que nous faisons.</p>
+          </div>
+
+          <div class="value-card">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 21c-4.5 0-8-3.5-8-8 0-4 3-7 8-9 5 2 8 5 8 9 0 4.5-3.5 8-8 8z"></path>
+                <path d="M12 5v16"></path>
+              </svg>
+            </div>
+            <h4>Durabilité</h4>
+            <p>Nous nous engageons envers une croissance durable et responsable.</p>
+          </div>
+
+          <div class="value-card">
+            <div class="icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+              </svg>
+            </div>
+            <h4>Communauté</h4>
+            <p>Nous construisons une communauté forte d'entrepreneurs et de clients.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Chronologie -->
+      <section class="about-section">
+        <h2>
+          <svg class="section-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+          </svg>
+          Notre Parcours
+        </h2>
+        
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="timeline-year">2026 - 10 janvier</div>
+            <div class="timeline-text"><strong>Fondation officielle de Vendoscity à Yaoundé</strong>, Cameroun - Début de la révolution du e-commerce africain</div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-year">2026 - Février</div>
+            <div class="timeline-text">Lancement beta de la plateforme avec plus de 500 articles</div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-year">2026 - Mars</div>
+            <div class="timeline-text">Lancement public et premiers vendeurs actifs</div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-year">2026 - Avril</div>
+            <div class="timeline-text">Mise en relation WhatsApp-first: discussion directe vendeur-acheteur</div>
+          </div>
+
+          <div class="timeline-item">
+            <div class="timeline-year">2026 - Présent</div>
+            <div class="timeline-text">Ameliorations produit et partenariats locaux selon les besoins des vendeurs</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2><i data-lucide="user" class="section-icon"></i> Le Fondateur</h2>
+        <p>Vendoscity est un projet fonde a Yaounde, construit avec une vision claire: simplifier la mise en relation entre vendeurs et acheteurs.</p>
+
+        <div class="team-grid">
+          <div class="team-member">
+            <div class="member-avatar"><i data-lucide="user"></i></div>
+            <div class="member-info">
+              <h4>Arthur Ngalamo</h4>
+              <div class="role">Fondateur</div>
+              <p>
+                Email: <a href="mailto:arthurngalamo7@gmail.com">arthurngalamo7@gmail.com</a><br>
+                Telephone: <a href="tel:+237681570075">+237 681 570 075</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+<section class="about-section" style="background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2)); color: white; padding: 40px 20px; border-radius: 10px; margin: 50px 0;">
+        <h2 style="color: white; border-bottom-color: var(--color-yellow);"><i data-lucide="bar-chart-2" class="section-icon"></i> Nos Chiffres Clés</h2>
+        
+        <div class="values-grid">
+          <div class="value-card" style="background: rgba(255,255,255,0.1); border-left-color: var(--color-yellow); color: white;">
+            <div style="font-size: 2rem; font-weight: 700; margin-bottom: 10px;">2026</div>
+            <p style="color: white;">Annee de lancement</p>
+          </div>
+
+          <div class="value-card" style="background: rgba(255,255,255,0.1); border-left-color: var(--color-yellow); color: white;">
+            <div style="font-size: 2rem; font-weight: 700; margin-bottom: 10px;">Yaounde</div>
+            <p style="color: white;">Siege</p>
+          </div>
+
+          <div class="value-card" style="background: rgba(255,255,255,0.1); border-left-color: var(--color-yellow); color: white;">
+            <div style="font-size: 2rem; font-weight: 700; margin-bottom: 10px;">0%</div>
+            <p style="color: white;">Commissions cachees</p>
+          </div>
+
+          <div class="value-card" style="background: rgba(255,255,255,0.1); border-left-color: var(--color-yellow); color: white;">
+            <div style="font-size: 2rem; font-weight: 700; margin-bottom: 10px;">Direct</div>
+            <p style="color: white;">Mise en relation</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="about-section">
+        <h2><i data-lucide="leaf" class="section-icon"></i> Notre Engagement Social</h2>
+        <p>Vendoscity croit en la responsabilité sociale. Nous nous engageons à:</p>
+        
+        <h3><i data-lucide="check-circle"></i> Soutenir les Entrepreneurs Locaux</h3>
+        <p>Nous offrons des outils gratuits et des formations pour aider les petits commerçants à se lancer en ligne.</p>
+
+        <h3><i data-lucide="check-circle"></i> Créer des Emplois</h3>
+        <p>Contribuer a l'activite des vendeurs locaux en facilitant la vente en ligne et la mise en relation.</p>
+
+        <h3><i data-lucide="check-circle"></i> Développement Durable</h3>
+        <p>Encourager des pratiques responsables (remise en main propre quand c'est possible, emballage raisonnable, etc.).</p>
+
+        <h3><i data-lucide="check-circle"></i> Éducation Numérique</h3>
+        <p>Nous proposons des formations gratuites sur la litératie numérique et le e-commerce.</p>
+      </section>
+
+      <!-- Appel à Action -->
+      <div style="background: var(--primary-blue); color: white; padding: 40px 20px; border-radius: 10px; text-align: center; margin-top: 50px;">
+        <h2 style="color: white; border: none; margin-bottom: 20px;">Rejoignez Notre Aventure!</h2>
+        <p style="font-size: 1.1rem; margin-bottom: 25px;">Que vous soyez acheteur ou vendeur, Vendoscity vous offre une mise en relation simple et directe.</p>
+        <a href="Boutique.html" class="cta-button" style="display: inline-block;">Découvrir la Boutique</a>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+

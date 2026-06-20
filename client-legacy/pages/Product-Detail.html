@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Détail Produit - Vendoscity</title>
+  <meta name="description" content="Consultez les détails du produit, puis passez commande sur la plateforme. Paiement hors plateforme directement avec le vendeur.">
+  <link rel="canonical" href="https://vendoscity.com/pages/Product-Detail">
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <link rel="stylesheet" href="/style/boutique.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      overflow-x: hidden; /* safety: prevent any accidental horizontal overflow on mobile */
+    }
+    .product-detail-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 40px;
+    }
+    .product-images {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      min-width: 0; /* allow thumbnails row to scroll instead of expanding the grid */
+    }
+    .main-image {
+      width: 100%;
+      height: 400px;
+      background: #f0f0f0;
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 4rem;
+      max-width: 100%;
+    }
+    .thumbnail-images {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      max-width: 100%;
+      min-width: 0;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+    }
+    .thumbnail {
+      flex: 0 0 84px;
+      height: 84px;
+      background: #f0f0f0;
+      border-radius: 5px;
+      cursor: pointer;
+      border: 2px solid #ddd;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+    .thumbnail:hover, .thumbnail.active {
+      border-color: var(--primary-blue);
+    }
+    .product-info h1 {
+      font-size: 2rem;
+      color: var(--primary-blue);
+      margin-bottom: 10px;
+    }
+    .product-meta {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .rating {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .rating .stars {
+      color: #ffc107;
+    }
+
+    /* Review stars (Play Store style) */
+    .review-rating-widget {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      user-select: none;
+    }
+    .review-star-btn {
+      width: 38px;
+      height: 38px;
+      border: 1px solid #e5e7eb;
+      background: white;
+      border-radius: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    }
+    .review-star-btn:hover {
+      transform: translateY(-1px);
+      border-color: #cbd5e1;
+    }
+    .review-star-btn:focus {
+      outline: 2px solid var(--color-yellow);
+      outline-offset: 2px;
+    }
+    .review-star-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: #f4b400;
+      fill: transparent;
+    }
+    .review-star-btn.is-filled svg {
+      fill: #f4b400;
+    }
+    .review-rating-caption {
+      margin-top: 10px;
+      color: #666;
+      font-size: 0.95rem;
+    }
+
+    .btn-share-product {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid #e5e7eb;
+      background: #fff;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--primary-blue);
+      flex: 0 0 auto;
+      box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+      transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease;
+    }
+    .btn-share-product:hover {
+      transform: translateY(-1px);
+      border-color: #cbd5e1;
+    }
+    .btn-share-product svg {
+      width: 20px;
+      height: 20px;
+    }
+
+    /* Cart FAB on product detail: keep it visible on desktop + mobile */
+    .cart-fab {
+      display: flex;
+    }
+    .price-section {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .price-current {
+      font-size: 1.25rem;
+      color: var(--color-red);
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+    .price-original {
+      text-decoration: line-through 3.5px #1a1a1a;
+      color: #777;
+      font-size: 1.8rem;
+      font-weight: 700;
+    }
+    .quantity-selector {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 20px 0;
+    }
+    .qty-input {
+      width: 60px;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      text-align: center;
+    }
+    .btn-add-cart {
+      background: var(--primary-blue);
+      color: white;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      transition: background 0.3s ease;
+    }
+    .btn-add-cart:hover {
+      background: var(--primary-blue-2);
+    }
+    .seller-info {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .seller-name {
+      font-weight: 600;
+      color: var(--primary-blue);
+      margin-bottom: 8px;
+    }
+    .reviews-section {
+      margin-top: 40px;
+      padding-top: 40px;
+      border-top: 2px solid #eee;
+    }
+    .review-item {
+      background: #f9f9f9;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    @media (max-width: 768px) {
+      .product-detail-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      .main-image {
+        height: min(56vh, 420px);
+      }
+      /* Avoid content being hidden behind the sticky WhatsApp CTA */
+      body {
+        padding-bottom: 88px;
+      }
+    }
+  </style>
+</head>
+<body class="vc-page-product">
+  <div id="header-placeholder"></div>
+
+  <main id="main-content" role="main">
+    <div class="product-detail-container">
+      <!-- Galerie Images -->
+      <div class="product-images">
+        <div class="main-image" id="product-main-image"><i data-lucide="smartphone" width="48" height="48"></i></div>
+        <div class="thumbnail-images">
+          <div class="thumbnail active"><i data-lucide="smartphone"></i></div>
+          <div class="thumbnail"><i data-lucide="image"></i></div>
+          <div class="thumbnail"><i data-lucide="image"></i></div>
+          <div class="thumbnail"><i data-lucide="image"></i></div>
+        </div>
+      </div>
+
+      <!-- Informations Produit -->
+      <div class="product-info">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px;">
+          <h1 id="product-title" style="margin:0;">Chargement...</h1>
+          <button id="btn-share-product" type="button" class="btn-share-product" aria-label="Partager cet article" title="Partager">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M22 2L11 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+              <path d="M22 2l-7 20-4-9-9-4 20-7z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+            </svg>
+          </button>
+        </div>
+        
+        <div class="product-meta">
+          <div class="rating">
+            <span class="stars" id="product-stars"></span>
+            <span id="product-reviews-count">(0 avis)</span>
+          </div>
+          <span id="product-stock-status"><i data-lucide="zap"></i> En stock</span>
+          <span id="product-location"><i data-lucide="map-pin"></i> Cameroun</span>
+        </div>
+
+        <p id="product-description" style="color: #666; line-height: 1.6;">Chargement du descriptif...</p>
+
+        <div class="price-section">
+          <div class="price-current" id="product-price">... FCFA</div>
+          <div class="price-original" id="product-old-price"></div>
+          <span id="product-discount-badge" style="color: var(--color-green); font-weight: 600; display: none;"></span>
+        </div>
+
+        <div class="quantity-selector">
+          <label>Quantité:</label>
+          <button type="button" data-action="qty-decrease" aria-label="Diminuer la quantite">-</button>
+          <input type="number" id="quantity" class="qty-input" value="1" min="1" max="10">
+          <button type="button" data-action="qty-increase" aria-label="Augmenter la quantite">+</button>
+        </div>
+
+        <a id="btn-whatsapp" class="btn-whatsapp" href="#" rel="noopener" aria-label="Contacter le vendeur sur WhatsApp">
+          <i data-lucide="message-circle"></i> Contacter sur WhatsApp
+        </a>
+
+        <button class="btn-add-cart" type="button" data-action="add-to-cart"><i data-lucide="shopping-cart"></i> Ajouter au panier</button>
+
+        <div class="seller-info">
+          <div class="seller-name" id="product-seller-name"><i data-lucide="package"></i> Vendeur: Chargement...</div>
+          <p id="product-seller-bio" style="font-size: 0.9rem; color: #666; margin: 5px 0;"></p>
+          <p style="font-size: 0.9rem; color: #555; margin: 0;"><i data-lucide="info"></i> Vendoscity met en relation directe. Verifiez le produit et les conditions avec le vendeur.</p>
+        </div>
+
+        <div style="background: var(--color-yellow); padding: 15px; border-radius: 8px; margin: 20px 0; color: var(--primary-blue); font-weight: 600;">
+          <i data-lucide="truck"></i> Livraison: a discuter avec le vendeur. Si le vendeur le souhaite, Vendoscity peut aider a organiser une livraison (prix discutable).
+        </div>
+      </div>
+    </div>
+
+    <!-- Détails & Avis -->
+    <div style="max-width: 1200px; margin: 40px auto; padding: 0 20px;">
+      <!-- Spécifications -->
+      <section style="background: #f9f9f9; padding: 30px; border-radius: 8px; margin-bottom: 30px;">
+        <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Spécifications</h2>
+        <div id="product-specs" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+          <p style="color:#999; margin:0;">Chargement des spécificités...</p>
+        </div>
+      </section>
+
+      <!-- Avis Clients -->
+      <section class="reviews-section">
+        <h2 style="color: var(--primary-blue); margin-bottom: 20px;">Avis Clients (<span id="reviews-header-count">0</span>)</h2>
+        
+        <!-- Formulaire Ajouter Avis -->
+        <div id="add-review-section" style="background: #fff; padding: 20px; border: 1px solid #eee; border-radius: 8px; margin-bottom: 30px; display: none;">
+          <h3 style="margin-top: 0; font-size: 1.1rem; margin-bottom: 15px;">Laisser un avis</h3>
+          <form id="review-form">
+            <div style="margin-bottom: 15px;">
+              <label>Note:</label>
+              <div class="review-rating-widget" id="review-rating-widget" role="radiogroup" aria-label="Note (1 à 5)">
+                <button class="review-star-btn" type="button" data-value="1" role="radio" aria-checked="false" aria-label="1 sur 5">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6L22 9.2l-5 4.6 1.4 7-6.4-3.8-6.4 3.8 1.4-7-5-4.6 7.1-.6L12 2z"/></svg>
+                </button>
+                <button class="review-star-btn" type="button" data-value="2" role="radio" aria-checked="false" aria-label="2 sur 5">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6L22 9.2l-5 4.6 1.4 7-6.4-3.8-6.4 3.8 1.4-7-5-4.6 7.1-.6L12 2z"/></svg>
+                </button>
+                <button class="review-star-btn" type="button" data-value="3" role="radio" aria-checked="false" aria-label="3 sur 5">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6L22 9.2l-5 4.6 1.4 7-6.4-3.8-6.4 3.8 1.4-7-5-4.6 7.1-.6L12 2z"/></svg>
+                </button>
+                <button class="review-star-btn" type="button" data-value="4" role="radio" aria-checked="false" aria-label="4 sur 5">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6L22 9.2l-5 4.6 1.4 7-6.4-3.8-6.4 3.8 1.4-7-5-4.6 7.1-.6L12 2z"/></svg>
+                </button>
+                <button class="review-star-btn" type="button" data-value="5" role="radio" aria-checked="true" aria-label="5 sur 5">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.6L22 9.2l-5 4.6 1.4 7-6.4-3.8-6.4 3.8 1.4-7-5-4.6 7.1-.6L12 2z"/></svg>
+                </button>
+              </div>
+              <input type="hidden" id="review-rating" value="5" required>
+              <div class="review-rating-caption" id="review-rating-caption">Excellent (5/5)</div>
+            </div>
+            <div style="margin-bottom: 15px;">
+              <textarea id="review-comment" placeholder="Votre commentaire..." rows="3" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-family: inherit;"></textarea>
+            </div>
+            <button type="submit" class="btn-primary" style="width: auto; padding: 10px 20px;">Envoyer mon avis</button>
+          </form>
+        </div>
+
+        <div id="login-to-review" style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+          <p style="margin: 0; color: #666;">Vous devez être <a href="/pages/Connexion.html" style="color: var(--primary-blue); font-weight: 600;">connecté</a> pour laisser un avis.</p>
+        </div>
+
+        <div id="reviews-container">
+          <p style="color: #999;">Chargement des avis...</p>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- FAB: accès rapide au panier depuis la fiche produit -->
+  <button id="cart-fab" class="cart-fab" type="button" aria-label="Ouvrir le panier" title="Ouvrir le panier">
+    <i data-lucide="shopping-cart"></i>
+    <span id="cart-fab-count" class="cart-fab-count">0</span>
+  </button>
+
+  <!-- Mobile-first sticky CTA (WhatsApp) -->
+  <div id="vc-sticky-cta" class="vc-sticky-cta" hidden>
+    <div class="vc-sticky-cta-inner">
+      <div class="vc-sticky-cta-price">
+        <div class="vc-sticky-cta-price-label">Prix</div>
+        <div class="vc-sticky-cta-price-value" id="vc-sticky-price">...</div>
+      </div>
+      <a id="vc-sticky-wa" class="vc-btn-wa" href="#" rel="noopener" aria-label="Contacter sur WhatsApp (barre fixe)">
+        WhatsApp
+      </a>
+    </div>
+  </div>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+  <script src="/script/product-detail.js"></script>
+</body>
+</html>

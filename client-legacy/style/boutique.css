@@ -1,0 +1,2119 @@
+/**
+ * ============================================================
+ * STYLESHEET BOTTIQUE - Marketplace Vendoscity
+ * ============================================================
+ * 
+ * STRUCTURE:
+ *   1. Variables & Reset (hérité du style.css)
+ *   2. En-tête de la boutique
+ *   3. Barre de recherche & filtres
+ *   4. Grille de produits
+ *   5. Cartes produits
+ *   6. Panier (sidebar)
+ *   7. Responsive mobile
+ * 
+ * PHILOSOPHIE:
+ *   - Mobile-first (styles pour mobile d'abord)
+ *   - Accessible (ARIA, focus states)
+ *   - Performant (CSS Grid, Flexbox)
+ *   - SEO-friendly (sémantique HTML)
+ * ============================================================
+ */
+
+/**
+ * CLASSE UTILITAIRE - Screen Readers Only
+ * ➜ POURQUOI: Masquer l'élément visuellement mais le garder pour accessibilité
+ * ➜ USAGE: <h2 class="sr-only">Titre invisible mais pour lecteurs d'écran</h2>
+ */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+/* ============================================================
+ * PAGE ATMOSPHERE (Temu-like density, but clean)
+ * ============================================================ */
+body.vc-page-boutique,
+body.vc-page-product,
+body.vc-page-seller {
+    background:
+        radial-gradient(1100px 700px at 10% -10%, rgba(var(--brand-highlight-rgb), 0.18), rgba(255,255,255,0) 60%),
+        radial-gradient(900px 600px at 110% 0%, rgba(var(--brand-accent-rgb), 0.14), rgba(255,255,255,0) 55%),
+        linear-gradient(180deg, #ffffff 0%, #fafafa 65%, #ffffff 100%);
+}
+
+/* ============================================================
+ * Boutique Meta: Trust Strip + Filter Chips
+ * ============================================================ */
+.vc-market-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 6px 0 14px 0;
+}
+
+.vc-trust-strip {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.vc-trust-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.95);
+    border: 1px solid rgba(15, 23, 42, 0.10);
+    color: rgba(15, 23, 42, 0.86);
+    font-weight: 850;
+    font-size: 12px;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+}
+
+.vc-trust-badge svg {
+    width: 16px;
+    height: 16px;
+}
+
+.vc-filter-chips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.vc-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.14);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
+    color: #0f172a;
+    font-weight: 900;
+    font-size: 13px;
+    cursor: pointer;
+    box-shadow: 0 12px 26px rgba(0,0,0,0.06);
+    transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.vc-chip:hover {
+    transform: translateY(-1px);
+    border-color: rgba(15, 23, 42, 0.22);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.09);
+}
+
+.vc-chip:active {
+    transform: translateY(0);
+}
+
+.vc-chip:focus-visible {
+    outline: 2px solid var(--color-yellow);
+    outline-offset: 2px;
+}
+
+.vc-chip .vc-chip-x {
+    width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.08);
+    color: rgba(15, 23, 42, 0.92);
+    font-weight: 1000;
+    line-height: 1;
+}
+
+.vc-chip.is-reset {
+    border-color: rgba(var(--brand-accent-rgb), 0.28);
+    background: rgba(var(--brand-accent-rgb), 0.10);
+    color: rgba(var(--brand-accent-rgb), 0.95);
+}
+
+/* ============================================================
+ * Mobile Filter Drawer (Temu-like)
+ * ============================================================ */
+.vc-only-mobile {
+    display: inline-flex;
+}
+
+@media (min-width: 900px) {
+    .vc-only-mobile {
+        display: none !important;
+    }
+}
+
+.vc-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(2, 6, 23, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 180ms ease;
+    z-index: 265;
+}
+
+.vc-drawer-backdrop.is-open {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.vc-filter-drawer {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 266;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(16px);
+    border-top-left-radius: 18px;
+    border-top-right-radius: 18px;
+    border-top: 1px solid rgba(15, 23, 42, 0.12);
+    box-shadow: 0 -18px 44px rgba(0,0,0,0.22);
+    max-height: min(82vh, 720px);
+    display: flex;
+    flex-direction: column;
+}
+
+.vc-filter-drawer[hidden] {
+    display: none;
+}
+
+.vc-drawer-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 14px 14px 10px 14px;
+}
+
+.vc-drawer-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 1000;
+    color: #0f172a;
+}
+
+.vc-drawer-title svg {
+    width: 18px;
+    height: 18px;
+}
+
+.vc-drawer-close {
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.12);
+    background: rgba(255,255,255,0.92);
+    color: #0f172a;
+    font-size: 22px;
+    line-height: 1;
+    font-weight: 900;
+    cursor: pointer;
+}
+
+.vc-drawer-body {
+    padding: 6px 14px 10px 14px;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.vc-drawer-section {
+    padding: 12px 0;
+    border-top: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.vc-drawer-section:first-child {
+    border-top: none;
+}
+
+.vc-drawer-h {
+    font-size: 13px;
+    letter-spacing: 0.2px;
+    text-transform: uppercase;
+    color: rgba(15, 23, 42, 0.62);
+    margin: 0 0 10px 0;
+    font-weight: 950;
+}
+
+.vc-drawer-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.vc-drawer-opt {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(15, 23, 42, 0.14);
+    background: rgba(255,255,255,0.92);
+    color: #0f172a;
+    font-weight: 950;
+    font-size: 13px;
+    cursor: pointer;
+    transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.vc-drawer-opt.is-selected {
+    border-color: rgba(var(--brand-accent-rgb), 0.30);
+    background: rgba(var(--brand-accent-rgb), 0.10);
+    color: rgba(var(--brand-accent-rgb), 0.98);
+}
+
+.vc-drawer-footer {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px)) 14px;
+    border-top: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.vc-drawer-btn {
+    flex: 1 1 auto;
+    border-radius: 14px;
+    padding: 12px 14px;
+    font-weight: 1000;
+    cursor: pointer;
+    border: 1px solid rgba(15, 23, 42, 0.14);
+}
+
+.vc-drawer-btn-primary {
+    background: var(--brand-warm-tint);
+    color: #0f172a;
+    border-color: var(--brand-warm-border);
+}
+
+.vc-drawer-btn-secondary {
+    background: rgba(255,255,255,0.92);
+    color: rgba(15, 23, 42, 0.92);
+}
+
+/**
+ * ============================================================
+ * SECTION: EN-TÊTE DE LA BOUTIQUE
+ * ============================================================
+ * 
+ * ➜ Banner d'introduction
+ * ➜ Responsive: pleine hauteur sur mobile
+ */
+.boutique-header {
+    background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2));
+    color: var(--color-white);
+    padding: 60px 20px;
+    text-align: center;
+    min-height: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.boutique-header-content {
+    max-width: 600px;
+}
+
+.boutique-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    font-weight: 700;
+}
+
+.boutique-subtitle {
+    font-size: 1.1rem;
+    margin-bottom: 30px;
+    opacity: 0.95;
+    line-height: 1.6;
+}
+
+/**
+ * BOUTON PRIMAIRE - Style réutilisable
+ * ➜ Cohérent avec le design global
+ */
+.btn-primary {
+    background-color: var(--brand-warm-tint);
+    color: var(--primary-blue);
+    border: 1px solid var(--brand-warm-border);
+    padding: 12px 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--brand-warm-tint-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary:focus {
+    outline: 2px solid var(--color-white);
+    outline-offset: 3px;
+}
+
+/**
+ * ============================================================
+ * SECTION: FILTRES & RECHERCHE
+ * ============================================================
+ * 
+ * ➜ Barre sticky en haut (position: sticky)
+ * ➜ Responsive: horizontal sur desktop, vertical sur mobile
+ */
+.boutique-controls {
+    background: linear-gradient(135deg, #ffffff, #f9f9f9);
+    padding: 20px;
+    border-bottom: 3px solid var(--primary-blue);
+    border-top: 2px solid #ddd;       /* Délimite le dessus */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* ➜ REMOVED: position: sticky (scroll naturellement avec la page) */
+}
+
+.filters-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+/**
+ * RECHERCHE - Barre de recherche
+ */
+.search-box {
+    display: flex;
+    background: rgba(255,255,255,0.96);
+    border: 1px solid rgba(15,23,42,0.14);
+    border-radius: 999px;
+    overflow: hidden;
+    position: relative; /* for animated search hint */
+    flex: 1 1 auto;
+    min-width: 0;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+    backdrop-filter: blur(10px);
+    transition: box-shadow var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.search-box:focus-within {
+    border-color: rgba(var(--brand-highlight-rgb), 0.80);
+    box-shadow: 0 16px 34px rgba(0,0,0,0.12);
+}
+
+.search-input {
+    flex: 1;
+    border: none;
+    padding: 10px 14px;
+    font-size: 1rem;
+    outline: none;
+    min-width: 0; /* allow the input to shrink in flex/grid without clipping */
+}
+
+.search-input::placeholder {
+    color: #999;
+}
+
+.btn-search {
+    background: linear-gradient(135deg, var(--color-yellow), var(--color-yellow-2));
+    color: #0f172a;
+    border: none;
+    width: 46px;
+    min-width: 46px;
+    padding: 0;
+    cursor: pointer;
+    font-size: 0;
+    transition: background-color var(--transition-speed) ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-search:hover {
+    filter: brightness(0.98);
+}
+
+/**
+ * FILTRES - Sélecteurs
+ */
+.category-filter,
+.sort-filter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-label {
+    font-weight: 600;
+    color: var(--primary-blue);
+    white-space: nowrap;
+}
+
+.category-select,
+.sort-select {
+    padding: 8px 12px;
+    border: 2px solid var(--primary-blue);
+    border-radius: 4px;
+    background: white;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+/**
+ * PANIER MOBILE - Bouton du panier sur mobile
+ */
+.btn-cart-mobile {
+    display: none;                     /* Deprecated: replaced by floating FAB everywhere */
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+    position: relative;
+    white-space: nowrap;
+    font-size: 0.95rem;
+    transition: all var(--transition-speed) ease;
+}
+
+.btn-cart-mobile:hover {
+    background-color: var(--primary-blue-2);
+    transform: translateY(-2px);
+}
+
+.btn-cart-mobile:active {
+    transform: translateY(0);
+}
+
+/**
+ * BADGE DU NOMBRE D'ARTICLES (FAB)
+ * ➜ Affiche l'emoji panier + nombre comme notification
+ */
+.cart-badge {
+    font-size: 2.2rem;
+    font-weight: 700;
+    color: var(--color-yellow);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    line-height: 1;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+}
+
+.cart-badge:hover {
+    transform: scale(1.15);
+}
+
+/* Ajoute l'emoji du panier AVANT le nombre */
+.cart-badge::before {
+    /* Panier icon handled by Lucide in HTML */
+    font-size: 1.8rem;
+}
+
+/* Cacher le badge quand le panier est ouvert en modal */
+.cart-sidebar.active .cart-badge {
+    display: none;
+}
+
+#cart-count {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--color-yellow);
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.btn-cart-mobile:hover {
+    background-color: var(--primary-blue-2);
+}
+
+/* The cart count is shown on the floating button; hide the old badge in the modal. */
+#cart-badge {
+    display: none;
+}
+
+/**
+ * ============================================================
+ * CONTENEUR PRINCIPAL - Grille + Panier
+ * ============================================================
+ * 
+ * ➜ Layout: Grid avec 2 colonnes
+ * ➜ 1ère colonne: Produits
+ * ➜ 2ème colonne: Panier (sticky)
+ */
+.boutique-container {
+    display: grid;
+    grid-template-columns: 1fr;            /* 1 colonne - produits prennent tout */
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 30px 20px;
+    align-items: start;
+}
+
+
+/**
+ * ============================================================
+ * SECTION: GRILLE DE PRODUITS
+ * ============================================================
+ * 
+ * ➜ auto-fit: Nombre de colonnes flexible
+ * ➜ minmax(280px, 1fr): Taille minimale 280px
+ */
+.products-section {
+    width: 100%;
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 14px;
+    width: 100%;                           /* Prend toute la largeur */
+}
+
+/**
+ * ÉTAT DE CHARGEMENT
+ */
+.loading {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: #999;
+    font-size: 1.1rem;
+}
+
+.spinner {
+    width: 30px;
+    height: 30px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid var(--primary-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 10px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/**
+ * ============================================================
+ * CARTES PRODUITS
+ * ============================================================
+ * 
+ * Chaque produit est une carte avec:
+ * - Image
+ * - Titre
+ * - Prix
+ * - Note
+ * - Bouton "Ajouter au panier"
+ */
+
+.product-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+}
+
+/* Avoid will-change memory warnings on mobile: only hint on devices that actually hover. */
+@media (hover: hover) and (pointer: fine) {
+    .product-card { will-change: transform; }
+}
+
+/* Hover: Monte la carte */
+.product-card:hover {
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.12);
+    transform: translateY(-3px);
+    border-color: var(--primary-blue);
+}
+
+.product-card:active {
+    /* Avoid making the whole card "press" when interacting with inner controls (share/cart). */
+    transform: none;
+}
+
+/* Focus pour accessibilité clavier */
+.product-card:focus {
+    outline: 2px solid var(--color-yellow);
+    outline-offset: 2px;
+}
+
+/**
+ * IMAGE DU PRODUIT
+ * ➜ Aspect ratio 1:1 (carré)
+ * ➜ Object-fit: cover (remplir sans déformer)
+ */
+.product-media {
+    position: relative;
+    /* Default across pages that import boutique.css: keep cards compact. */
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    padding: 8px;
+    background: #fff;
+}
+
+/* Top actions overlay (share + add-to-cart) */
+.product-media-actions {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    z-index: 6;
+    pointer-events: none; /* allow image link except on buttons */
+}
+
+.product-media-actions > * {
+    pointer-events: auto;
+}
+
+.product-link {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain; /* keep the original framing (no aggressive crop/zoom) */
+    background-color: #fff;
+    border-radius: 10px;
+}
+
+/* Add-to-cart overlay (Temu-like). Uses .btn-add-cart-mini (not global .btn-add-cart). */
+.btn-add-cart-overlay {
+    position: static;
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: rgba(18, 18, 147, 0.92);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
+    z-index: 3;
+}
+
+.btn-add-cart-overlay:hover {
+    transform: translateY(-1px);
+}
+
+.btn-add-cart-overlay svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-add-cart-mini {
+    border: none;
+    padding: 0;
+    min-width: 44px;
+    min-height: 44px;
+}
+
+/* Share button (inline, under image) */
+.btn-share-inline {
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    color: var(--primary-blue);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+    position: relative;
+    z-index: 6; /* ensure it captures the click above any overlapping layers */
+    pointer-events: auto;
+}
+
+/* Share button when used on-image */
+.btn-share-overlay {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+}
+
+.btn-share-inline:hover {
+    transform: translateY(-1px);
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+}
+
+.btn-share-inline svg {
+    width: 18px;
+    height: 18px;
+}
+
+/**
+ * SELECTEUR D'IMAGES (points)
+ * - Peut être en overlay dans l'image (dans .product-media)
+ * - Ou en dessous de l'image (dans .product-info) pour réduire l'encombrement visuel
+ */
+.product-dots {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    pointer-events: auto;
+}
+
+/* Default behavior (other pages): dots overlay the media */
+.product-media .product-dots {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    top: 62px;
+    z-index: 4; /* ensure dots sit above the link/image layer on mobile */
+}
+
+/* Boutique cards: dots can be placed under the image (less clutter) */
+.product-info .product-dots {
+    position: static;
+    margin: 6px 0 2px 0;
+}
+
+.product-dot-btn {
+    width: 16px;
+    height: 16px;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    background: rgba(255, 255, 255, 0.55);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+    cursor: pointer;
+    touch-action: manipulation;
+}
+
+/* Dots on-image: smaller + softer so they don't cover the photo too much */
+.product-media .product-dot-btn {
+    width: 12px;
+    height: 12px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+.product-dot-btn.active {
+    background: var(--color-yellow);
+}
+
+/* When dots are under the image, make them smaller + remove heavy shadow */
+.product-info .product-dot-btn {
+    width: 10px;
+    height: 10px;
+    border: 1px solid #cbd5e1;
+    background: #e2e8f0;
+    box-shadow: none;
+}
+
+.product-info .product-dot-btn.active {
+    background: var(--color-yellow);
+    border-color: rgba(0,0,0,0.06);
+}
+
+/**
+ * CONTENU DE LA CARTE
+ */
+.product-info {
+    padding: 6px 10px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.product-loc-price-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+    margin: 2px 0 4px 0;
+    min-width: 0;
+}
+
+.product-price-mini {
+    font-size: 0.98rem;
+    font-weight: 850;
+    line-height: 1.1;
+    white-space: nowrap;
+}
+
+.product-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 4px;
+    min-width: 0;
+}
+
+.product-rating-mini {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.btn-share-inline {
+    flex: 0 0 auto;
+}
+
+/**
+ * CATÉGORIE & TITRE
+ */
+.product-category {
+    font-size: 0.78rem;
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.product-title {
+    font-size: 0.95rem;
+    font-weight: 650;
+    color: #0f172a;
+    margin-bottom: 4px;
+    line-height: 1.25;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    letter-spacing: -0.01em;
+}
+
+/**
+ * VENDEUR & NOTE
+ */
+.product-subline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #666;
+    font-size: 0.82rem;
+    margin-bottom: 10px;
+    min-height: 20px;
+}
+
+/* Compact title for minimal cards */
+.product-title-compact {
+    margin: 0 0 6px 0; /* sits above the price row */
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.15;
+    -webkit-line-clamp: 1;
+}
+
+/* ============================================================
+ * BOUTIQUE PAGE: ultra-mini cards
+ * Scope to Boutique only so index/vendeur/product-detail stay stable.
+ * ============================================================ */
+.vc-page-boutique .product-media {
+    aspect-ratio: 3 / 4;
+    padding: 8px 8px 4px 8px;
+}
+
+.vc-page-boutique .product-info {
+    padding: 2px 10px 8px 10px;
+}
+
+.vc-page-boutique .product-loc-price-row {
+    margin: 1px 0 2px 0;
+}
+
+.vc-page-boutique .product-meta-row {
+    display: none;
+}
+
+.vc-page-boutique .product-title-compact {
+    margin: 0 0 4px 0;
+    font-size: 0.80rem;
+}
+
+.vc-page-boutique .btn-add-cart-overlay {
+    width: 40px;
+    height: 40px;
+}
+
+.vc-page-boutique .btn-add-cart-mini {
+    min-width: 40px;
+    min-height: 40px;
+}
+
+.vc-page-boutique .btn-share-inline {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+}
+
+.product-title a,
+.product-title-compact a {
+    color: inherit;
+    text-decoration: none;
+}
+
+.product-title a:hover,
+.product-title-compact a:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+.product-loc-mini {
+    margin: 0 0 6px 0;
+    font-size: 0.72rem;
+    font-weight: 750;
+    color: #64748b; /* slate */
+    line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-dot {
+    opacity: 0.5;
+}
+
+.product-seller-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.product-seller-inline svg {
+    width: 14px;
+    height: 14px;
+}
+
+.seller-link {
+    color: var(--primary-blue);
+    font-weight: 600;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(18, 18, 147, 0.35);
+}
+
+.seller-link:hover {
+    border-bottom-color: rgba(18, 18, 147, 0.9);
+}
+
+.seller-link:focus {
+    outline: 2px solid var(--color-yellow);
+    outline-offset: 2px;
+    border-bottom-color: transparent;
+}
+
+.stars {
+    color: #ffc107;
+}
+
+.stars .star-filled,
+.stars .star-empty {
+    width: 16px;
+    height: 16px;
+}
+
+.stars .star-filled {
+    fill: currentColor;
+}
+
+.stars .star-empty {
+    opacity: 0.35;
+}
+
+.rating-count {
+    color: #999;
+    font-size: 0.8rem;
+}
+
+/**
+ * PRIX & BOUTON
+ */
+.product-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.product-price-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+.product-price {
+    font-size: 1.12rem; /* smaller, denser like Temu */
+    font-weight: 800;
+    color: var(--color-red);
+    line-height: 1.05;
+    position: relative;
+    top: -1px;
+}
+
+.product-rating-mini {
+    font-size: 0.72rem;
+    line-height: 1.1;
+    font-weight: 900;
+    color: #111;
+    background: rgba(var(--brand-highlight-rgb), 0.18);
+    border: 1px solid rgba(0,0,0,0.06);
+    padding: 4px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.product-rating-mini .star {
+    color: #f4b400;
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+.product-rating-mini .count {
+    color: #666;
+    font-weight: 900;
+    font-size: 0.92em;
+}
+
+.btn-add-cart {
+    width: 44px;
+    height: 44px;
+    border-radius: 999px;
+    border: 1px solid #e5e7eb;
+    background: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+
+.btn-add-cart:hover {
+    transform: translateY(-1px);
+    border-color: #cbd5e1;
+    box-shadow: 0 10px 24px rgba(0,0,0,0.10);
+}
+
+.btn-add-cart svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-add-cart {
+    background-color: var(--primary-blue);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background-color var(--transition-speed) ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-width: 44px;
+    min-height: 38px;
+}
+
+.btn-add-cart svg {
+    width: 18px;
+    height: 18px;
+}
+
+.btn-add-cart:hover {
+    background-color: var(--primary-blue-2);
+}
+
+.btn-add-cart:focus {
+    outline: 2px solid var(--color-yellow);
+}
+
+/**
+ * ============================================================
+ * PANIER SIDEBAR (FAB - FLOATING ACTION BUTTON)
+ * ============================================================
+ * 
+ * ➜ Desktop: Petite icône flottante cliquable
+ * ➜ Mobile: Drawer overlay (toggle)
+ */
+.cart-sidebar {
+    display: none; /* only visible when active (opened from the floating button) */
+}
+
+/**
+ * PANIER ACTIF - Desktop (modal/modal view)
+ * ➜ Affiche le contenu du panier comme une fenêtre
+ * ➜ CRITIQUE: pointer-events: auto permet l'interaction avec le modal
+ */
+.cart-sidebar.active {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    transform: translate(-50%, -50%);
+    width: 95%;
+    max-width: 400px;
+    height: auto;
+    max-height: 80vh;
+    border-radius: 12px;
+    padding: 20px;
+    background: white;
+    border: 2px solid var(--primary-blue);
+    z-index: 999;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    overflow-y: auto;
+    flex-direction: column;
+    display: flex;
+    pointer-events: auto;
+}
+
+/* Backdrop (desktop + mobile): créé en DOM pour éviter les soucis de clics des pseudo-éléments */
+.cart-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    z-index: 998;
+}
+
+.cart-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+/* FAB (icône panier flottante) - visible sur tous les ecrans */
+.cart-fab {
+    position: fixed;
+    right: 18px;
+    bottom: 18px;
+    width: 58px;
+    height: 58px;
+    border-radius: 999px;
+    border: none;
+    background: var(--primary-blue);
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 250;
+}
+
+/* Product detail has a sticky WhatsApp CTA bar on mobile. Keep the cart FAB above it. */
+@media (max-width: 899px) {
+    body.vc-page-product .cart-fab {
+        bottom: calc(18px + 86px + env(safe-area-inset-bottom, 0px));
+    }
+}
+
+.cart-fab svg {
+    width: 22px;
+    height: 22px;
+}
+
+.cart-fab-count {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--color-yellow);
+    color: var(--primary-blue);
+    font-weight: 800;
+    font-size: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+}
+
+.cart-fab.hidden {
+    display: none !important;
+}
+
+/* ============================================================
+ * PRODUCT DETAIL - WhatsApp CTA (mobile-first)
+ * ============================================================ */
+.btn-whatsapp {
+    width: 100%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 12px;
+    text-decoration: none;
+    font-weight: 900;
+    letter-spacing: 0.2px;
+    background: #16a34a; /* WhatsApp-ish green */
+    color: #fff;
+    border: 1px solid rgba(0,0,0,0.06);
+    box-shadow: 0 12px 26px rgba(22,163,74,0.22);
+    transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, filter var(--transition-speed) ease;
+}
+
+.btn-whatsapp:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 16px 34px rgba(22,163,74,0.28);
+    filter: saturate(1.05);
+}
+
+.btn-whatsapp:active {
+    transform: translateY(0);
+}
+
+.btn-whatsapp:focus-visible {
+    outline: 2px solid var(--color-yellow);
+    outline-offset: 3px;
+}
+
+.btn-whatsapp svg {
+    width: 18px;
+    height: 18px;
+}
+
+.vc-sticky-cta {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 260;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(14px);
+    border-top: 1px solid rgba(15, 23, 42, 0.10);
+}
+
+.vc-sticky-cta-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.vc-sticky-cta-price {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.vc-sticky-cta-price-label {
+    font-size: 12px;
+    color: rgba(15, 23, 42, 0.62);
+    font-weight: 800;
+}
+
+.vc-sticky-cta-price-value {
+    font-size: 16px;
+    font-weight: 1000;
+    color: var(--color-red);
+    line-height: 1.1;
+}
+
+.vc-btn-wa {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    border-radius: 14px;
+    background: #16a34a;
+    color: #fff;
+    font-weight: 1000;
+    text-decoration: none;
+    box-shadow: 0 12px 26px rgba(22,163,74,0.22);
+    min-width: 160px;
+}
+
+@media (min-width: 900px) {
+    /* On desktop, the fixed bar is unnecessary. */
+    .vc-sticky-cta { display: none !important; }
+}
+
+/**
+ * EN-TÊTE DU PANIER
+ */
+.cart-header {
+    display: none;                     /* Caché sur desktop FAB */
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--primary-blue);
+    gap: 10px;
+}
+
+/* Affiche l'en-tête quand le panier est actif (desktop modal) */
+.cart-sidebar.active .cart-header {
+    display: flex;
+}
+
+.cart-header h2 {
+    font-size: 1.3rem;
+    color: var(--primary-blue);
+    margin: 0;
+    font-weight: 700;
+}
+
+.btn-close-cart {
+    display: none;                     /* Visible seulement en mobile */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--color-red);
+    padding: 0 5px;
+    width: auto;
+    height: auto;
+    flex-shrink: 0;
+    transition: all var(--transition-speed) ease;
+}
+
+/* Affiche le bouton close quand le panier est actif */
+.cart-sidebar.active .btn-close-cart {
+    display: block;
+}
+
+.btn-close-cart:hover {
+    color: #990000;
+    font-size: 1.7rem;
+}
+
+/**
+ * ARTICLES DU PANIER
+ */
+.cart-items {
+    display: none;                     /* Caché sur desktop FAB */
+    flex-grow: 1;
+    max-height: 300px;                 /* RÉDUIT pour éviter débordement */
+    overflow-y: auto;
+    margin-bottom: 20px;
+    border: 1px solid #eee;            /* Délimite la zone de scroll */
+    border-radius: 4px;
+    padding: 10px 0;
+}
+
+/* Affiche les articles quand le panier est actif */
+.cart-sidebar.active .cart-items {
+    display: block;
+}
+
+.cart-empty {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 0.95rem;
+}
+
+/**
+ * ITEM (article du panier)
+ */
+.cart-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.cart-item-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.cart-item-name {
+    font-weight: 600;
+    color: var(--primary-blue);
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cart-item-price {
+    color: var(--color-red);
+    font-weight: 600;
+}
+
+.cart-item-qty {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.btn-qty {
+    background: var(--primary-blue);
+    color: white;
+    border: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.9rem;
+}
+
+.btn-remove {
+    background: var(--color-red);
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 0.8rem;
+}
+
+/**
+ * PIED DU PANIER
+ */
+.cart-footer {
+    display: none;                     /* Caché sur desktop FAB */
+    border-top: 2px solid var(--primary-blue);
+    padding-top: 15px;
+}
+
+/* Affiche le footer quand le panier est actif */
+.cart-sidebar.active .cart-footer {
+    display: block;
+}
+
+.cart-total {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.1rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+.btn-checkout,
+.btn-continue-shopping {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--transition-speed) ease;
+    margin-bottom: 8px;
+}
+
+.btn-checkout {
+    background-color: var(--brand-warm-tint);
+    color: var(--primary-blue);
+    border: 1px solid var(--brand-warm-border);
+}
+
+.btn-checkout:hover {
+    background-color: var(--brand-warm-tint-hover);
+}
+
+.btn-continue-shopping {
+    background-color: var(--primary-blue);
+    color: white;
+    border: 2px solid var(--primary-blue);
+}
+
+.btn-continue-shopping:hover {
+    background-color: transparent;
+    color: var(--primary-blue);
+}
+
+/**
+ * ============================================================
+ * RESPONSIVE MOBILE - max-width: 768px
+ * ============================================================
+ * 
+ * ➜ 1 colonne au lieu de 2
+ * ➜ Panier: toggle au lieu de sidebar
+ */
+@media (max-width: 768px) {
+    /**
+     * BARRE DE FILTRES MOBILE
+     * ➜ Padding augmenté pour éviter chevauchement
+     */
+    .boutique-controls {
+        padding: 20px 15px;
+        margin-bottom: 10px;            /* Espace après la barre */
+    }
+
+    /**
+     * CONTENEUR PRINCIPAL
+     * ➜ 1 colonne (produits seulement)
+     * ➜ Panier caché (toggle)
+     */
+    .boutique-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 14px 8px;
+    }
+
+    /**
+     * GRILLE PRODUITS (2 par ligne) - mobile/tablette
+     * Objectif: cartes qui touchent presque les bords, gap très serré.
+     */
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    /**
+     * IMAGE PLUS "PROPRE" (moins de crop/zoom) pour petits écrans.
+     * On garde un léger padding pour que l'image respire dans la carte.
+     */
+	    .product-media {
+	        aspect-ratio: 1 / 1;
+	        padding: 6px;
+	        background: #fff;
+	    }
+
+    .product-media-actions {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+    }
+
+    .product-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-image {
+        object-fit: contain;
+        background: #fff;
+        border-radius: 10px;
+    }
+
+	    .product-info {
+	        padding: 6px 8px 8px 8px;
+	    }
+
+	    /* Boutique page: keep cards miniature on mobile too. */
+	    .vc-page-boutique .product-media {
+	        aspect-ratio: 3 / 4;
+	        padding: 6px 6px 3px 6px;
+	    }
+
+	    .vc-page-boutique .product-info {
+	        padding: 2px 8px 6px 8px;
+	    }
+
+    .product-title {
+        font-size: 0.86rem;
+        -webkit-line-clamp: 1;
+        margin-bottom: 3px;
+    }
+
+    .product-price {
+        font-size: 0.98rem;
+    }
+
+    /* Share button was getting clipped on dense 2-up layouts; shrink slightly on small screens. */
+    .btn-share-inline {
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+    }
+
+    .btn-share-inline svg {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Cart uses the same floating FAB + centered modal on all screen sizes. */
+
+    /**
+     * AFFICHER LE CONTENU DU PANIER EN MOBILE
+     */
+    .cart-sidebar .cart-header {
+        display: flex;
+    }
+
+    .cart-sidebar .cart-header h2 {
+        margin: 0;
+        font-size: 1.3rem;
+        flex-grow: 1;
+    }
+
+    .cart-sidebar .btn-close-cart {
+        display: block;
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--primary-blue);
+        padding: 0;
+        width: auto;
+        height: auto;
+    }
+
+    .cart-sidebar .btn-close-cart:hover {
+        color: var(--color-red);
+    }
+
+    .cart-sidebar .cart-items {
+        display: block;
+    }
+
+    .cart-sidebar .cart-footer {
+        display: block;
+    }
+
+    /**
+     * BADGE CACHÉ EN MOBILE
+     */
+    .cart-badge {
+        display: none;
+    }
+
+    .cart-backdrop {
+        z-index: 150; /* Derrière le drawer (z-index: 200) */
+        transition: opacity 0.3s ease;
+    }
+
+    /**
+     * BOUTON PANIER MOBILE - Visible en mobile
+     */
+    .btn-cart-mobile {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    /**
+     * BOUTON FERMER (X) VISIBLE EN MOBILE
+     */
+    .btn-close-cart {
+        display: block;
+    }
+
+    /**
+     * FILTRES RESPONSIVE - MOBILE
+     * ➜ TOUS LES ÉLÉMENTS EN 1 COLONNE
+     * ➜ PAS DE CHEVAUCHEMENT
+     */
+    .filters-container {
+        /* Keep filter + search on one line even on small screens. */
+        gap: 10px;
+        row-gap: 10px;
+    }
+
+    .search-box {
+        grid-column: 1 / -1;
+        width: 100%;
+    }
+
+    /**
+     * CATÉGORIE & TRI EN COLONNE COMPLÈTE
+     */
+    .category-filter,
+    .sort-filter {
+        grid-column: 1 / -1;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .filter-label {
+        display: block;
+        margin-bottom: 3px;
+    }
+
+    .category-select,
+    .sort-select {
+        width: 100%;
+        padding: 10px;
+    }
+
+    /**
+     * BOUTON PANIER EN LIGNE COMPLÈTE
+     */
+    .btn-cart-mobile {
+        grid-column: 1 / -1;
+        width: 100%;
+        justify-content: center;
+    }
+
+    /**
+     * GRILLE PRODUITS MOBILE
+     * ➜ 1 ou 2 colonnes selon l'espace
+     */
+    .products-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 15px;
+    }
+
+    /**
+     * EN-TÊTE BOUTIQUE
+     */
+    .boutique-header {
+        padding: 40px 20px;
+        min-height: 300px;
+    }
+
+    .boutique-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .boutique-subtitle {
+        font-size: 1rem;
+    }
+
+    .category-filter,
+    .sort-filter {
+        width: 100%;
+    }
+
+    .category-select,
+    .sort-select {
+        width: 100%;
+        padding: 10px;
+    }
+
+    /* Espace ajouté pour éviter le chevauchement entre sections */
+    .products-section {
+        margin-top: 10px;
+    }
+}
+
+/**
+ * ============================================================
+ * RESPONSIVE TRÈS PETIT ÉCRAN - max-width: 480px
+ * ============================================================
+ */
+@media (max-width: 480px) {
+    .boutique-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .boutique-subtitle {
+        font-size: 0.95rem;
+    }
+
+    /* 2-up mobile grid: cards should reach screen edges with a tight gap (Temu-like). */
+    .boutique-container {
+        padding: 12px 6px;
+        gap: 16px;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 6px;
+    }
+
+    /* Keep taller cards while keeping the image very visible and not "zoomed". */
+    .product-media {
+        aspect-ratio: 1 / 1;
+        padding: 6px;
+        background: #fff;
+    }
+
+    .product-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .product-image {
+        height: 100%;
+        object-fit: contain; /* show the full uploaded image, avoid aggressive cropping */
+        background: #fff;
+        border-radius: 10px;
+    }
+
+    .product-media .product-dots {
+        left: 8px;
+        right: 8px;
+        top: 56px;
+    }
+
+    .product-info {
+        padding: 6px 8px 8px 8px;
+    }
+
+    /* Boutique page: miniature cards */
+    .vc-page-boutique .product-media {
+        aspect-ratio: 3 / 4;
+        padding: 6px 6px 3px 6px;
+    }
+
+    .vc-page-boutique .product-info {
+        padding: 2px 8px 6px 8px;
+    }
+
+    .product-title {
+        font-size: 0.82rem;
+        -webkit-line-clamp: 1;
+    }
+
+    .product-price {
+        font-size: 0.96rem;
+    }
+
+    .btn-share-inline {
+        width: 30px;
+        height: 30px;
+        border-radius: 10px;
+    }
+
+    .btn-share-inline svg {
+        width: 15px;
+        height: 15px;
+    }
+
+    .btn-add-cart {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/**
+ * ============================================================
+ * CHAMP WHATSAPP - Styles Input
+ * ============================================================
+ * 
+ * ➜ Améliore le contraste et l'UX du champ WhatsApp
+ * ➜ Ajoute des effets de focus et animation
+ */
+.whatsapp-input-group {
+    background: #f9f9f9;
+    padding: 12px;
+    border-radius: 5px;
+    margin: 12px 0;
+}
+
+#whatsapp-input {
+    border: 2px solid #ddd !important;
+}
+
+#whatsapp-input:focus {
+    border-color: var(--primary-blue) !important;
+    background: white !important;
+    box-shadow: 0 0 8px rgba(18, 18, 147, 0.2) !important;
+}
+
+#whatsapp-input::placeholder {
+    color: #999;
+    opacity: 0.7;
+}
+
+/**
+ * BOUTON COMMANDER - Nouveau style WhatsApp
+ * ➜ Met en avant l'action principale
+ */
+.btn-checkout {
+    background: linear-gradient(135deg, var(--color-green), #008c5c);
+    color: white !important;
+    padding: 14px !important;
+    font-weight: 700;
+    margin-top: 10px !important;
+    transition: all 0.3s ease;
+    pointer-events: auto;
+}
+
+.btn-checkout:hover {
+    background: linear-gradient(135deg, #008c5c, #006b49);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 140, 92, 0.4);
+}
+
+.btn-checkout:active {
+    transform: translateY(0);
+}
+
+/**
+ * ============================================================
+ * MODAL CONFIRMATION COMMANDE (WhatsApp-first)
+ * ============================================================
+ */
+.order-confirmation-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 18px;
+    z-index: 9999;
+}
+
+.order-confirmation-modal {
+    width: min(760px, 100%);
+    max-height: 85vh;
+    overflow: auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    border: 1px solid rgba(0,0,0,0.06);
+}
+
+.order-confirmation-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 18px;
+    border-bottom: 1px solid #eee;
+}
+
+.order-confirmation-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    color: var(--primary-blue);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.order-confirmation-close {
+    appearance: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+.order-confirmation-close:hover {
+    background: rgba(0,0,0,0.05);
+}
+
+.order-confirmation-subtitle {
+    margin: 0;
+    padding: 12px 18px 0 18px;
+    color: #555;
+    font-size: 0.95rem;
+    line-height: 1.4;
+}
+
+.order-confirmation-list {
+    padding: 14px 18px 4px 18px;
+    display: grid;
+    gap: 12px;
+}
+
+.order-confirmation-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.order-confirmation-item-main {
+    min-width: 0;
+}
+
+.order-confirmation-ref {
+    color: #111;
+    font-size: 0.98rem;
+}
+
+.order-confirmation-meta {
+    margin-top: 4px;
+    color: #666;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.order-confirmation-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--color-green), #008c5c);
+    color: #fff;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.order-confirmation-btn:hover {
+    background: linear-gradient(135deg, #008c5c, #006b49);
+}
+
+.order-confirmation-footer {
+    padding: 14px 18px 18px 18px;
+    display: flex;
+    justify-content: flex-end;
+    border-top: 1px solid #eee;
+}
+
+.order-confirmation-done {
+    border: none;
+    cursor: pointer;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: var(--primary-blue);
+    color: #fff;
+    font-weight: 700;
+}
+
+.order-confirmation-done:hover {
+    background: #0a0a5e;
+}
+
+@media (max-width: 520px) {
+    .order-confirmation-item {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .order-confirmation-btn {
+        justify-content: center;
+    }
+    .order-confirmation-footer {
+        justify-content: stretch;
+    }
+    .order-confirmation-done {
+        width: 100%;
+    }
+}
+

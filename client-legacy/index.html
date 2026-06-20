@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<!-- 
+  ============================================================
+  PROJET: Vendoscity - Site Web Responsive & SEO Optimisé
+  DESCRIPTION: Site vitrine avec navigation mobile-friendly et optimisation SEO complète
+  AUTEUR: [Votre Nom]
+  LAST UPDATED: 22/03/2026
+  
+  ✓ OPTIMISATIONS SEO APPLIQUÉES:
+    - Meta tags complets (description, keywords, OG, Twitter)
+    - Structured Data (JSON-LD Schema.org)
+    - Performance hints (preconnect, prefetch)
+    - Heading hierarchy H1→H2→H3
+    - Alt text sur images
+    - Canonical URL
+    - Mobile-first responsive
+  ============================================================
+-->
+
+<html lang="fr" dir="ltr">
+<head>
+  <!-- 
+    ============================================================
+    SECTION 1: META TAGS CRITIQUES POUR LE SEO
+    ============================================================
+  -->
+  
+  <!-- 
+    ENCODING - Charset UTF-8
+    ➜ POURQUOI: Permet les accents français et caractères spéciaux
+    ➜ IMPACT SEO: Google préfère l'UTF-8, améliore l'indexation
+  -->
+  <meta charset="UTF-8">
+
+  <!-- Ensure relative URLs (style/, script/, assets/) resolve from site root even on fallback routes. -->
+  <base href="/">
+
+  <!-- Site icon (tab / title) -->
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <!--
+    VIEWPORT - Responsive Design
+    ➜ POURQUOI: Configuration pour l'affichage mobile
+    ➜ IMPACT SEO: CRITIQUE - Google privilégie les sites mobile-friendly
+    ➜ width=device-width: Adapte la largeur à l'écran
+    ➜ initial-scale=1.0: Pas de zoom automatique (meilleure UX)
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- 
+    LANGUAGE / REGION - Pour les moteurs de recherche
+    ➜ POURQUOI: Indique que le site est en français
+    ➜ IMPACT SEO: Google affiche le site aux utilisateurs francophones
+  -->
+  <meta http-equiv="content-language" content="fr-FR">
+  
+  <!-- 
+    ============================================================
+    SECTION 2: TITLE & META DESCRIPTION (LES PLUS IMPORTANTS!)
+    ============================================================
+    
+    ➜ LE TITLE IS SUPER CRITICAL:
+      - Longueur idéale: 50-60 caractères
+      - Doit contenir le mot-clé principal
+      - Affiché dans les résultats Google et l'onglet du navigateur
+    
+    ➜ META DESCRIPTION:
+      - Longueur idéale: 150-160 caractères
+      - C'est ce qu'on voit dans les résultats Google
+      - Doit encourager le clic (CTA implicite)
+  -->
+  
+  <!-- 
+    TITLE - Titre de la page (50-60 caractères recommandé)
+    Format: Marque | Mot-clé Principal | Valeur Proposée
+    Mots-clés: Vendoscity, services, boutique en ligne
+  -->
+  <title>Vendoscity - Services & Boutique en Ligne | Découvrez</title>
+  
+  <!-- 
+    META DESCRIPTION - Description pour Google (150-160 caractères)
+    ➜ Joue un rôle dans le CTR (taux de clic)
+    ➜ Doit contenir un appel à l'action
+    ➜ Doit être unique et descriptive
+  -->
+  <meta name="description" content="Bienvenue sur Vendoscity, votre portail de services et boutique en ligne. Découvrez nos produits innovants et services de qualité. Accès à notre plateforme 24/7.">
+  
+  <!-- 
+    META KEYWORDS - Mots-clés (moins important mais utile)
+    ➜ ATTENTION: Google ignore presque les keywords
+    ➜ Utile pour: Bing, DuckDuckGo, et clarté interne
+    ➜ Conseils: 5-10 keywords pertinents, séparés par des virgules
+  -->
+  <meta name="keywords" content="vendoscity, boutique en ligne, services, plateforme, e-commerce, achats en ligne">
+  
+  <!-- 
+    ============================================================
+    SECTION 3: OPEN GRAPH TAGS (Pour réseaux sociaux)
+    ============================================================
+    
+    ➜ POURQUOI: Contrôle l'apparence du site sur Facebook, LinkedIn, etc.
+  
+  <!-- 
+    VIEWPORT - Responsive Design
+    ➜ POURQUOI: Configuration pour l'affichage mobile
+    ➜ IMPACT SEO: CRITIQUE - Google privilégie les sites mobile-friendly
+    ➜ width=device-width: Adapte la largeur à l'écran
+    ➜ initial-scale=1.0: Pas de zoom automatique (meilleure UX)
+  -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- 
+    LANGUAGE / REGION - Pour les moteurs de recherche
+    ➜ POURQUOI: Indique que le site est en français
+    ➜ IMPACT SEO: Google affiche le site aux utilisateurs francophones
+  -->
+  <meta http-equiv="content-language" content="fr-FR">
+  
+  <!-- 
+    ============================================================
+    SECTION 2: TITLE & META DESCRIPTION (LES PLUS IMPORTANTS!)
+    ============================================================
+    
+    ➜ LE TITLE IS SUPER CRITICAL:
+      - Longueur idéale: 50-60 caractères
+      - Doit contenir le mot-clé principal
+      - Affiché dans les résultats Google et l'onglet du navigateur
+    
+    ➜ META DESCRIPTION:
+      - Longueur idéale: 150-160 caractères
+      - C'est ce qu'on voit dans les résultats Google
+      - Doit encourager le clic (CTA implicite)
+  -->
+  
+  <!-- 
+    TITLE - Titre de la page (50-60 caractères recommandé)
+    Format: Marque | Mot-clé Principal | Valeur Proposée
+    Mots-clés: Vendoscity, services, boutique en ligne
+  -->
+  <title>Vendoscity - Services & Boutique en Ligne | Découvrez</title>
+  
+  <!-- 
+    META DESCRIPTION - Description pour Google (150-160 caractères)
+    ➜ Joue un rôle dans le CTR (taux de clic)
+    ➜ Doit contenir un appel à l'action
+    ➜ Doit être unique et descriptive
+  -->
+  <meta name="description" content="Bienvenue sur Vendoscity, votre portail de services et boutique en ligne. Découvrez nos produits innovants et services de qualité. Accès à notre plateforme 24/7.">
+  
+  <!-- 
+    META KEYWORDS - Mots-clés (moins important mais utile)
+    ➜ ATTENTION: Google ignore presque les keywords
+    ➜ Utile pour: Bing, DuckDuckGo, et clarté interne
+    ➜ Conseils: 5-10 keywords pertinents, séparés par des virgules
+  -->
+  <meta name="keywords" content="vendoscity, boutique en ligne, services, plateforme, e-commerce, achats en ligne">
+  
+  <!-- 
+    ============================================================
+    SECTION 3: OPEN GRAPH TAGS (Pour réseaux sociaux)
+    ============================================================
+    
+    ➜ POURQUOI: Contrôle l'apparence du site sur Facebook, LinkedIn, etc.
+    ➜ IMPACT: Meilleur CTR depuis les réseaux sociaux
+  -->
+  
+  <!-- Open Graph - Type de contenu -->
+  <meta property="og:type" content="website">
+  
+  <!-- Open Graph - URL canonique -->
+  <meta property="og:url" content="https://vendoscity.vercel.app">
+  
+  <!-- Open Graph - Titre (peut être différent du title HTML) -->
+  <meta property="og:title" content="Vendoscity - Vos Services & Boutique en Ligne">
+  
+  <!-- Open Graph - Description -->
+  <meta property="og:description" content="Découvrez Vendoscity: votre plateforme complète de services et shopping en ligne. Innovation, qualité, accessibilité 24/7.">
+  
+  <!-- Open Graph - Image (minimum 1200x630px, idéaldaignan 1.91:1 ratio) -->
+  <meta property="og:image" content="https://vendoscity.vercel.app/assets/images/og-image.jpg">
+  
+  <!-- Open Graph - Image dimensions pour meilleur rendu -->
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:type" content="image/jpeg">
+  
+  <!-- Open Graph - Site name -->
+  <meta property="og:site_name" content="Vendoscity">
+  
+  <!-- Open Graph - Locale -->
+  <meta property="og:locale" content="fr_FR">
+  
+  <!-- 
+    ============================================================
+    SECTION 4: TWITTER CARD TAGS
+    ============================================================
+    
+    ➜ POURQUOI: Contrôle le rendu sur Twitter
+    ➜ IMPACT: Augmente le partage sur Twitter
+  -->
+  
+  <!-- Twitter Card - Type -->
+  <meta name="twitter:card" content="summary_large_image">
+  
+  <!-- Twitter - Créateur (@username) -->
+  <meta name="twitter:creator" content="@vendoscity">
+  
+  <!-- Twitter - Titre -->
+  <meta name="twitter:title" content="Vendoscity - Services & Boutique en Ligne">
+  
+  <!-- Twitter - Description -->
+  <meta name="twitter:description" content="Vendoscity: marketplace de mise en relation directe acheteur-vendeur, basée a Yaounde. Paiement et livraison se discutent entre les parties.">
+  
+  <!-- Twitter - Image -->
+  <meta name="twitter:image" content="https://vendoscity.vercel.app/assets/images/twitter-image.jpg">
+  
+  <!-- 
+    ============================================================
+    SECTION 5: CRAWLER & INDEXATION
+    ============================================================
+  -->
+  
+  <!-- 
+    ROBOTS META - Instructions pour les crawlers
+    ➜ index: Autoriser l'indexation par Google
+    ➜ follow: Suivre les liens sur la page
+    ➜ max-snippet: Longueur max dans les résultats
+    ➜ max-image-preview: Taille max de l'image en résultats
+    ➜ max-video-preview: Durée max de la vidéo en résultats
+  -->
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  <!-- 
+    GOOGLEBOT - Instructions spécifiques à Google
+    ➜ Permet une indexation plus agressive
+  -->
+  <meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+  
+  <!-- 
+    ============================================================
+    SECTION 6: CANONICAL URL (Anti-Duplicate Content)
+    ============================================================
+    
+    ➜ POURQUOI: Évite les problématiques de contenu dupliqué
+    ➜ IMPACT: Très important pour le SEO
+    ➜ EXEMPLE: "https://vendoscity.com" est l'URL canonique
+  -->
+  <link rel="canonical" href="https://vendoscity.vercel.app">
+  
+  <!-- 
+    ============================================================
+    SECTION 7: ALTERNATE LINKS (Multilingue)
+    ============================================================
+    
+    Si vous avez une version anglaise, c'est ici qu'on la lie
+  -->
+  <link rel="alternate" hreflang="fr" href="https://vendoscity.vercel.app">
+  <link rel="alternate" hreflang="en" href="https://vendoscity.vercel.app/en">
+  
+  <!-- 
+    ============================================================
+    SECTION 8: PERFORMANCE HINTS (Core Web Vitals)
+    ============================================================
+    
+    ➜ POURQUOI: Améliore la vitesse de chargement
+    ➜ IMPACT SEO: La vitesse est un facteur de classement Google
+  -->
+  
+  <!-- 
+    DNS-PREFETCH - Résout le DNS plus tôt
+    ➜ POURQUOI: Réduit la latence DNS pour les domaines externes
+  -->
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com">
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  
+  <!-- 
+    PRECONNECT - Établit la connexion en avance
+    ➜ POURQUOI: Plus rapide que DNS-prefetch
+    ➜ UTILISER POUR: Ressources critiques
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <!-- 
+    PREFETCH - Charge les ressources en arrière-plan
+    ➜ UTILISER POUR: Ressources probablement nécessaires
+  -->
+  <link rel="prefetch" href="/assets/images/Ville%20futuriste%20au%20coucher%20du%20soleil.png">
+  
+  <!-- 
+    ============================================================
+    SECTION 9: STYLESHEET CSS
+    ============================================================
+    
+    ➜ rel="stylesheet": Feuille de style critique
+    ➜ media="all": S'applique à tous les appareils
+  -->
+  <link rel="stylesheet" href="style/style.css" media="all">
+  <!-- Reuse the marketplace card styles on the homepage shelves -->
+  <link rel="stylesheet" href="style/boutique.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- 
+    ============================================================
+    SECTION 10: SCHEMA.ORG STRUCTURED DATA (JSON-LD)
+    ============================================================
+    
+    ➜ POURQUOI: Aide Google à comprendre votre contenu
+    ➜ IMPACT: Rich snippets dans les résultats Google
+    ➜ TYPES UTILISABLES:
+      - Organization: Infos sur l'entreprise
+      - LocalBusiness: Pour les entreprises locales
+      - Product: Pour les produits
+      - BreadcrumbList: Fil d'Ariane
+  -->
+  
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Vendoscity",
+    "url": "https://vendoscity.com",
+    "logo": "/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3",
+    "description": "Marketplace de mise en relation directe entre acheteurs et vendeurs",
+    "sameAs": [
+      "https://www.facebook.com/profile.php?id=61577818894324",
+      "https://x.com/@ngalamo2092",
+      "https://www.instagram.com/vendoscity?igsh=MXhmeGg4MmJyY2xkeg=="
+    ],
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "contactType": "Customer Service",
+      "telephone": "+237-681-570-075",
+      "email": "arthurngalamo7@gmail.com"
+    }
+  }
+  </script>
+  
+  <!-- 
+    SCHEMA: Boutique en Ligne (LocalBusiness)
+    ➜ POURQUOI: Améliore l'indexation des boutiques locales
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org/",
+    "@type": "LocalBusiness",
+    "name": "Vendoscity",
+    "image": "/assets/images/shop.jpg",
+    "description": "Marketplace de mise en relation directe acheteur-vendeur",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "ESSESALAKOK NGOUSSO",
+      "addressLocality": "YAOUNDE",
+      "addressCountry": "CM"
+    },
+    "telephone": "+237-68-15-70-0-75",
+    "url": "https://vendoscity.vercel.app",
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Monday",
+        "opens": "08:00",
+        "closes": "20:00"
+      }
+    ]
+  }
+  </script>
+  
+  <!-- 
+    SCHEMA: Fil d'Ariane (Breadcrumb)
+    ➜ POURQUOI: Améliore la navigation et les résultats Google
+  -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Accueil",
+        "item": "https://vendoscity.vercel.app"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "Boutique",
+        "item": "https://vendoscity.vercel.app/boutique"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "Services",
+        "item": "https://vendoscity.vercel.app/services"
+      }
+    ]
+  }
+  </script>
+</head>
+
+<body>
+  <div id="header-placeholder"></div>
+
+  <!-- 
+    HERO SECTION - Section principale du site avec image de fond
+    C'est la première impression de l'utilisateur
+  -->
+  <section class="hero-section" aria-labelledby="hero-title">
+    <!-- Contenu centré dans la section hero -->
+    <div class="hero-content">
+      
+      <!-- 
+        H1 - Titre principal (TRÈS IMPORTANT pour SEO!)
+        ➜ RÈGLE CRITIQUE: Un seul H1 par page
+        ➜ CONTENU: Doit contenir les mots-clés principaux
+        ➜ LONGUEUR: 50-60 caractères idéalement
+        ➜ IMPACT: Facteur de classement majeur
+      -->
+      <h1 id="hero-title">Vendoscity - Marketplace de Mise en Relation Directe</h1>
+      
+      <!-- 
+        PARAGRAPHE - Tagline / Sous-titre
+        ➜ CONTENU: Complète le H1, ajoute du contexte
+        ➜ MOTS-CLÉS: Incluent des variations de mots-clés
+      -->
+      <p>Vous commandez sur la plateforme, puis vous echangez directement avec le vendeur. Paiement hors plateforme. Entreprise basée à Yaoundé.</p>
+      
+      <!-- 
+        CTA BUTTON - Appel à l'action
+        ➜ aria-label: Accessibilité
+        ➜ title: Texte au survol (améliore l'UX)
+      -->
+      <div class="home-hero-actions">
+        <a class="cta-button" href="/pages/Boutique.html" aria-label="Explorer la boutique" title="Voir les articles disponibles" role="button">
+          Explorer la boutique <i data-lucide="shopping-bag" style="margin-left: 8px;"></i>
+        </a>
+        <a class="cta-button cta-secondary" href="/pages/Services.html" aria-label="Découvrir nos services" title="Cliquer pour explorer nos services" role="button">
+          Nos services <i data-lucide="arrow-right" style="margin-left: 8px;"></i>
+        </a>
+      </div>
+
+      <form class="home-hero-search" id="home-search-form" role="search" aria-label="Rechercher un article">
+        <label class="sr-only" for="home-search-input">Rechercher un article</label>
+        <input id="home-search-input" name="q" type="search" placeholder="Rechercher: téléphone, robe, voiture..." autocomplete="off">
+        <button type="submit" aria-label="Rechercher dans la boutique">
+          <i data-lucide="search"></i>
+        </button>
+      </form>
+    </div>
+  </section>
+
+  <!-- Catégories rapides (entrées courtes, mobile-friendly) -->
+  <section class="home-categories" aria-labelledby="home-categories-title">
+    <details class="home-disclosure" id="home-categories-details">
+      <summary class="home-disclosure-summary" id="home-categories-title">
+        Explorer par catégorie
+      </summary>
+      <div class="home-disclosure-body">
+        <a class="home-section-link" href="/pages/Boutique.html">Voir tout</a>
+        <div class="home-category-grid" id="home-category-grid">
+          <!-- Injecté par home.js -->
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <!-- Rayons produits (Nouveautés + Tendances) -->
+  <section class="home-shelves" aria-label="Sélections de la boutique">
+    <div class="home-shelf" aria-labelledby="home-new-title">
+      <div class="home-section-head">
+        <h2 id="home-new-title">Nouveautés</h2>
+        <a class="home-section-link" href="/pages/Boutique.html">Tout voir</a>
+      </div>
+      <div class="products-grid home-products-grid" id="home-new-grid" aria-live="polite">
+        <div class="loading">Chargement...</div>
+      </div>
+    </div>
+
+    <div class="home-shelf" aria-labelledby="home-trending-title">
+      <div class="home-section-head">
+        <h2 id="home-trending-title">Tendances au Cameroun</h2>
+        <a class="home-section-link" href="/pages/Boutique.html">Voir la boutique</a>
+      </div>
+      <div class="products-grid home-products-grid" id="home-trending-grid" aria-live="polite">
+        <div class="loading">Chargement...</div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- 
+    ============================================================
+    SECTION FEATURES - Points forts de Vendoscity
+    ============================================================
+    
+    ➜ H2: Sous-titre (aide à l'organisation SEO)
+    ➜ MOTS-CLÉS: Chaque section cible des variations
+  -->
+  <section class="features" aria-labelledby="features-title">
+    <h2 id="features-title">Comment ça marche</h2>
+    
+    <!-- Feature 1 -->
+    <article class="feature">
+      <i data-lucide="search" style="width: 48px; height: 48px; color: var(--primary-blue); margin-bottom: 15px;"></i>
+      <h3>Choisissez</h3>
+      <p>Explorez la boutique et trouvez l'article qui vous plaît.</p>
+    </article>
+    
+    <!-- Feature 2 -->
+    <article class="feature">
+      <i data-lucide="message-circle" style="width: 48px; height: 48px; color: var(--primary-blue); margin-bottom: 15px;"></i>
+      <h3>Discutez</h3>
+      <p>Après la commande, contactez le vendeur sur WhatsApp pour confirmer.</p>
+    </article>
+    
+    <!-- Feature 3 -->
+    <article class="feature">
+      <i data-lucide="package-check" style="width: 48px; height: 48px; color: var(--primary-blue); margin-bottom: 15px;"></i>
+      <h3>Récupérez</h3>
+      <p>Paiement hors plateforme. Livraison à discuter avec le vendeur.</p>
+    </article>
+  </section>
+  
+  <div id="footer-placeholder"></div>
+  
+  <!-- 
+    ============================================================
+    SCRIPT JAVASCRIPT - Menu mobile interactif
+    ============================================================
+    
+    ➜ POSITIONNEMENT: À la fin du body (meilleure performance)
+    ➜ POURQUOI: Le DOM est chargé avant l'exécution du script
+    ➜ IMPACT: Démarrage plus rapide de la page
+  -->
+  <script src="script/config.js"></script>
+  <script src="script/script.js"></script>
+  <script src="script/component-loader.js"></script>
+  <script src="script/home.js"></script>
+</body>
+</html>
+
+
+
+
+
+

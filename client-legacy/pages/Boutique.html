@@ -1,0 +1,364 @@
+﻿<!DOCTYPE html>
+<!-- 
+  ============================================================
+  PAGE: MARKEPLACE VENDOSCITY - BOUTIQUE EN LIGNE
+  ============================================================
+  
+  DESCRIPTION: 
+    Plateforme de vente sans restriction où les utilisateurs 
+    peuvent vendre et acheter n'importe quel produit/service
+  
+  FEATURES:
+    ✓ Filtrage par catégorie
+    ✓ Recherche en temps réel
+    ✓ Panier dynamique
+    ✓ Notation produits
+    ✓ Responsive mobile-first
+    ✓ SEO optimisé
+    ✓ Accessibilité complète
+  
+  LAST UPDATED: 23/03/2026
+  ============================================================
+-->
+
+<html lang="fr" dir="ltr">
+<head>
+  <!-- 
+    META TAGS ESSENTIELS POUR LE SEO
+    ➜ Charset, Viewport, Description, Keywords
+  -->
+  <meta charset="UTF-8">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  
+  <!-- 
+    TITLE & DESCRIPTION - Critiques pour le SEO
+    ➜ Title: 50-60 caractères
+    ➜ Description: 150-160 caractères
+  -->
+  <title>Vendoscity Boutique - Marketplace Sans Restriction | Achetez & Vendez</title>
+  <meta name="description" content="Vendoscity Boutique: marketplace de mise en relation directe. Contactez le vendeur, discutez du paiement et de la livraison directement.">
+  <meta name="keywords" content="marketplace, boutique en ligne, acheter, vendre, occasion, services, vendoscity">
+  
+  <!-- 
+    CANONICAL URL - Évite contenu dupliqué
+  -->
+  <link rel="canonical" href="https://vendoscity.com/boutique">
+  
+  <!-- 
+    STYLESHEETS
+    ➜ Main CSS: Commun à tout le site
+    ➜ Boutique CSS: Spécifique à la page boutique
+  -->
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <link rel="stylesheet" href="/style/boutique.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body class="vc-page-boutique">
+  <!-- 
+    ============================================================
+    HEADER & NAVIGATION - Réutilisé du site principal
+    ============================================================
+    
+    ➜ Navigation cohérente à travers tout le site
+    ➜ Hamburger menu pour mobile
+  -->
+  <div id="header-placeholder"></div>
+
+  <!-- 
+    ============================================================
+    MAIN CONTENT - Contenu principal de la boutique
+    ============================================================
+  -->
+  <main id="main-content" role="main">
+    
+    <!-- 
+      ============================================================
+      SECTION: BARRE DE RECHERCHE & FILTRES
+      ============================================================
+      
+      ➜ Recherche en temps réel
+      ➜ Filtres par catégorie
+      ➜ Tri par prix, popularité, etc.
+    -->
+    <section class="boutique-controls" aria-labelledby="controls-title">
+      <h2 id="controls-title" class="sr-only">Recherche et filtrage des produits</h2>
+      
+      <!-- CONTENEUR DES FILTRES -->
+      <div class="filters-container vc-boutique-header-tools" data-vc-header-tools>
+        <button id="vc-btn-filters" class="vc-tool-btn pressable" type="button" aria-label="Ouvrir les filtres" title="Filtres" data-vc-tooltip="Filtres">
+          <i data-lucide="sliders-horizontal"></i>
+        </button>
+
+        <!-- RECHERCHE (compacte, centree sous logo/hamburger) -->
+        <div class="search-box vc-search-compact">
+          <input
+            type="search"
+            id="search-input"
+            class="search-input"
+            placeholder="Rechercher..."
+            aria-label="Rechercher dans la boutique"
+            title="Entrez le nom du produit a rechercher">
+          <button
+            class="btn-search"
+            aria-label="Lancer la recherche"
+            title="Rechercher">
+            <i data-lucide="search"></i>
+          </button>
+        </div>
+
+        <!-- Keep native selects for functionality, but move them off-screen (opened via the icon buttons). -->
+        <div class="vc-offscreen-controls" aria-hidden="false">
+          <label for="category-select" class="sr-only">Categorie</label>
+          <select
+            id="category-select"
+            class="category-select vc-hidden-select"
+            aria-label="Filtrer par categorie de produits">
+            <option value="all">Toutes les categories</option>
+            <option value="electronique">Electronique</option>
+            <option value="informatique">Informatique</option>
+            <option value="vetements">Vetements</option>
+            <option value="beaute">Beaute</option>
+            <option value="maison">Maison & Deco</option>
+            <option value="cuisine">Cuisine</option>
+            <option value="bebe-enfants">Bebe & Enfants</option>
+            <option value="sante">Sante</option>
+            <option value="animaux">Animaux</option>
+            <option value="jardin">Jardin</option>
+            <option value="jeux">Jeux</option>
+            <option value="musique">Musique</option>
+            <option value="immobilier">Immobilier</option>
+            <option value="services">Services</option>
+            <option value="vehicules">Vehicules</option>
+            <option value="livres">Livres</option>
+            <option value="sports">Sports & Loisirs</option>
+            <option value="emploi">Emploi</option>
+            <option value="autres">Autres</option>
+          </select>
+
+          <label for="sort-select" class="sr-only">Trier</label>
+          <select
+            id="sort-select"
+            class="sort-select vc-hidden-select"
+            aria-label="Trier les produits">
+            <option value="recommended" selected>Recommande</option>
+            <option value="recent">Plus recent</option>
+            <option value="price-asc">Prix: Bas vers Haut</option>
+            <option value="price-desc">Prix: Haut vers Bas</option>
+            <option value="popular">Plus populaire</option>
+            <option value="rating">Meilleure note</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- 
+      ============================================================
+      SECTION: CONTENEUR PRINCIPAL (GRILLE + PANIER)
+      ============================================================
+    -->
+    <div class="boutique-container">
+      
+      <!-- 
+        GRILLE DE PRODUITS
+        ➜ grid auto-responsive
+        ➜ Cartes produits dynamiques
+      -->
+      <section class="products-section" aria-labelledby="products-title">
+        <h2 id="products-title" class="sr-only">Liste des produits disponibles</h2>
+
+        <!-- Trust + active filters (Temu-like, adapted to "mise en relation") -->
+        <div class="vc-market-meta" aria-label="Infos et filtres">
+          <div class="vc-trust-strip" aria-label="Conseils de securite">
+            <span class="vc-trust-badge"><i data-lucide="shield-check"></i> Paiement a la remise</span>
+            <span class="vc-trust-badge"><i data-lucide="message-circle"></i> Contact WhatsApp direct</span>
+            <span class="vc-trust-badge"><i data-lucide="scan-eye"></i> Verifiez avant de payer</span>
+          </div>
+
+          <div id="vc-filter-chips" class="vc-filter-chips" role="list" aria-label="Filtres actifs"></div>
+        </div>
+        
+        <!-- 
+          CONTENEUR GRILLE
+          ➜ grid-template-columns: auto-fit, minmax pour responsive
+          ➜ sera rempli dynamiquement par JavaScript
+        -->
+        <div class="products-grid" id="products-grid">
+          <!-- Les produits seront injectés ici par JavaScript -->
+          <div class="loading">Chargement des produits...</div>
+        </div>
+
+        <!-- Sentinel pour l'Infinite Scroll -->
+        <div id="infinite-scroll-sentinel" style="height: 20px; margin-top: 20px;"></div>
+        
+        <!-- Loader d'Infinite Scroll -->
+        <div id="infinite-loader" style="text-align: center; padding: 20px; display: none;">
+          <div class="spinner" style="margin: 0 auto;"></div>
+          <p style="color: #666; font-size: 0.9rem; margin-top: 10px;">Chargement de produits supplémentaires...</p>
+        </div>
+      </section>
+
+      <!-- 
+        ============================================================
+        PANIER (SIDEBAR)
+        ============================================================
+        
+        ➜ Affichage du panier
+        ➜ Mobile: Toggle avec bouton
+        ➜ Desktop: Toujours visible
+      -->
+      <aside class="cart-sidebar" id="cart-sidebar" aria-label="Panier d'achat">
+        <!-- Badge avec nombre (FAB Desktop) -->
+        <span id="cart-badge" class="cart-badge">0</span>
+        
+        <!-- Cart Header (hidden on desktop, visible on mobile) -->
+        <div class="cart-header">
+          <h2><i data-lucide="package"></i> Votre Panier</h2>
+          <button class="btn-close-cart" id="close-cart" aria-label="Fermer le panier"><i data-lucide="x"></i></button>
+        </div>
+
+        <!-- ARTICLES DU PANIER -->
+        <div class="cart-items" id="cart-items">
+          <p class="cart-empty">Votre panier est vide</p>
+        </div>
+
+        <!-- TOTAL & CHECKOUT -->
+        <div class="cart-footer">
+          <div class="cart-total">
+            <strong>Total:</strong>
+            <span id="cart-total">0 FCFA</span>
+          </div>
+
+          <!-- CHAMP WHATSAPP OBLIGATOIRE -->
+          <div class="whatsapp-input-group">
+            <label for="whatsapp-input" style="display: block; margin: 15px 0 8px 0; font-weight: 600; color: var(--primary-blue); font-size: 0.95rem;">
+              <i data-lucide="phone"></i> Numéro WhatsApp
+            </label>
+            <input 
+              type="tel" 
+              id="whatsapp-input" 
+              placeholder="+237681570075"
+              aria-label="Votre numéro WhatsApp"
+              title="Entrez votre numéro WhatsApp pour que le vendeur vous contacte"
+              style="
+                width: 100%;
+                padding: 12px;
+                border: 2px solid #ddd;
+                border-radius: 5px;
+                font-size: 1rem;
+                box-sizing: border-box;
+                font-family: inherit;
+                transition: border-color 0.3s ease;
+              "
+            >
+            <small style="display: block; margin-top: 5px; color: #666;">Le vendeur vous contactera à ce numéro</small>
+          </div>
+
+          <button 
+            class="btn-checkout" 
+            id="btn-checkout"
+            aria-label="Commander et envoyer votre numéro WhatsApp"
+            title="Confirmer la commande">
+            <i data-lucide="phone-forwarded"></i> Commander via WhatsApp
+          </button>
+          <button 
+            class="btn-continue-shopping" 
+            id="btn-continue"
+            aria-label="Continuer vos achats"
+            title="Revenir aux produits">
+            Continuer vos achats
+          </button>
+        </div>
+      </aside>
+
+      <!-- Backdrop séparé pour le panier (plus fiable que ::before/::after) -->
+      <div id="cart-backdrop" class="cart-backdrop" aria-hidden="true"></div>
+
+      <!-- FAB mobile: bouton flottant pour ouvrir le panier -->
+      <button id="cart-fab" class="cart-fab" type="button" aria-label="Ouvrir le panier" title="Ouvrir le panier">
+        <i data-lucide="shopping-cart"></i>
+        <span id="cart-fab-count" class="cart-fab-count">0</span>
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Drawer mobile: Filtres (Temu-like) -->
+  <div id="vc-filter-drawer-backdrop" class="vc-drawer-backdrop" hidden aria-hidden="true"></div>
+  <aside id="vc-filter-drawer" class="vc-filter-drawer" hidden aria-hidden="true" aria-label="Filtres boutique">
+    <div class="vc-drawer-head">
+      <div class="vc-drawer-title">
+        <i data-lucide="sliders-horizontal"></i>
+        <span>Filtres</span>
+      </div>
+      <button id="vc-filter-drawer-close" class="vc-drawer-close pressable" type="button" aria-label="Fermer les filtres" title="Fermer">×</button>
+    </div>
+
+    <div class="vc-drawer-body">
+      <div class="vc-drawer-section" aria-label="Filtres actifs">
+        <div id="vc-filter-chips-drawer" class="vc-filter-chips" role="list" aria-label="Filtres actifs (drawer)"></div>
+      </div>
+
+      <div class="vc-drawer-section" aria-label="Categorie">
+        <h3 class="vc-drawer-h">Categorie</h3>
+        <div id="vc-drawer-category" class="vc-drawer-options" role="listbox" aria-label="Choisir une categorie"></div>
+      </div>
+
+      <div class="vc-drawer-section" aria-label="Tri">
+        <h3 class="vc-drawer-h">Trier par</h3>
+        <div id="vc-drawer-sort" class="vc-drawer-options" role="listbox" aria-label="Choisir un tri"></div>
+      </div>
+
+      <div class="vc-drawer-section" aria-label="Conseils">
+        <div class="vc-trust-strip" aria-label="Conseils de securite (drawer)">
+          <span class="vc-trust-badge"><i data-lucide="shield-check"></i> Paiement a la remise</span>
+          <span class="vc-trust-badge"><i data-lucide="message-circle"></i> WhatsApp direct</span>
+          <span class="vc-trust-badge"><i data-lucide="scan-eye"></i> Verifiez avant de payer</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="vc-drawer-footer">
+      <button id="vc-drawer-reset" class="vc-drawer-btn vc-drawer-btn-secondary pressable" type="button">Reinitialiser</button>
+      <button id="vc-drawer-apply" class="vc-drawer-btn vc-drawer-btn-primary pressable" type="button">Voir les produits</button>
+    </div>
+  </aside>
+
+  <!-- 
+    ============================================================
+    FOOTER - Pied de page
+    ============================================================
+  -->
+  <div id="footer-placeholder"></div>
+
+  <!-- 
+    ============================================================
+    SCRIPTS JAVASCRIPT
+    ============================================================
+    
+    ➜ Ordre d'import IMPORTANT:
+      1. script.js: Menu hamburger global
+      2. boutique.js: Logique marketplace
+  -->
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+  <script src="/script/boutique.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+

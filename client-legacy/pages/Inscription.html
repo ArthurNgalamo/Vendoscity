@@ -1,0 +1,176 @@
+﻿<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Inscription - Vendoscity</title>
+  <meta name="description" content="Créez un compte vendeur pour publier vos articles sur Vendoscity.">
+  <link rel="canonical" href="https://vendoscity.com/pages/Inscription">
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .auth-wrap {
+      max-width: 980px;
+      margin: 40px auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 22px;
+      align-items: start;
+    }
+    .auth-card {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 18px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.08);
+    }
+    .auth-card h1 {
+      color: var(--primary-blue);
+      font-size: 1.6rem;
+      margin: 0 0 10px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .auth-sub {
+      color: #666;
+      margin-bottom: 14px;
+    }
+    .auth-form {
+      display: grid;
+      gap: 12px;
+    }
+    .auth-form label {
+      font-weight: 700;
+      color: var(--primary-blue);
+      display: block;
+      margin-bottom: 6px;
+    }
+    .auth-form input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font: inherit;
+      outline: none;
+    }
+    .auth-form input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 4px rgba(18,18,147,0.12);
+    }
+    .auth-hint {
+      color: #666;
+      font-size: 0.9rem;
+      margin-top: -6px;
+    }
+    .auth-btn {
+      border: none;
+      border-radius: 999px;
+      padding: 12px 16px;
+      font-weight: 900;
+      cursor: pointer;
+      background: var(--color-green);
+      color: #fff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 18px 45px rgba(0,0,0,0.12);
+    }
+    .auth-side {
+      background: linear-gradient(135deg, rgba(18,18,147,0.08), rgba(0,168,107,0.12));
+      border: 1px solid rgba(18,18,147,0.16);
+      border-radius: 16px;
+      padding: 18px;
+    }
+    .auth-side h2 {
+      margin: 0 0 8px 0;
+      color: var(--primary-blue);
+      font-size: 1.1rem;
+    }
+    .auth-side p {
+      margin: 0;
+      color: #444;
+    }
+    .auth-link {
+      color: var(--primary-blue);
+      font-weight: 900;
+      text-decoration: none;
+      border-bottom: 1px dashed rgba(18,18,147,0.35);
+    }
+    .auth-link:hover { border-bottom-color: rgba(18,18,147,0.9); }
+    @media (max-width: 860px) {
+      .auth-wrap { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main id="main-content" role="main">
+    <div class="auth-wrap">
+      <section class="auth-card">
+        <h1><i data-lucide="user-plus"></i> Inscription vendeur</h1>
+        <p class="auth-sub">Choisissez un nom de boutique unique et recevez les commandes via WhatsApp.</p>
+
+        <form id="seller-register-form" class="auth-form">
+          <div>
+            <label for="reg-name">Nom de la boutique</label>
+            <input type="text" id="reg-name" maxlength="50" required autocomplete="organization">
+            <div class="auth-hint">Ce nom doit être unique sur la plateforme.</div>
+          </div>
+          <div>
+            <label for="reg-email">Email</label>
+            <input type="email" id="reg-email" required autocomplete="email">
+          </div>
+          <div>
+            <label for="reg-password">Mot de passe</label>
+            <input type="password" id="reg-password" minlength="6" required autocomplete="new-password">
+          </div>
+          <div>
+            <label for="reg-whatsapp">WhatsApp (commandes)</label>
+            <input type="tel" id="reg-whatsapp" placeholder="Ex: +237681570075" maxlength="20" required autocomplete="tel">
+            <div class="auth-hint">Les commandes des clients arriveront sur ce numéro.</div>
+          </div>
+
+          <button class="auth-btn" type="submit"><i data-lucide="check-circle"></i> Créer mon compte</button>
+        </form>
+
+        <p style="margin-top: 14px; color:#666;">
+          Déjà un compte ? <a class="auth-link" href="/pages/Connexion.html">Se connecter</a>
+        </p>
+      </section>
+
+      <aside class="auth-side" aria-label="Infos">
+        <h2>À savoir</h2>
+        <p>Vendoscity n'intervient pas dans le paiement. Vous publiez, les clients commandent et vous contactez directement via WhatsApp.</p>
+      </aside>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+  <script src="/script/seller.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+

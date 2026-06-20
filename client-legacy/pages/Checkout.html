@@ -1,0 +1,374 @@
+﻿<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Commander - Vendoscity</title>
+  <meta name="description" content="Passez une commande (demande) sur Vendoscity. Mise en relation directe acheteur-vendeur. Paiement hors plateforme entre les parties.">
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    body {
+      background-color: #f4f7f6;
+      color: #333;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    .checkout-hero {
+      background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2));
+      color: white;
+      padding: 60px 20px;
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .checkout-hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .checkout-container {
+      max-width: 1200px;
+      margin: 0 auto 60px;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1.8fr 1.2fr;
+      gap: 30px;
+    }
+
+    .checkout-section {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      margin-bottom: 30px;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border-left: 5px solid #2196f3;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 30px;
+      grid-column: 1 / -1;
+    }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .step-card {
+      background: rgba(255,255,255,0.7);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #e0e0e0;
+    }
+
+    .step-number {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-green);
+      margin-bottom: 5px;
+    }
+
+    .form-section-title {
+      font-size: 1.4rem;
+      color: var(--primary-blue);
+      margin-bottom: 25px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #eee;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      vertical-align: top;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: #444;
+    }
+
+    .form-group input, .form-group select, .form-group textarea {
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s;
+    }
+
+    .form-group input:focus {
+      outline: none;
+      border-color: var(--primary-blue);
+    }
+
+    .order-summary-sidebar {
+      position: sticky;
+      top: 20px;
+      height: fit-content;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      color: #666;
+    }
+
+    .summary-total {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--primary-blue);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: var(--color-green);
+      color: white;
+      padding: 18px;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 25px;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .btn-submit:hover {
+      background: #00764d;
+      transform: translateY(-2px);
+    }
+
+    .trust-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 20px;
+      color: #0f5132;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      .checkout-container {
+        grid-template-columns: 1fr;
+      }
+      .summary-card {
+        margin-bottom: 40px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main>
+    <div class="checkout-hero">
+      <h1><i data-lucide="send" width="36" height="36"></i> Envoyer Une Demande</h1>
+      <p>Vous commandez sur Vendoscity. Ensuite, le vendeur vous contacte pour organiser la remise et le paiement hors plateforme.</p>
+    </div>
+
+    <div class="checkout-container">
+      <!-- Intro / How it works -->
+      <div class="info-box">
+    <h2 style="margin-top:0; display:flex; align-items:center; gap:10px; color:var(--primary-blue-2);">
+          <i data-lucide="info"></i> Comment ça fonctionne?
+        </h2>
+        <p>Vendoscity vous met en relation directe. Une fois la demande envoyee, le ou les vendeurs vous contactent sur WhatsApp pour confirmer la disponibilite, organiser la remise/livraison et convenir du paiement (hors plateforme).</p>
+        <div class="steps-grid">
+          <div class="step-card"><div class="step-number">1</div><p>Saisie des infos</p></div>
+          <div class="step-card"><div class="step-number">2</div><p>Envoi commande</p></div>
+          <div class="step-card"><div class="step-number">3</div><p>Contact WhatsApp</p></div>
+          <div class="step-card"><div class="step-number">4</div><p>Accord & Remise</p></div>
+        </div>
+      </div>
+
+      <!-- Formulaire -->
+      <div class="checkout-form-column">
+        <form id="checkout-form" onsubmit="submitCheckout(event)">
+          <div class="checkout-section">
+            <h2 class="form-section-title"><i data-lucide="user"></i> Vos Coordonnées</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Prénom</label>
+                <input type="text" id="cust-firstname" required placeholder="Ex: Jean">
+              </div>
+              <div class="form-group">
+                <label>Nom</label>
+                <input type="text" id="cust-lastname" required placeholder="Ex: Bakari">
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label>WhatsApp / Mobile (9 chiffres)</label>
+                <input type="tel" id="cust-phone" required pattern="[0-9]{9}" placeholder="Ex: 68157XXXX">
+              </div>
+              <div class="form-group">
+                <label>Email (Optionnel)</label>
+                <input type="email" id="cust-email" placeholder="votre@email.com">
+              </div>
+            </div>
+          </div>
+
+          <div class="checkout-section">
+            <h2 class="form-section-title"><i data-lucide="map-pin"></i> Livraison (Optionnelle)</h2>
+            <div class="form-row">
+              <div class="form-group">
+                <label>Ville</label>
+                <select id="cust-city">
+                  <option>Douala</option>
+                  <option>Yaoundé</option>
+                  <option>Bafoussam</option>
+                  <option>Garoua</option>
+                  <option>Autre Ville</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Quartier</label>
+                <input type="text" id="cust-neighbourhood" placeholder="Ex: Akwa, Bastos... (si livraison)">
+              </div>
+            </div>
+            <div class="form-group" style="margin-top: 15px;">
+              <label>Notes ou précisions pour le livreur</label>
+              <textarea id="cust-notes" rows="2" placeholder="Près de l'immeuble X..."></textarea>
+            </div>
+            <p style="margin:10px 0 0; font-size:0.9rem; color:#555;">
+              La plateforme n'intervient pas par defaut. Si le vendeur le souhaite, Vendoscity peut aider a organiser une livraison avec un prix discutable au cas par cas.
+            </p>
+          </div>
+
+          <div class="checkout-section">
+            <h2 class="form-section-title"><i data-lucide="handshake"></i> Paiement</h2>
+            <div style="background: #fdfae3; padding: 15px; border-radius: 8px; border: 1px solid #f1c40f;">
+              <p style="margin:0; font-size:0.9rem;">
+                <i data-lucide="alert-circle" style="display:inline-block; vertical-align:middle; margin-right:5px;"></i>
+                Vendoscity ne traite pas les paiements. Apres votre commande, vous payez hors plateforme directement le vendeur selon le mode convenu (MOMO, cash, virement, etc.).
+              </p>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Résumé Sidebar -->
+      <div class="order-summary-sidebar">
+        <div class="summary-card">
+          <h2 class="form-section-title" style="border:none; margin-bottom:15px;"><i data-lucide="clipboard-list"></i> Votre Panier</h2>
+          <div id="cart-items-list">
+            <!-- Dynamique -->
+            <p style="color: #999; font-style: italic;">Votre panier est vide...</p>
+          </div>
+          
+          <div class="summary-total">
+            <span>Total</span>
+            <span id="final-total">0 FCFA</span>
+          </div>
+
+          <button type="submit" form="checkout-form" class="btn-submit">
+            <i data-lucide="send"></i> Envoyer la demande
+          </button>
+
+          <div class="trust-badge">
+            <i data-lucide="info"></i> Conseils: verifiez le vendeur, le produit et les conditions avant de payer.
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+  <script>
+    // Logique Panier
+    const cart = JSON.parse(localStorage.getItem('vendorCart') || '[]');
+    const container = document.getElementById('cart-items-list');
+    const totalEl = document.getElementById('final-total');
+
+    if (cart.length > 0) {
+      let total = 0;
+      container.innerHTML = cart.map(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        return `
+          <div class="summary-item">
+            <span>${item.title} <small>x${item.quantity}</small></span>
+            <span style="font-weight:600;">${Math.round(subtotal).toLocaleString('fr-FR')} FCFA</span>
+          </div>
+        `;
+      }).join('');
+      totalEl.textContent = Math.round(total).toLocaleString('fr-FR') + ' FCFA';
+    }
+
+    function submitCheckout(e) {
+      e.preventDefault();
+      if (cart.length === 0) {
+        alert('Votre panier est vide !');
+        return;
+      }
+      
+      const phone = document.getElementById('cust-phone').value;
+      alert(`Félicitations !\n\nVotre commande a été transmise aux vendeurs.\nIls vous contacteront très vite au ${phone} sur WhatsApp pour finaliser.\n\nMerci de votre confiance sur Vendoscity !`);
+      
+      localStorage.removeItem('vendorCart');
+      window.location.href = 'Boutique.html';
+    }
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+

@@ -1,0 +1,417 @@
+﻿<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="content-language" content="fr-FR">
+  <link rel="icon" type="image/svg+xml" href="/assets/images/logo/vendoscity-logo.svg?v=20260327-logo3">
+  <link rel="icon" type="image/png" href="/favicon.png">
+  
+  <link rel="manifest" href="/manifest.webmanifest?v=2026-03-27-iconfix1">
+  <link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png?v=20260327-iconfix2">
+  <meta name="theme-color" content="#ff6a00">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Actualités & Blog - Vendoscity</title>
+  <meta name="description" content="Découvrez les actualités, tendances et conseils de notre blog Vendoscity. Restez informé des dernières nouveautés e-commerce.">
+  <link rel="canonical" href="https://vendoscity.com/pages/Blog">
+  <link rel="stylesheet" href="/style/style.css" media="all">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .blog-hero {
+      background: linear-gradient(135deg, var(--color-yellow) 0%, #ffaa00 100%);
+      color: var(--primary-blue);
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .blog-hero h1 {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+    .blog-hero p {
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .blog-container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .blog-filters {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+    }
+    .blog-filter-btn {
+      background: #f0f0f0;
+      border: 2px solid #ddd;
+      padding: 10px 20px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s ease;
+    }
+    .blog-filter-btn.active {
+      background: var(--primary-blue);
+      color: white;
+      border-color: var(--primary-blue);
+    }
+    .blog-filter-btn:hover {
+      border-color: var(--primary-blue);
+    }
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+    .blog-card {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      cursor: pointer;
+    }
+    .blog-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 24px rgba(18, 18, 147, 0.15);
+    }
+    .blog-image {
+      width: 100%;
+      height: 200px;
+      background: linear-gradient(135deg, var(--primary-blue), var(--color-yellow));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: white;
+    }
+    .blog-content {
+      padding: 20px;
+    }
+    .blog-category {
+      display: inline-block;
+      background: var(--color-yellow);
+      color: var(--primary-blue);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+    .blog-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--primary-blue);
+      margin: 10px 0;
+      line-height: 1.4;
+    }
+    .blog-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .blog-excerpt {
+      color: #555;
+      line-height: 1.6;
+      margin-bottom: 15px;
+      min-height: 60px;
+    }
+    .blog-read-more {
+      color: var(--primary-blue);
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .blog-read-more:hover {
+      text-decoration: underline;
+    }
+    .blog-featured {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      background: white;
+      border: 2px solid var(--color-yellow);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+    .blog-featured-image {
+      background: linear-gradient(135deg, var(--color-yellow) 0%, var(--primary-blue));
+      height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+    }
+    .blog-featured-content {
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .blog-featured-content h2 {
+      color: var(--primary-blue);
+      font-size: 1.8rem;
+      margin-bottom: 15px;
+    }
+    .blog-featured-content p {
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .blog-sidebar {
+      background: #f9f9f9;
+      padding: 20px;
+      border-radius: 8px;
+      margin-top: 40px;
+    }
+    .blog-sidebar h3 {
+      color: var(--primary-blue);
+      margin-bottom: 20px;
+      font-size: 1.2rem;
+    }
+    .blog-sidebar-item {
+      padding: 12px 0;
+      border-bottom: 1px solid #eee;
+      color: #555;
+    }
+    .blog-sidebar-item:last-child {
+      border-bottom: none;
+    }
+    .blog-sidebar-item a {
+      color: var(--primary-blue);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .blog-sidebar-item a:hover {
+      text-decoration: underline;
+    }
+    .blog-newsletter {
+      background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-2) 100%);
+      color: white;
+      padding: 30px;
+      border-radius: 8px;
+      text-align: center;
+      margin-top: 40px;
+    }
+    .blog-newsletter h3 {
+      margin-bottom: 15px;
+    }
+    .blog-newsletter-form {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+    .blog-newsletter-form input {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+    }
+    .blog-newsletter-form button {
+      background: var(--color-yellow);
+      color: var(--primary-blue);
+      border: none;
+      padding: 12px 25px;
+      border-radius: 5px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    @media (max-width: 768px) {
+      .blog-hero h1 {
+        font-size: 1.8rem;
+      }
+      .blog-featured {
+        grid-template-columns: 1fr;
+      }
+      .blog-featured-image {
+        height: 200px;
+        font-size: 3rem;
+      }
+      .blog-newsletter-form {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="header-placeholder"></div>
+
+  <main id="main-content" role="main">
+    <!-- Hero Section -->
+    <div class="blog-hero">
+      <h1><i data-lucide="newspaper"></i> Actualités & Blog</h1>
+      <p>Découvrez les tendances e-commerce, conseils vendeurs et actualités Vendoscity</p>
+    </div>
+
+    <div class="blog-container">
+      <!-- Article en Vedette -->
+      <div class="blog-featured">
+        <div class="blog-featured-image"><i data-lucide="smartphone" style="width: 80px; height: 80px;"></i></div>
+        <div class="blog-featured-content">
+          <span class="blog-category">Tendances</span>
+          <h2>L'avenir du commerce en ligne en 2026</h2>
+          <p>Découvrez les tendances qui transforment la vente en ligne: IA personnalisée, marketplaces de proximité, messagerie directe vendeur-acheteur, et plus...</p>
+          <a href="#" class="blog-read-more">Lire l'article complet →</a>
+        </div>
+      </div>
+
+      <!-- Filtres de Catégories -->
+      <div class="blog-filters">
+        <button class="blog-filter-btn active" type="button" data-filter="all">Tous</button>
+        <button class="blog-filter-btn" type="button" data-filter="tendances"><i data-lucide="bar-chart-2"></i> Tendances</button>
+        <button class="blog-filter-btn" type="button" data-filter="conseils"><i data-lucide="lightbulb"></i> Conseils</button>
+        <button class="blog-filter-btn" type="button" data-filter="vendeurs"><i data-lucide="user"></i> Pour Vendeurs</button>
+        <button class="blog-filter-btn" type="button" data-filter="acheteurs"><i data-lucide="shopping-bag"></i> Pour Acheteurs</button>
+      </div>
+
+      <!-- Grille d'articles -->
+      <div class="blog-grid">
+        <!-- Article 1 -->
+        <div class="blog-card" data-category="conseils">
+          <div class="blog-image"><i data-lucide="credit-card" style="width: 60px; height: 60px;"></i></div>
+          <div class="blog-content">
+            <span class="blog-category">Conseils</span>
+            <h3 class="blog-title">10 Astuces pour Augmenter vos Ventes en Ligne</h3>
+            <div class="blog-meta">
+              <span><i data-lucide="calendar"></i> 15 Mar 2026</span>
+              <span><i data-lucide="user"></i> Arthur Ngalamo</span>
+            </div>
+            <p class="blog-excerpt">Découvrez les 10 stratégies éprouvées pour augmenter votre chiffre d'affaires en ligne. Des techniques simples mais efficaces...</p>
+            <a href="#" class="blog-read-more">Lire la suite →</a>
+          </div>
+        </div>
+
+        <!-- Article 2 -->
+        <div class="blog-card" data-category="vendeurs">
+          <div class="blog-image"><i data-lucide="trending-up" style="width: 60px; height: 60px;"></i></div>
+          <div class="blog-content">
+            <span class="blog-category">Pour Vendeurs</span>
+            <h3 class="blog-title">Comment Optimiser vos Fiches Produits</h3>
+            <div class="blog-meta">
+              <span><i data-lucide="calendar"></i> 12 Mar 2026</span>
+              <span><i data-lucide="user"></i> Arthur Ngalamo</span>
+            </div>
+            <p class="blog-excerpt">Les fiches produits mal optimisées = ventes perdues. Apprenez à rédiger des descriptions qui convertissent...</p>
+            <a href="#" class="blog-read-more">Lire la suite →</a>
+          </div>
+        </div>
+
+        <!-- Article 3 -->
+        <div class="blog-card" data-category="acheteurs">
+          <div class="blog-image"><i data-lucide="lock" style="width: 60px; height: 60px;"></i></div>
+          <div class="blog-content">
+            <span class="blog-category">Pour Acheteurs</span>
+            <h3 class="blog-title">Guide Complet de la Sécurité en Ligne</h3>
+            <div class="blog-meta">
+              <span><i data-lucide="calendar"></i> 10 Mar 2026</span>
+              <span><i data-lucide="user"></i> Arthur Ngalamo</span>
+            </div>
+            <p class="blog-excerpt">Protégez vos données personnelles et vos transactions en ligne. Voici tout ce que vous devez savoir...</p>
+            <a href="#" class="blog-read-more">Lire la suite →</a>
+          </div>
+        </div>
+
+        <!-- Article 4 -->
+        <div class="blog-card" data-category="tendances">
+          <div class="blog-image"><i data-lucide="bot" style="width: 60px; height: 60px;"></i></div>
+          <div class="blog-content">
+            <span class="blog-category">Tendances</span>
+            <h3 class="blog-title">L'IA Révolutionne l'Expérience Utilisateur</h3>
+            <div class="blog-meta">
+              <span><i data-lucide="calendar"></i> 08 Mar 2026</span>
+              <span><i data-lucide="user"></i> Arthur Ngalamo</span>
+            </div>
+            <p class="blog-excerpt">L'intelligence artificielle personnalise déjà l'expérience d'achat. Comment les marchands en tirent profit...</p>
+            <a href="#" class="blog-read-more">Lire la suite →</a>
+          </div>
+        </div>
+
+        <!-- Article 5 -->
+        <div class="blog-card" data-category="vendeurs">
+          <div class="blog-image"><i data-lucide="truck" style="width: 60px; height: 60px;"></i></div>
+          <div class="blog-content">
+            <span class="blog-category">Pour Vendeurs</span>
+            <h3 class="blog-title">Logistique: Réduire vos Coûts de Livraison</h3>
+            <div class="blog-meta">
+              <span><i data-lucide="calendar"></i> 05 Mar 2026</span>
+              <span><i data-lucide="user"></i> Arthur Ngalamo</span>
+            </div>
+            <p class="blog-excerpt">Les frais de livraison érodent vos marges. Découvrez comment les optimiser sans sacrifier la qualité...</p>
+            <a href="#" class="blog-read-more">Lire la suite →</a>
+          </div>
+        </div>
+
+        <!-- Article 6 -->
+        <div class="blog-card" data-category="conseils">
+          <div class="blog-image"><i data-lucide="star" style="width: 60px; height: 60px;"></i></div>
+          <div class="blog-content">
+            <span class="blog-category">Conseils</span>
+            <h3 class="blog-title">Gérer les Avis Clients: Stratégie Gagnante</h3>
+            <div class="blog-meta">
+              <span><i data-lucide="calendar"></i> 02 Mar 2026</span>
+              <span><i data-lucide="user"></i> Arthur Ngalamo</span>
+            </div>
+            <p class="blog-excerpt">Les avis clients influencent 92% des décisions d'achat. Voici comment les gérer efficacement...</p>
+            <a href="#" class="blog-read-more">Lire la suite →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="blog-sidebar">
+        <h3><i data-lucide="flame"></i> Articles Populaires</h3>
+        <div class="blog-sidebar-item">
+          <a href="#">L'avenir du commerce en ligne en 2026</a>
+        </div>
+        <div class="blog-sidebar-item">
+          <a href="#">10 Astuces pour Augmenter vos Ventes</a>
+        </div>
+        <div class="blog-sidebar-item">
+          <a href="#">Comment Optimiser vos Fiches Produits</a>
+        </div>
+        <div class="blog-sidebar-item">
+          <a href="#">L'IA Révolutionne l'Expérience Utilisateur</a>
+        </div>
+        <div class="blog-sidebar-item">
+          <a href="#">Guide Complet de la Sécurité en Ligne</a>
+        </div>
+      </div>
+
+      <!-- Newsletter -->
+      <div class="blog-newsletter">
+        <h3><i data-lucide="mail"></i> Abonnez-vous à notre Newsletter</h3>
+        <p>Recevez les dernières actualités et conseils directement dans votre boîte mail</p>
+        <div class="blog-newsletter-form">
+          <input id="newsletter-email" type="email" placeholder="Votre email..." autocomplete="email" required>
+          <button id="newsletter-submit" type="button">S'abonner</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="footer-placeholder"></div>
+
+  <script src="/script/config.js"></script>
+  <script src="/script/script.js"></script>
+  <script src="/script/component-loader.js"></script>
+  <script src="/script/blog.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+

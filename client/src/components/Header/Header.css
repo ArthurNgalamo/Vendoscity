@@ -1,0 +1,1436 @@
+/* ========================================================================= */
+/* 🛒 STYLE DE L'EN-TÊTE STYLE ALIBABA.COM                                   */
+/* Extrait de style.css – importé dans Header/index.js                        */
+/* ========================================================================= */
+
+/* ── Curseur clignotant pour l'effet machine à écrire du placeholder ── */
+@keyframes vc-blink {
+    0%, 100% { border-color: transparent; }
+    45%, 55% { border-color: #94a3b8; }
+}
+
+/* Input en mode « frappe active » : caret visible dans le placeholder */
+.alibaba-search-box-form input:placeholder-shown,
+.mobile-search-box-premium input:placeholder-shown {
+    border-right: 2px solid #94a3b8;
+    animation: vc-blink 1s step-end infinite;
+}
+
+/* Quand l'utilisateur a tapé du texte : retirer le curseur synthétique */
+.alibaba-search-box-form input:not(:placeholder-shown),
+.mobile-search-box-premium input:not(:placeholder-shown) {
+    border-right: none;
+    animation: none;
+}
+
+.alibaba-global-header {
+    width: 100%;
+    border-bottom: 1px solid #eeeeee;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    position: relative;
+    z-index: 1000;
+}
+
+/* 🖥️ DESKTOP STICKY STYLES */
+@media (min-width: 1024px) {
+    /* Set transitions on header wrapper */
+    .alibaba-global-header {
+        transition: box-shadow 0.3s ease, background-color 0.3s ease;
+    }
+    
+    /* Keep it sticky to top 0 */
+    .alibaba-global-header.is-sticky-desktop {
+        position: sticky;
+        top: 0;
+        background: #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    
+    /* Transitions for collapsible rows to make it smooth (not abrupt!) */
+    .alibaba-nav-bar {
+        transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                    opacity 0.2s ease, 
+                    padding 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                    border-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        max-height: 80px;
+        opacity: 1;
+        overflow: hidden;
+    }
+    
+    .alibaba-search-row {
+        transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                    opacity 0.2s ease, 
+                    padding 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+                    border-width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        max-height: 160px;
+        opacity: 1;
+        overflow: hidden;
+    }
+    
+    /* Collapse Row 2 (categories nav) and Row 3 (big search bar) smoothly when sticky */
+    .alibaba-global-header.is-sticky-desktop .alibaba-nav-bar {
+        max-height: 0 !important;
+        opacity: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        border-top-width: 0 !important;
+        border-bottom-width: 0 !important;
+        pointer-events: none;
+    }
+    
+    .alibaba-global-header.is-sticky-desktop .alibaba-search-row {
+        max-height: 0 !important;
+        opacity: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        border-bottom-width: 0 !important;
+        pointer-events: none;
+    }
+    
+    /* Make top row more compact when sticky */
+    .alibaba-global-header.is-sticky-desktop .alibaba-top-row {
+        padding-top: 6px;
+        padding-bottom: 6px;
+        gap: 12px;
+    }
+    
+    .alibaba-global-header.is-sticky-desktop .logo-brand {
+        font-size: 20px;
+    }
+    
+    /* Hide address and language/currency dropdowns when sticky to free up space */
+    .alibaba-global-header.is-sticky-desktop .delivery-address-tool,
+    .alibaba-global-header.is-sticky-desktop .lang-currency-tool {
+        display: none !important;
+    }
+    
+    /* Show the compact search bar inside top row when sticky */
+    .desktop-sticky-search-form {
+        display: none !important;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+    }
+    
+    .alibaba-global-header.is-sticky-desktop .desktop-sticky-search-form {
+        display: flex !important;
+        opacity: 1;
+        flex: 1;
+        max-width: 520px;
+        margin: 0 30px;
+        height: 36px;
+        border-radius: 20px;
+    }
+}
+
+/* 📱 MOBILE STICKY & HIDE ON SCROLL STYLES */
+@media (max-width: 1023px) {
+    /* Set transitions for smooth sliding animation */
+    .alibaba-global-header {
+        transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease;
+    }
+    
+    /* Scrolling down: hide completely */
+    .alibaba-global-header.is-hidden-mobile {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        transform: translateY(-100%);
+    }
+    
+    /* Scrolling up: make sticky at top and slide down */
+    .alibaba-global-header.is-sticky-mobile {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        transform: translateY(0);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        background-color: #ffffff;
+    }
+    
+    /* Hide non-essential rows in sticky mobile mode to keep it compact */
+    .alibaba-global-header.is-sticky-mobile .mobile-shortcuts-row,
+    .alibaba-global-header.is-sticky-mobile .mobile-promo-row,
+    .alibaba-global-header.is-sticky-mobile .mobile-filters-row {
+        display: none !important;
+    }
+}
+
+.alibaba-header-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+/* White base background layer */
+.alibaba-header-bg::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ffffff;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Animated subtle green, orange, yellow cloud-like background */
+.alibaba-header-bg::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    right: -50%;
+    bottom: -50%;
+    z-index: 2;
+    pointer-events: none;
+    background: radial-gradient(circle at 15% 20%, rgba(34, 197, 94, 0.20) 0%, transparent 40%),
+                radial-gradient(circle at 80% 30%, rgba(255, 106, 0, 0.22) 0%, transparent 45%),
+                radial-gradient(circle at 45% 75%, rgba(234, 179, 8, 0.20) 0%, transparent 40%);
+    background-size: 200% 200%;
+    filter: blur(45px);
+    animation: alibaba-header-clouds 5s infinite linear;
+}
+
+@keyframes alibaba-header-clouds {
+    0% {
+        background-position: 0% 0%;
+        transform: rotate(0deg) scale(1);
+    }
+    50% {
+        background-position: 100% 100%;
+        transform: rotate(180deg) scale(1.12);
+    }
+    100% {
+        background-position: 0% 100%;
+        transform: rotate(360deg) scale(1);
+    }
+}
+
+/* 🖥️ DESKTOP LAYOUT (Large screens) */
+.alibaba-header-desktop {
+    display: block;
+}
+
+/* 📱 MOBILE LAYOUT (Compact screens) */
+.alibaba-header-mobile {
+    display: none;
+}
+
+/* ROW 1: Logo & actions tools */
+.alibaba-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 14px 20px;
+    gap: 20px;
+}
+
+.logo-brand {
+    font-size: 24px;
+    font-weight: 800;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    letter-spacing: -0.5px;
+    flex-shrink: 0;
+    transition: transform var(--transition-speed) ease;
+}
+
+.logo-brand:hover {
+    transform: scale(1.03);
+}
+
+.logo-brand-main {
+    color: #ff6a00; /* Orange exact Alibaba */
+}
+
+.logo-brand-dotcom {
+    color: #222222;
+}
+
+.top-row-tools {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* Dropdown triggers */
+.tool-dropdown-trigger {
+    position: relative;
+    cursor: pointer;
+    padding: 4px 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    user-select: none;
+}
+
+.tool-label {
+    font-size: 11px;
+    color: #666666;
+    font-weight: 500;
+}
+
+.tool-value {
+    font-size: 13px;
+    color: #222222;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tool-icon {
+    color: #333333;
+}
+
+.chevron-icon {
+    color: #888888;
+    transition: transform 0.2s ease;
+}
+
+/* Dropdown menu overlay */
+.tool-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 12px;
+    min-width: 190px;
+    z-index: 1010;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+}
+
+/* Hover effects for dropdowns on desktop */
+@media (min-width: 1024px) {
+    .tool-dropdown-trigger:hover .tool-dropdown-menu {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateX(-50%) translateY(0);
+    }
+    
+    .tool-dropdown-trigger:hover .chevron-icon {
+        transform: rotate(180deg);
+    }
+}
+
+.menu-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #111111;
+    margin: 0 0 8px 0;
+}
+
+.menu-desc {
+    font-size: 11px;
+    color: #777777;
+    margin: 8px 0 0 0;
+    line-height: 1.3;
+}
+
+.menu-item {
+    font-size: 13px;
+    color: #475569;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.menu-item:hover {
+    background: #fff3f0;
+    color: #ff6a00;
+}
+
+.menu-item.active {
+    font-weight: 700;
+    color: #ff6a00;
+    background: #fff6f3;
+}
+
+.menu-divider {
+    border: 0;
+    border-top: 1px solid #e2e8f0;
+    margin: 8px 0;
+}
+
+/* User profile dropdown custom */
+.user-menu-dropdown {
+    min-width: 210px;
+    right: 0;
+    left: auto;
+    transform: translateY(8px);
+}
+
+@media (min-width: 1024px) {
+    .user-account-tool:hover .user-menu-dropdown {
+        transform: translateY(0);
+    }
+}
+
+.user-profile-summary {
+    padding: 4px 8px 8px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.user-profile-summary strong {
+    font-size: 14px;
+    color: #111111;
+}
+
+.user-profile-summary span {
+    font-size: 11px;
+    color: #666666;
+}
+
+.menu-link-action {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #222222;
+    text-decoration: none;
+    padding: 8px 10px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 600;
+}
+
+.menu-link-action:hover {
+    background: #fff3f0;
+    color: #ff6a00;
+}
+
+.menu-button-logout {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #cc3333;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    padding: 8px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s;
+    font-weight: 600;
+    font-family: inherit;
+}
+
+.menu-button-logout:hover {
+    background: #fef2f2;
+}
+
+/* Guest user dropdown menu custom */
+.guest-menu-dropdown {
+    min-width: 220px;
+    right: 0;
+    left: auto;
+    transform: translateY(8px);
+    padding: 16px;
+    text-align: center;
+}
+
+@media (min-width: 1024px) {
+    .user-guest-tool:hover .guest-menu-dropdown {
+        transform: translateY(0);
+    }
+}
+
+.welcome-text {
+    font-size: 13px;
+    color: #333333;
+    margin: 0 0 12px 0;
+    font-weight: 500;
+}
+
+.menu-btn-primary {
+    display: block;
+    width: 100%;
+    background: #ff6a00;
+    color: white !important;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 8px 0;
+    border-radius: 20px;
+    transition: background 0.2s;
+}
+
+.menu-btn-primary:hover {
+    background: #e65f00;
+}
+
+.signup-link-wrap {
+    font-size: 11px;
+    color: #666666;
+    margin-top: 10px;
+}
+
+.signup-link-wrap a {
+    color: #ff6a00;
+    text-decoration: none;
+    font-weight: 700;
+}
+
+.signup-link-wrap a:hover {
+    text-decoration: underline;
+}
+
+/* Auth Buttons Group */
+.auth-buttons-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.btn-signin-text {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: #333333;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.btn-signin-text:hover {
+    color: #ff6a00;
+}
+
+.btn-signup-pill {
+    background: linear-gradient(135deg, #ff8a00 0%, #ff6a00 100%);
+    color: #ffffff !important;
+    padding: 8px 22px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 13px;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(255, 106, 0, 0.15);
+    transition: all 0.2s ease;
+}
+
+.btn-signup-pill:hover {
+    background: linear-gradient(135deg, #ff6a00 0%, #e65f00 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(255, 106, 0, 0.25);
+}
+
+.btn-signup-pill:active {
+    transform: translateY(0);
+}
+
+/* Favorites and Cart Action links */
+.tool-link-favorites, .tool-link-cart {
+    background: none;
+    border: none;
+    color: #333333;
+    cursor: pointer;
+    position: relative;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s, transform 0.2s;
+}
+
+.tool-link-favorites:hover {
+    color: #e11d48;
+    transform: scale(1.1);
+}
+
+.tool-link-cart:hover {
+    color: #ff6a00;
+    transform: scale(1.1);
+}
+
+.cart-wrapper {
+    position: relative;
+}
+
+.badge-count {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ff6a00;
+    color: white;
+    font-size: 10px;
+    font-weight: 700;
+    border-radius: 50%;
+    min-width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    box-shadow: 0 2px 4px rgba(255, 106, 0, 0.2);
+}
+
+/* ROW 2: Navigation & Categories */
+.alibaba-nav-bar {
+    background-color: transparent;
+    border-top: 1px solid #f1f5f9;
+    border-bottom: 1px solid #f1f5f9;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 8px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+}
+
+.nav-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.categories-dropdown-container {
+    position: relative;
+}
+
+.nav-categories-trigger {
+    background: none;
+    border: none;
+    color: #111111;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 0;
+}
+
+.categories-mega-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+    padding: 16px;
+    width: 320px;
+    z-index: 1010;
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: all 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+    .categories-dropdown-container:hover .categories-mega-menu {
+        display: block;
+        opacity: 1;
+        pointer-events: auto;
+        transform: translateY(0);
+    }
+}
+
+.categories-grid-nav {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+}
+
+.category-menu-link {
+    font-size: 12px;
+    color: #475569;
+    text-decoration: none;
+    padding: 6px 10px;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+    font-weight: 600;
+}
+
+.category-menu-link:hover {
+    background: #fff3f0;
+    color: #ff6a00;
+}
+
+.nav-main-link {
+    font-size: 13px;
+    color: #222222;
+    font-weight: 700;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+}
+
+.nav-main-link:hover {
+    color: #ff6a00;
+}
+
+.link-icon {
+    color: #ff6a00;
+}
+
+.nav-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-sub-link {
+    font-size: 12px;
+    color: #555555;
+    text-decoration: none;
+    font-weight: 600;
+    transition: color 0.2s;
+}
+
+.nav-sub-link:hover {
+    color: #ff6a00;
+}
+
+/* ROW 3: Centered Alibaba-style search section */
+.alibaba-search-row {
+    background: transparent;
+    padding: 20px 20px 32px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.alibaba-search-container {
+    width: 100%;
+    max-width: 740px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.search-tabs-list {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding-left: 16px;
+}
+
+.search-tab-item {
+    background: none;
+    border: none;
+    font-size: 13px;
+    font-weight: 600;
+    color: #666666;
+    cursor: pointer;
+    padding: 4px 0;
+    position: relative;
+    transition: color 0.2s;
+    font-family: inherit;
+}
+
+.search-tab-item:hover {
+    color: #ff6a00;
+}
+
+.search-tab-item.active {
+    color: #ff6a00;
+    font-weight: 700;
+}
+
+.search-tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #ff6a00;
+    border-radius: 2px;
+}
+
+.tab-badge-verified {
+    background: #e3f2fd;
+    color: #2563eb;
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    font-weight: 700;
+    margin-left: 2px;
+}
+
+/* Alibaba Search Box */
+.alibaba-search-box-form {
+    background: #ffffff;
+    border: 2px solid #ff6a00;
+    border-radius: 30px;
+    display: flex;
+    align-items: center;
+    padding: 3px 3px 3px 16px;
+    box-shadow: 0 4px 18px rgba(255, 106, 0, 0.06);
+    position: relative;
+    transition: box-shadow 0.3s;
+}
+
+.alibaba-search-box-form:focus-within {
+    box-shadow: 0 6px 22px rgba(255, 106, 0, 0.14);
+}
+
+.search-image-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #666666;
+    font-size: 13px;
+    cursor: pointer;
+    padding-right: 14px;
+    border-right: 1px solid #dddddd;
+    user-select: none;
+    transition: color 0.2s;
+    flex-shrink: 0;
+}
+
+.search-image-btn:hover {
+    color: #ff6a00;
+}
+
+.search-input-field-wrap {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    padding-left: 14px;
+}
+
+.search-input-field-wrap input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #222222;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.search-input-field-wrap input::placeholder {
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.btn-alibaba-search-submit {
+    background: linear-gradient(135deg, #ff8a00 0%, #ff5000 100%);
+    border: none;
+    border-radius: 20px;
+    color: #ffffff;
+    padding: 10px 24px;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: opacity 0.2s, transform 0.1s;
+    font-family: inherit;
+}
+
+.btn-alibaba-search-submit:hover {
+    opacity: 0.95;
+    transform: scale(1.01);
+}
+
+.btn-alibaba-search-submit:active {
+    transform: scale(0.98);
+}
+
+/* Autocomplete list */
+.alibaba-search-autocomplete-list {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.06);
+    padding: 6px 0;
+    list-style: none;
+    margin: 0;
+    z-index: 1010;
+}
+
+.alibaba-search-autocomplete-list li a {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 16px;
+    font-size: 13px;
+    color: #333333;
+    text-decoration: none;
+    transition: background 0.2s;
+}
+
+.alibaba-search-autocomplete-list li a:hover {
+    background-color: #fff3f0;
+    color: #ff6a00;
+}
+
+.alibaba-search-autocomplete-list li a .suggestion-price {
+    font-weight: 700;
+    color: #ff6a00;
+}
+
+/* ROW 4: Bottom Welcome Row */
+.alibaba-welcome-row {
+    background-color: transparent;
+    border-bottom: 1px solid #f1f5f9;
+    padding: 8px 20px;
+    font-size: 12px;
+    color: #475569;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.welcome-left {
+    color: #111111;
+}
+
+.welcome-right {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+}
+
+.welcome-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+    font-size: 11px;
+}
+
+.welcome-item:hover {
+    color: #ff6a00;
+}
+
+/* 📱 MOBILE HEADER LAYOUT (Compact screens) */
+@media (max-width: 1023px) {
+    .alibaba-header-desktop {
+        display: none;
+    }
+    
+    .alibaba-header-mobile {
+        display: block;
+    }
+
+    .alibaba-global-header.hide-on-mobile {
+        display: none;
+    }
+}
+
+.mobile-header-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: transparent;
+}
+
+.mobile-header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.mobile-tool-link {
+    position: relative;
+    color: #222222;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+}
+
+.mobile-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: #ff6a00;
+    color: white;
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 50%;
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.mobile-search-bar-row {
+    padding: 6px 16px 12px 16px;
+    background-color: transparent;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.mobile-search-form {
+    display: flex;
+    align-items: center;
+    border: 1.5px solid #ff6a00;
+    border-radius: 20px;
+    padding: 1px 1px 1px 12px;
+    background-color: #f8fafc;
+}
+
+.mobile-search-form input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 13px;
+    padding: 6px 0;
+}
+
+.mobile-search-btn {
+    background: #ff6a00;
+    border: none;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+}
+
+.mobile-hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 20px;
+    height: 14px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    outline: none;
+    margin-left: 4px;
+}
+
+.mobile-hamburger span {
+    height: 2px;
+    width: 100%;
+    background-color: #222222;
+    border-radius: 2px;
+    transition: all 0.25s ease;
+}
+
+.mobile-hamburger.active span:nth-child(1) {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.mobile-hamburger.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.mobile-hamburger.active span:nth-child(3) {
+    transform: translateY(-6px) rotate(-45deg);
+}
+
+.mobile-nav-bar-drawer {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: #ffffff;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+    display: none;
+    flex-direction: column;
+    list-style: none;
+    padding: 8px 0;
+    border-top: 1px solid #f1f5f9;
+    z-index: 1009;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+}
+
+.mobile-nav-bar-drawer.active {
+    display: flex;
+}
+
+.mobile-nav-bar-drawer li {
+    border-bottom: 1px solid #f8fafc;
+}
+
+.mobile-nav-bar-drawer li a, .mobile-nav-bar-drawer li button {
+    display: flex;
+    width: 100%;
+    padding: 12px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222222;
+    text-decoration: none;
+    background: none;
+    border: none;
+    text-align: left;
+    font-family: inherit;
+}
+
+.mobile-nav-bar-drawer li a.active {
+    color: #ff6a00;
+    background: #fffcfb;
+}
+
+.mobile-nav-dashboard {
+    color: var(--primary-blue) !important;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.mobile-nav-logout button {
+    color: #cc3333 !important;
+}
+
+/* 📱 ALIBABA MOBILE HEADER & TABBAR STYLES */
+/* ========================================================================= */
+
+.mobile-tabs-row {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px 0 6px 0;
+    border-bottom: 1px solid #f1f5f9;
+    background-color: transparent;
+}
+
+.mobile-tab-item {
+    font-size: 14px;
+    font-weight: 600;
+    color: #666666;
+    background: none;
+    border: none;
+    padding: 6px 12px;
+    position: relative;
+    font-family: inherit;
+    cursor: pointer;
+}
+
+.mobile-tab-item.active {
+    color: #111111;
+    font-weight: 800;
+}
+
+.mobile-tab-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 20%;
+    right: 20%;
+    height: 3px;
+    background-color: #ff6a00;
+    border-radius: 2px;
+}
+
+.mobile-search-bar-row-premium {
+    padding: 10px 14px;
+    background-color: transparent;
+}
+
+.mobile-search-box-premium {
+    display: flex;
+    align-items: center;
+    border: 2px solid #ff6a00;
+    border-radius: 24px;
+    padding: 3px 3px 3px 14px;
+    background-color: #ffffff;
+    gap: 10px;
+    box-shadow: 0 4px 10px rgba(255, 106, 0, 0.05);
+}
+
+.mobile-search-camera-icon {
+    color: #555555;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.mobile-search-input-wrap {
+    flex: 1;
+    display: flex;
+    align-items: center;
+}
+
+.mobile-search-input-wrap input {
+    width: 100%;
+    border: none;
+    outline: none;
+    font-size: 14px;
+    color: #222222;
+    background: transparent;
+    font-family: inherit;
+    font-weight: 500;
+}
+
+.mobile-search-input-wrap input::placeholder {
+    color: #777777;
+    font-weight: 600;
+}
+
+.mobile-search-mic-icon {
+    color: #555555;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding-right: 6px;
+}
+
+.mobile-search-submit-btn {
+    background: linear-gradient(135deg, #ff8a00 0%, #ff5000 100%);
+    border: none;
+    border-radius: 20px;
+    width: 48px;
+    height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(255, 106, 0, 0.2);
+}
+
+.mobile-shortcuts-row {
+    display: flex;
+    gap: 10px;
+    padding: 8px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.mobile-shortcuts-row::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-shortcut-card {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background-color: #ffffff;
+    border: 1px solid #f1f5f9;
+    border-radius: 10px;
+    padding: 10px 12px;
+    min-width: 140px;
+    text-decoration: none;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+    transition: transform 0.2s;
+}
+
+.mobile-shortcut-card:active {
+    transform: scale(0.97);
+}
+
+.mobile-shortcut-icon {
+    width: 28px;
+    height: 28px;
+    background-color: #fff3f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ff6a00;
+    flex-shrink: 0;
+}
+
+.mobile-shortcut-text {
+    font-size: 11px;
+    font-weight: 700;
+    color: #333333;
+    line-height: 1.2;
+}
+
+.mobile-promo-row {
+    display: flex;
+    gap: 10px;
+    padding: 4px 14px 8px 14px;
+}
+
+.mobile-promo-banner {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(135deg, #fff6f3 0%, #ffebe5 100%);
+    border-radius: 8px;
+    padding: 8px 10px;
+    border: 1px solid rgba(255, 106, 0, 0.05);
+}
+
+.mobile-promo-icon {
+    color: #ff6a00;
+    flex-shrink: 0;
+}
+
+.mobile-promo-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.mobile-promo-title {
+    font-size: 10px;
+    font-weight: 800;
+    color: #222222;
+    line-height: 1.2;
+}
+
+.mobile-promo-desc {
+    font-size: 9px;
+    color: #666666;
+    line-height: 1.2;
+    margin-top: 1px;
+}
+
+.mobile-filters-row {
+    display: flex;
+    gap: 8px;
+    padding: 6px 14px 12px 14px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+
+.mobile-filters-row::-webkit-scrollbar {
+    display: none;
+}
+
+.mobile-filter-pill {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background-color: #f1f5f9;
+    border-radius: 20px;
+    padding: 8px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #475569;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.mobile-filter-pill.active {
+    background-color: #ffebe5;
+    color: #ff6a00;
+    border: 1px solid rgba(255, 106, 0, 0.15);
+}
+
+.mobile-filter-icon {
+    width: 12px;
+    height: 12px;
+    color: #ff6a00;
+}
+
+/* Fixed Mobile Tabbar Bottom */
+.alibaba-mobile-tabbar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 56px;
+    background-color: #ffffff;
+    border-top: 1px solid #eeeeee;
+    display: none;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 1050;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+}
+
+@media (max-width: 1023px) {
+    .alibaba-mobile-tabbar {
+        display: flex;
+    }
+    
+    body {
+        padding-bottom: 56px !important; /* reserve space for fixed bottom menu */
+    }
+}
+
+.tabbar-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666666;
+    text-decoration: none;
+    font-size: 10px;
+    font-weight: 700;
+    gap: 3px;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    position: relative;
+    font-family: inherit;
+    transition: color 0.2s;
+}
+
+.tabbar-item.active {
+    color: #ff6a00;
+}
+
+.tabbar-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tabbar-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background-color: #ff6a00;
+    color: white;
+    font-size: 9px;
+    font-weight: 800;
+    border-radius: 50%;
+    min-width: 15px;
+    height: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    border: 1px solid #ffffff;
+}
