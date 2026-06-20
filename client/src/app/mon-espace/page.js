@@ -301,11 +301,7 @@ export default function MonEspacePage() {
             </Link>
 
             {/* Link 2: Mon Profil */}
-            <Link href="/dashboard?tab=profile" onClick={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('vc_dashboard_active_tab', 'profile');
-              }
-            }} className="premium-link">
+            <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="premium-link">
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
                 <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <User width="18" height="18" style={{ color: '#ef4444' }} />

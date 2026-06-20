@@ -541,13 +541,13 @@ export default function DashboardPage() {
             >
               <TrendingUp width="18" height="18" /> Statistiques & Métriques
             </button>
-            <button
-              onClick={() => setActiveSection('profile')}
-              className={`dashboard-menu-item ${activeSection === 'profile' ? 'active' : ''}`}
-              style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+            <Link
+              href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`}
+              className="dashboard-menu-item"
+              style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}
             >
-              <User width="18" height="18" /> Mon Profil
-            </button>
+              <User width="18" height="18" /> Mon Profil / Boutique
+            </Link>
           </div>
         </aside>
 
