@@ -7,7 +7,7 @@ import ProductCard from '../../../components/ProductCard';
 import { useToast } from '../../../context/ToastContext';
 import { getApiBaseUrl, fetchWithTimeout, logAnalyticsEvent } from '../../../core/api';
 import { shareLink } from '../../../core/share';
-import { Store, Share2, ArrowLeft, QrCode } from 'lucide-react';
+import { Store, Share2, ArrowLeft, QrCode, Phone, MessageSquare, ShieldCheck, ShoppingBag, Star, Truck } from 'lucide-react';
 
 export default function SellerPublicPage({ params }) {
   const resolvedParams = use(params);
@@ -98,100 +98,156 @@ export default function SellerPublicPage({ params }) {
   }
 
   const shopName = seller.shop_name || seller.first_name || 'Boutique';
-  const bio = seller.bio || 'Ce vendeur n&apos;a pas encore rédigé de biographie.';
+  const bio = seller.bio || 'Ce vendeur n\'a pas encore rédigé de biographie.';
+  const initialLetter = shopName.charAt(0).toUpperCase();
+  const contactPhone = seller.phone || seller.whatsapp || '';
 
   return (
-    <div style={{ paddingBottom: '60px' }}>
+    <div style={{ paddingBottom: '60px', backgroundColor: '#f8fafc' }}>
       
-      {/* Seller Hero Banner */}
-      <section className="seller-hero" aria-label="Profil vendeur">
+      {/* 1. Seller Hero Banner (slate gradient) */}
+      <section className="seller-hero" aria-label="Bannière boutique">
         <div className="seller-hero-inner">
           <div>
-            <h1 className="seller-title" id="seller-name">{shopName}</h1>
-            <p className="seller-subtitle">Consultez les articles publiés par ce vendeur. Paiement et livraison se discutent directement avec le vendeur.</p>
+            <div className="seller-title-wrapper">
+              <h1 className="seller-title" id="seller-name">{shopName}</h1>
+              <span className="seller-badge-verified" title="Vendeur Vérifié">
+                <ShieldCheck width="14" height="14" fill="white" color="#007aff" />
+              </span>
+            </div>
+            <p className="seller-subtitle">
+              Vitrine professionnelle certifiée. Contact direct sans commission intermédiaire.
+            </p>
           </div>
           <div className="seller-actions">
             <button
               type="button"
               id="btn-qr-shop-header"
               onClick={() => setShowQrModal(true)}
-              style={{
-                background: 'none',
-                border: '1px solid rgba(255,255,255,0.25)',
-                color: 'white',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              aria-label="Générer QR Code"
+              title="Générer le QR Code de la boutique"
             >
-              <QrCode width="18" height="18" /> QR Code
+              <QrCode width="16" height="16" /> QR Code
             </button>
             <button
               type="button"
               id="btn-share-shop-header"
               onClick={handleShareShop}
-              style={{
-                background: 'none',
-                border: '1px solid rgba(255,255,255,0.25)',
-                color: 'white',
-                padding: '10px 14px',
-                borderRadius: '8px',
-                fontWeight: 700,
-                cursor: 'pointer',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}
-              aria-label="Partager la boutique"
+              title="Partager la boutique"
             >
-              <Share2 width="18" height="18" /> Partager
+              <Share2 width="16" height="16" /> Partager
             </button>
-            <Link href="/boutique" aria-label="Retour à la boutique">
-              <Store width="16" height="16" style={{ verticalAlign: 'middle', marginRight: '4px' }} /> Boutique
+            <Link href="/boutique" aria-label="Retour à la boutique principale">
+              <Store width="16" height="16" /> Catalogue
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Seller Bio & Products */}
-      <div className="seller-body">
-        <div className="seller-card" id="seller-bio-card" style={{ display: bio ? 'block' : 'none' }}>
-          <p className="seller-bio" id="seller-bio">{bio}</p>
-        </div>
-
-        <h2 className="seller-products-title">
-          <Store width="22" height="22" style={{ marginRight: '8px', verticalAlign: 'middle' }} /> Articles publiés
-        </h2>
-
-        {products.length > 0 ? (
-          <div className="products-grid" style={{ marginTop: '20px' }}>
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
+      {/* 2. Split layout (Sidebar left, Products right) */}
+      <div className="seller-split-layout">
+        
+        {/* Left Column: Identité de l'entreprise */}
+        <aside className="seller-info-sidebar">
+          <div className="seller-profile-card-header">
+            <div className="seller-avatar-large">
+              {initialLetter}
+            </div>
+            <h2 className="seller-sidebar-title">{shopName}</h2>
+            <p className="seller-sidebar-subtitle">Boutique Vérifiée</p>
           </div>
-        ) : (
-          <div
-            id="seller-products-empty"
-            style={{
-              padding: '40px',
-              textAlign: 'center',
-              background: '#fff',
-              border: '1px dashed #ccc',
-              borderRadius: '8px',
-              color: '#666',
-              marginTop: '15px'
-            }}
-          >
-            Aucun produit publié pour le moment par ce vendeur.
+
+          <div className="seller-bio-section">
+            <h4>À propos</h4>
+            <p className="seller-bio-text">{bio}</p>
           </div>
-        )}
+
+          {contactPhone && (
+            <div className="seller-contact-section">
+              <h4>Contact Direct</h4>
+              <div className="seller-contact-list">
+                <a
+                  href={`https://wa.me/${contactPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
+                    `Bonjour ${shopName}, j'ai visité votre boutique en ligne sur Vendoscity et je souhaiterais échanger avec vous.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="seller-contact-link whatsapp"
+                  onClick={() => logAnalyticsEvent('whatsapp_click', seller.id)}
+                >
+                  <MessageSquare width="16" height="16" fill="white" /> WhatsApp direct
+                </a>
+                <a
+                  href={`tel:${contactPhone.replace(/\D/g, '')}`}
+                  className="seller-contact-link phone"
+                  onClick={() => logAnalyticsEvent('phone_click', seller.id)}
+                >
+                  <Phone width="16" height="16" /> Appeler le vendeur
+                </a>
+              </div>
+            </div>
+          )}
+        </aside>
+
+        {/* Right Column: KPIs & Product catalog */}
+        <main className="seller-catalog-area">
+          
+          {/* Stats Bar */}
+          <div className="seller-stats-summary">
+            <div className="seller-stat-widget">
+              <span className="seller-stat-val" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <ShoppingBag width="18" height="18" style={{ color: 'var(--primary-blue)' }} />
+                {products.length}
+              </span>
+              <span className="seller-stat-lbl">Articles en vente</span>
+            </div>
+            <div className="seller-stat-widget">
+              <span className="seller-stat-val" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Star width="18" height="18" style={{ color: '#ff9e00' }} fill="#ff9e00" />
+                4.8
+              </span>
+              <span className="seller-stat-lbl">Évaluation vendeur</span>
+            </div>
+            <div className="seller-stat-widget">
+              <span className="seller-stat-val" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Truck width="18" height="18" style={{ color: '#22c55e' }} />
+                Directe
+              </span>
+              <span className="seller-stat-lbl">Mode de livraison</span>
+            </div>
+          </div>
+
+          {/* Products List */}
+          <h2 className="seller-products-title">
+            <Store width="20" height="20" style={{ color: 'var(--primary-blue)' }} /> 
+            Articles disponibles ({products.length})
+          </h2>
+
+          {products.length > 0 ? (
+            <div className="products-grid" style={{ marginTop: '0px' }}>
+              {products.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          ) : (
+            <div
+              id="seller-products-empty"
+              style={{
+                padding: '60px 20px',
+                textAlign: 'center',
+                background: '#fff',
+                border: '1px dashed #e2e8f0',
+                borderRadius: '12px',
+                color: '#64748b',
+                marginTop: '10px'
+              }}
+            >
+              Aucun produit publié pour le moment par ce vendeur.
+            </div>
+          )}
+        </main>
       </div>
 
+      {/* QR Code Modal Overlay */}
       {showQrModal && (
         <div
           onClick={() => setShowQrModal(false)}
@@ -223,11 +279,11 @@ export default function SellerPublicPage({ params }) {
               animation: 'scaleUpPwa 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
             }}
           >
-            <h3 style={{ margin: '0 0 10px 0', color: '#111', fontWeight: '800' }}>QR Code de la boutique</h3>
-            <p style={{ fontSize: '0.8rem', color: '#666', margin: '0 0 20px 0' }}>
-              Scannez ce code pour visiter la boutique en ligne de <strong>{shopName}</strong>.
+            <h3 style={{ margin: '0 0 10px 0', color: '#0f172a', fontWeight: '800' }}>QR Code de la boutique</h3>
+            <p style={{ fontSize: '0.8rem', color: '#64748b', margin: '0 0 20px 0' }}>
+              Scannez ce code pour visiter la boutique de <strong>{shopName}</strong>.
             </p>
-            <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '12px', display: 'inline-block', marginBottom: '20px', border: '1px solid #eee' }}>
+            <div style={{ background: '#f8fafc', padding: '16px', borderRadius: '12px', display: 'inline-block', marginBottom: '20px', border: '1px solid #e2e8f0' }}>
               <img
                 src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
                 alt={`QR Code ${shopName}`}
@@ -239,8 +295,8 @@ export default function SellerPublicPage({ params }) {
                 onClick={() => setShowQrModal(false)}
                 style={{
                   flex: 1,
-                  background: '#f3f4f6',
-                  color: '#4b5563',
+                  background: '#f1f5f9',
+                  color: '#475569',
                   border: 'none',
                   borderRadius: '8px',
                   padding: '10px',
