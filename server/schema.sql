@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS public.products (
     whatsapp TEXT,
     rating NUMERIC DEFAULT 4.5,
     reviews INTEGER DEFAULT 10,
+    is_featured BOOLEAN DEFAULT false,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 

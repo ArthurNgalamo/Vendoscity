@@ -434,6 +434,8 @@ function BoutiqueContent() {
         CATEGORIES={CATEGORIES}
         selectedCategory={selectedCategory}
         setSelectedCategory={setSelectedCategory}
+        selectedLocation={selectedLocation}
+        setSelectedLocation={setSelectedLocation}
         setProducts={setProducts}
         setCurrentPage={setCurrentPage}
         setHasMore={setHasMore}

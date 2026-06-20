@@ -128,8 +128,33 @@ export default function ProductCard({ product }) {
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="product-media" style={{ position: 'relative', width: '100%' }}>
+        {product?.is_featured && (
+          <div 
+            className="product-badge-featured" 
+            style={{ 
+              position: 'absolute',
+              top: '8px',
+              left: '8px',
+              zIndex: 5,
+              background: 'linear-gradient(135deg, #ff9e00, #ff6a00)',
+              color: 'white',
+              fontSize: '0.65rem',
+              fontWeight: '800',
+              padding: '3px 8px',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(255,106,0,0.4)',
+              textTransform: 'uppercase',
+              letterSpacing: '0.5px',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '3px'
+            }}
+          >
+            ⭐ Vedette
+          </div>
+        )}
         {discountPercent > 0 && (
-          <div className="product-badge-discount" style={{ zIndex: 5 }}>-{discountPercent}%</div>
+          <div className="product-badge-discount" style={{ zIndex: 5, left: product?.is_featured ? '85px' : '8px' }}>-{discountPercent}%</div>
         )}
 
         {/* Favorite heart button overlay */}

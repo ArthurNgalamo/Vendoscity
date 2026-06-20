@@ -69,7 +69,7 @@ async function initDb() {
         
         // Produits
         const { rows: products } = await pool.query(`
-            INSERT INTO public.products (title, price, category, image, seller_id, whatsapp, quartier, specs)
+            INSERT INTO public.products (title, price, category, image, seller_id, whatsapp, quartier, specs, is_featured)
             SELECT 
                 'Produit de test ' || i, 
                 (random() * 50000 + 5000)::int, 
@@ -81,7 +81,8 @@ async function initDb() {
                 jsonb_build_array(
                     jsonb_build_object('label','Etat','value','Neuf'),
                     jsonb_build_object('label','Origine','value','Yaounde')
-                )
+                ),
+                (i % 5 = 0)
             FROM generate_series(1, 40) s(i)
             RETURNING id, price
         `, [dummyUserId]);

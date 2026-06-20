@@ -7,7 +7,7 @@ import ProductCard from '../../../components/ProductCard';
 import { useToast } from '../../../context/ToastContext';
 import { getApiBaseUrl, fetchWithTimeout, logAnalyticsEvent } from '../../../core/api';
 import { shareLink } from '../../../core/share';
-import { Store, Share2, ArrowLeft } from 'lucide-react';
+import { Store, Share2, ArrowLeft, QrCode } from 'lucide-react';
 
 export default function SellerPublicPage({ params }) {
   const resolvedParams = use(params);
@@ -17,6 +17,7 @@ export default function SellerPublicPage({ params }) {
   const [seller, setSeller] = useState(null);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showQrModal, setShowQrModal] = useState(false);
 
   useEffect(() => {
     if (!sellerId) return;
@@ -112,6 +113,26 @@ export default function SellerPublicPage({ params }) {
           <div className="seller-actions">
             <button
               type="button"
+              id="btn-qr-shop-header"
+              onClick={() => setShowQrModal(true)}
+              style={{
+                background: 'none',
+                border: '1px solid rgba(255,255,255,0.25)',
+                color: 'white',
+                padding: '10px 14px',
+                borderRadius: '8px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+              aria-label="Générer QR Code"
+            >
+              <QrCode width="18" height="18" /> QR Code
+            </button>
+            <button
+              type="button"
               id="btn-share-shop-header"
               onClick={handleShareShop}
               style={{
@@ -170,6 +191,91 @@ export default function SellerPublicPage({ params }) {
           </div>
         )}
       </div>
+
+      {showQrModal && (
+        <div
+          onClick={() => setShowQrModal(false)}
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 11000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '20px'
+          }}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              background: '#fff',
+              borderRadius: '16px',
+              width: '90%',
+              maxWidth: '360px',
+              padding: '24px',
+              textAlign: 'center',
+              boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
+              position: 'relative',
+              animation: 'scaleUpPwa 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards'
+            }}
+          >
+            <h3 style={{ margin: '0 0 10px 0', color: '#111', fontWeight: '800' }}>QR Code de la boutique</h3>
+            <p style={{ fontSize: '0.8rem', color: '#666', margin: '0 0 20px 0' }}>
+              Scannez ce code pour visiter la boutique en ligne de <strong>{shopName}</strong>.
+            </p>
+            <div style={{ background: '#f9fafb', padding: '16px', borderRadius: '12px', display: 'inline-block', marginBottom: '20px', border: '1px solid #eee' }}>
+              <img
+                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                alt={`QR Code ${shopName}`}
+                style={{ width: '200px', height: '200px', display: 'block' }}
+              />
+            </div>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={() => setShowQrModal(false)}
+                style={{
+                  flex: 1,
+                  background: '#f3f4f6',
+                  color: '#4b5563',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px',
+                  fontWeight: '700',
+                  cursor: 'pointer'
+                }}
+              >
+                Fermer
+              </button>
+              <a
+                href={`https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(typeof window !== 'undefined' ? window.location.href : '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                download={`qrcode-${shopName.toLowerCase().replace(/\s+/g, '-')}.png`}
+                style={{
+                  flex: 1,
+                  background: 'var(--primary-blue)',
+                  color: '#fff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px',
+                  fontWeight: '700',
+                  textDecoration: 'none',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer'
+                }}
+              >
+                Télécharger
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
