@@ -10,6 +10,8 @@ import { Info } from 'lucide-react';
 
 import FilterDrawer from './components/FilterDrawer';
 import BoutiqueToolbar from './components/BoutiqueToolbar';
+import '../boutique.css'; // chargé uniquement sur cette page
+
 
 const CATEGORIES = [
   { value: 'all', label: 'Toutes les catégories' },
