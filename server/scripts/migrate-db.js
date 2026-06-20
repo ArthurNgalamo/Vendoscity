@@ -57,6 +57,7 @@ async function runMigrations() {
                     ALTER TABLE public.products ADD COLUMN IF NOT EXISTS images JSONB NOT NULL DEFAULT '[]'::jsonb;
                     ALTER TABLE public.products ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0;
                     ALTER TABLE public.products ADD COLUMN IF NOT EXISTS old_price NUMERIC DEFAULT 0;
+                    ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
                 END IF;
                 
                 -- Support legacy "produits" table if it exists
