@@ -13,7 +13,7 @@ import PwaInstallPrompt from '../components/PwaInstallPrompt';
 
 // Load our stylesheets
 import './style.css';
-import './boutique.css';
+// boutique.css is imported locally in boutique/page.js to avoid loading it on every page
 
 export const metadata = {
   title: 'Vendoscity - Services & Boutique en Ligne | Découvrez',

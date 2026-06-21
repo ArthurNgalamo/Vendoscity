@@ -49,7 +49,16 @@ export default function Header() {
 
   const currentUserId = user?.id || user?.sub || user?.uid || user?.user_id;
 
-  // Poll unread messages count periodically
+  // Wake up the Render backend as soon as the header mounts (fire-and-forget)
+  useEffect(() => {
+    const base = getApiBaseUrl();
+    // Only ping on production (same-origin proxy), not in local dev
+    if (base === '') {
+      fetch('/api/products?page=0&limit=1').catch(() => {});
+    }
+  }, []);
+
+  // Poll unread messages count — paused when tab is hidden
   useEffect(() => {
     if (!user || !currentUserId) {
       setUnreadCount(0);
@@ -57,6 +66,8 @@ export default function Header() {
     }
 
     const loadUnreadCount = async () => {
+      // Skip when tab is in background to save bandwidth
+      if (document.visibilityState === 'hidden') return;
       try {
         const res = await authFetch('/api/messages');
         if (res.ok) {
@@ -73,8 +84,8 @@ export default function Header() {
     };
 
     loadUnreadCount();
-    // Poll every 8 seconds to stay reasonably fresh
-    const interval = setInterval(loadUnreadCount, 8000);
+    // Reduced from 8s → 45s to avoid hammering the server
+    const interval = setInterval(loadUnreadCount, 45000);
     return () => clearInterval(interval);
   }, [user, currentUserId, authFetch]);
 

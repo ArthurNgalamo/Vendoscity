@@ -1,7 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    unoptimized: true,
+    // Optimization enabled: Next.js will serve WebP/AVIF automatically
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 86400, // 24h cache on optimized images
     remotePatterns: [
       {
         protocol: 'https',
@@ -12,6 +14,17 @@ const nextConfig = {
         hostname: '**',
       }
     ],
+  },
+  async headers() {
+    return [
+      {
+        // Cache static assets for 1 year
+        source: '/assets/:path*',
+        headers: [
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+        ],
+      },
+    ];
   },
   async rewrites() {
     return [

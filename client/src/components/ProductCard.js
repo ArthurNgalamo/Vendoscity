@@ -1,7 +1,7 @@
 // client/src/components/ProductCard.js
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, memo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useCart } from '../context/CartContext';
@@ -11,7 +11,7 @@ import { normalizeSupabaseImageUrl, formatCurrency, getApiBaseUrl } from '../cor
 import { shareLink } from '../core/share';
 import { Store, Share2, Star, Heart } from 'lucide-react';
 
-export default function ProductCard({ product }) {
+function ProductCard({ product }) {
   const { addToCart, setCartOpen } = useCart();
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const showToast = useToast();
@@ -335,3 +335,6 @@ export default function ProductCard({ product }) {
     </article>
   );
 }
+
+// Wrap in memo to prevent unnecessary re-renders when parent state changes
+export default memo(ProductCard);
