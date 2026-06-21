@@ -225,13 +225,67 @@ function ChatContent() {
     }
   }, [user]);
 
-  // Polling every 5 seconds for real-time updates
+  // Adaptive polling for real-time messaging updates
   useEffect(() => {
     if (!user) return;
-    const interval = setInterval(() => {
-      loadMessages(true);
-    }, 5000);
-    return () => clearInterval(interval);
+    
+    let timerId = null;
+    let lastActivityTime = Date.now();
+
+    const getPollingInterval = () => {
+      // 1. If tab is completely hidden, poll very slowly (every 30 seconds) to save resources
+      if (document.visibilityState === 'hidden') {
+        return 30000;
+      }
+      
+      // 2. If tab is visible but window does not have focus (user in another app)
+      const isFocused = document.hasFocus();
+      if (!isFocused) {
+        return 8000; // 8 seconds
+      }
+
+      // 3. High activity: If user recently interacted (last 1 minute)
+      const timeSinceLastActivity = Date.now() - lastActivityTime;
+      if (timeSinceLastActivity < 60000) {
+        return 2500; // 2.5 seconds for ultra-responsive live chat!
+      }
+
+      return 4000; // 4 seconds default focused interval
+    };
+
+    const poll = async () => {
+      try {
+        await loadMessages(true);
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+      
+      // Schedule next poll dynamically based on user state
+      const nextInterval = getPollingInterval();
+      timerId = setTimeout(poll, nextInterval);
+    };
+
+    // Track user activity to trigger high-activity polling
+    const handleActivity = () => {
+      lastActivityTime = Date.now();
+    };
+
+    // Listen to focus, visibility, and activity events
+    window.addEventListener('focus', handleActivity);
+    window.addEventListener('click', handleActivity);
+    window.addEventListener('keydown', handleActivity);
+    document.addEventListener('visibilitychange', handleActivity);
+
+    // Initial delay before starting the adaptive poll loop
+    timerId = setTimeout(poll, 2500);
+
+    return () => {
+      clearTimeout(timerId);
+      window.removeEventListener('focus', handleActivity);
+      window.removeEventListener('click', handleActivity);
+      window.removeEventListener('keydown', handleActivity);
+      document.removeEventListener('visibilitychange', handleActivity);
+    };
   }, [user, activePartnerId]);
 
   // Handle URL params for initiating a new chat
