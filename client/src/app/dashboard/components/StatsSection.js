@@ -10,7 +10,6 @@ import {
   ArrowDownRight,
   Package, 
   Calendar,
-  Sparkles,
   ArrowRight,
   TrendingDown,
   Info,
@@ -18,6 +17,7 @@ import {
   MessageSquare,
   Phone
 } from 'lucide-react';
+import Sparkles from '../../../components/Sparkles';
 
 export default function StatsSection({
   myProducts = [],

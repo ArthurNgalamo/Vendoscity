@@ -18,9 +18,9 @@ import {
   Truck, 
   ShieldCheck, 
   ArrowLeft,
-  ArrowRight,
-  Sparkles
+  ArrowRight
 } from 'lucide-react';
+import Sparkles from '../../components/Sparkles';
 import { formatCurrency, normalizeSupabaseImageUrl } from '../../core/api';
 import './panier.css';
 

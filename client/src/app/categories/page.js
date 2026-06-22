@@ -8,7 +8,6 @@ import {
   Smartphone,
   Laptop,
   Shirt,
-  Sparkles,
   Home,
   Utensils,
   Baby,
@@ -23,6 +22,7 @@ import {
   Book,
   Briefcase
 } from 'lucide-react';
+import Sparkles from '../../components/Sparkles';
 
 const CATEGORIES = [
   { key: 'electronique', label: 'Électronique', icon: Smartphone },

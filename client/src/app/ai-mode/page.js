@@ -9,7 +9,6 @@ import { getApiBaseUrl, formatCurrency } from '../../core/api';
 import { 
   Bot, 
   Send, 
-  Sparkles, 
   User, 
   ArrowLeft, 
   FileText, 
@@ -19,6 +18,7 @@ import {
   Building,
   HelpCircle
 } from 'lucide-react';
+import Sparkles from '../../components/Sparkles';
 
 function AiChatContent() {
   const { user } = useAuth();
