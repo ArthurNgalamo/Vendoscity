@@ -101,9 +101,22 @@ async function runMigrations() {
                 user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
                 product_id UUID REFERENCES public.products(id) ON DELETE CASCADE NOT NULL,
                 quantity INTEGER DEFAULT 1,
+                is_group_buy BOOLEAN DEFAULT false,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
-                UNIQUE(user_id, product_id)
+                UNIQUE(user_id, product_id, is_group_buy)
             );
+        `);
+
+        await pool.query(`
+            DO $$
+            BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='cart_items') THEN
+                    ALTER TABLE public.cart_items ADD COLUMN IF NOT EXISTS is_group_buy BOOLEAN DEFAULT false;
+                    ALTER TABLE public.cart_items DROP CONSTRAINT IF EXISTS cart_items_user_id_product_id_key;
+                    ALTER TABLE public.cart_items DROP CONSTRAINT IF EXISTS cart_items_user_id_product_id_is_group_buy_key;
+                    ALTER TABLE public.cart_items ADD CONSTRAINT cart_items_user_id_product_id_is_group_buy_key UNIQUE (user_id, product_id, is_group_buy);
+                END IF;
+            END $$;
         `);
 
         // 6. Migrate: Messages table (for direct chat)

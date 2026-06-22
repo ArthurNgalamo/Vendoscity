@@ -113,7 +113,7 @@ export default function PanierPage() {
   // Save for later (Favorite)
   const handleSaveForLater = (item) => {
     addFavorite(item);
-    removeFromCart(item.id);
+    removeFromCart(item.id, item.is_group_buy);
     showToast(`${item.title} sauvegardé pour plus tard !`);
   };
 
@@ -222,7 +222,7 @@ export default function PanierPage() {
                           <div className="cart-quantity-selector">
                             <button 
                               type="button" 
-                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
+                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1), item.is_group_buy)}
                               className="qty-btn"
                               aria-label="Diminuer quantité"
                             >
@@ -231,7 +231,7 @@ export default function PanierPage() {
                             <span className="qty-value">{item.quantity}</span>
                             <button 
                               type="button" 
-                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.is_group_buy)}
                               className="qty-btn"
                               aria-label="Augmenter quantité"
                             >
@@ -249,7 +249,7 @@ export default function PanierPage() {
                               <Heart width="14" height="14" /> <span>Mettre de côté</span>
                             </button>
                             <button 
-                              onClick={() => removeFromCart(item.id)}
+                              onClick={() => removeFromCart(item.id, item.is_group_buy)}
                               className="item-action-btn delete"
                               title="Retirer du panier"
                             >

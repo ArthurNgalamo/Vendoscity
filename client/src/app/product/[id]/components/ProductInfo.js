@@ -100,7 +100,10 @@ export default function ProductInfo({
         </span>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
           <div 
-            onClick={() => setPurchaseMode('individual')}
+            onClick={() => {
+              setPurchaseMode('individual');
+              setQuantity(1);
+            }}
             style={{
               border: `2px solid ${purchaseMode === 'individual' ? 'var(--primary-blue)' : '#cbd5e1'}`,
               background: purchaseMode === 'individual' ? '#f0f4ff' : '#ffffff',
@@ -118,7 +121,10 @@ export default function ProductInfo({
           </div>
 
           <div 
-            onClick={() => setPurchaseMode('group')}
+            onClick={() => {
+              setPurchaseMode('group');
+              setQuantity(product.group_min_participants || 3);
+            }}
             style={{
               border: `2px solid ${purchaseMode === 'group' ? 'var(--primary-blue)' : '#cbd5e1'}`,
               background: purchaseMode === 'group' ? '#f0f4ff' : '#ffffff',

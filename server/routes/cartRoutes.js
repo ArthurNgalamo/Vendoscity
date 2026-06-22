@@ -16,6 +16,7 @@ router.get('/', authenticate, async (req, res) => {
             id,
             quantity,
             product_id,
+            is_group_buy,
             products (*)
         `)
         .eq('user_id', req.user.id);
@@ -26,7 +27,6 @@ router.get('/', authenticate, async (req, res) => {
     }
     
     // Format response to match frontend expectations
-    // Frontend expects array of items containing id, quantity, title, price, etc.
     const formatted = (data || []).map(item => {
         const p = item.products || {};
         const defaultImage = '/assets/images/Gemini_Generated_Image_w7kyliw7kyliw7ky.png';
@@ -34,18 +34,23 @@ router.get('/', authenticate, async (req, res) => {
             ? p.images
             : [p.image_url || p.image || defaultImage].filter(Boolean);
 
+        const groupPrice = p.group_price && Number(p.group_price) > 0
+            ? Number(p.group_price)
+            : Math.round(Number(p.price || 0) * 0.85);
+
         return {
             id: p.id || item.product_id,
             quantity: item.quantity,
             title: p.title || 'Produit',
-            price: Number(p.price || 0),
+            price: item.is_group_buy ? groupPrice : Number(p.price || 0),
             category: p.category || '',
             whatsapp: p.whatsapp || '',
             image_url: p.image_url || '',
             image: p.image || '',
             images: images,
             seller_id: p.seller_id || '',
-            shop_name: p.shop_name || 'Boutique'
+            shop_name: p.shop_name || 'Boutique',
+            is_group_buy: !!item.is_group_buy
         };
     });
 
@@ -54,8 +59,9 @@ router.get('/', authenticate, async (req, res) => {
 
 // 2. Add/Increment quantity of an item
 router.post('/', authenticate, async (req, res) => {
-    const { product_id, quantity } = req.body;
+    const { product_id, quantity, is_group_buy } = req.body;
     const qty = parseInt(quantity, 10) || 1;
+    const isGroupBuy = !!is_group_buy;
 
     if (!product_id || !isUuid(product_id)) {
         return res.status(400).json({ error: 'product_id invalide' });
@@ -68,7 +74,8 @@ router.post('/', authenticate, async (req, res) => {
         .from('cart_items')
         .select('*')
         .eq('user_id', req.user.id)
-        .eq('product_id', product_id);
+        .eq('product_id', product_id)
+        .eq('is_group_buy', isGroupBuy);
 
     if (fetchError) {
         console.error('Error checking existing cart item:', fetchError);
@@ -83,6 +90,7 @@ router.post('/', authenticate, async (req, res) => {
             .update({ quantity: newQty })
             .eq('user_id', req.user.id)
             .eq('product_id', product_id)
+            .eq('is_group_buy', isGroupBuy)
             .select();
 
         if (error) {
@@ -94,7 +102,7 @@ router.post('/', authenticate, async (req, res) => {
         // Insert new
         const { data, error } = await client
             .from('cart_items')
-            .insert([{ user_id: req.user.id, product_id, quantity: qty }])
+            .insert([{ user_id: req.user.id, product_id, quantity: qty, is_group_buy: isGroupBuy }])
             .select();
 
         if (error) {
@@ -108,8 +116,9 @@ router.post('/', authenticate, async (req, res) => {
 // 3. Update exact quantity of a product
 router.put('/:product_id', authenticate, async (req, res) => {
     const { product_id } = req.params;
-    const { quantity } = req.body;
+    const { quantity, is_group_buy } = req.body;
     const qty = parseInt(quantity, 10);
+    const isGroupBuy = !!(is_group_buy === 'true' || is_group_buy === true || req.query.is_group_buy === 'true');
 
     if (!product_id || !isUuid(product_id)) {
         return res.status(400).json({ error: 'product_id invalide' });
@@ -124,6 +133,7 @@ router.put('/:product_id', authenticate, async (req, res) => {
         .update({ quantity: qty })
         .eq('user_id', req.user.id)
         .eq('product_id', product_id)
+        .eq('is_group_buy', isGroupBuy)
         .select();
 
     if (error) {
@@ -139,6 +149,7 @@ router.put('/:product_id', authenticate, async (req, res) => {
 // 4. Delete item from cart
 router.delete('/:product_id', authenticate, async (req, res) => {
     const { product_id } = req.params;
+    const isGroupBuy = !!(req.query.is_group_buy === 'true' || req.body.is_group_buy === 'true' || req.body.is_group_buy === true);
 
     if (!product_id || !isUuid(product_id)) {
         return res.status(400).json({ error: 'product_id invalide' });
@@ -149,7 +160,8 @@ router.delete('/:product_id', authenticate, async (req, res) => {
         .from('cart_items')
         .delete()
         .eq('user_id', req.user.id)
-        .eq('product_id', product_id);
+        .eq('product_id', product_id)
+        .eq('is_group_buy', isGroupBuy);
 
     if (error) {
         console.error('Error deleting cart item:', error);

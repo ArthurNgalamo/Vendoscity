@@ -182,7 +182,7 @@ export function CartProvider({ children }) {
         const res = await authFetch('/api/cart', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ product_id: item.id, quantity: addQty })
+          body: JSON.stringify({ product_id: item.id, quantity: addQty, is_group_buy: item.is_group_buy })
         });
         if (!res.ok) throw new Error('DB add failed');
       } catch (err) {
@@ -191,12 +191,14 @@ export function CartProvider({ children }) {
     }
   }, [user, authFetch, showToast]);
 
-  const updateQuantity = useCallback(async (itemId, qty) => {
+  const updateQuantity = useCallback(async (itemId, qty, isGroupBuy = false) => {
     const nextQty = Math.max(1, parseInt(String(qty), 10) || 1);
 
     setCart((prevCart) => {
       const nextCart = prevCart.map((item) =>
-        String(item.id) === String(itemId) ? { ...item, quantity: nextQty } : item
+        (String(item.id) === String(itemId) && !!item.is_group_buy === !!isGroupBuy)
+          ? { ...item, quantity: nextQty }
+          : item
       );
       try {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextCart));
@@ -209,7 +211,7 @@ export function CartProvider({ children }) {
         const res = await authFetch(`/api/cart/${encodeURIComponent(itemId)}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ quantity: nextQty })
+          body: JSON.stringify({ quantity: nextQty, is_group_buy: isGroupBuy })
         });
         if (!res.ok) throw new Error('DB update failed');
       } catch (err) {
@@ -218,9 +220,9 @@ export function CartProvider({ children }) {
     }
   }, [user, authFetch]);
 
-  const removeFromCart = useCallback(async (itemId) => {
+  const removeFromCart = useCallback(async (itemId, isGroupBuy = false) => {
     setCart((prevCart) => {
-      const nextCart = prevCart.filter((item) => String(item.id) !== String(itemId));
+      const nextCart = prevCart.filter((item) => !(String(item.id) === String(itemId) && !!item.is_group_buy === !!isGroupBuy));
       try {
         localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(nextCart));
       } catch (_) {}
@@ -230,7 +232,7 @@ export function CartProvider({ children }) {
 
     if (user) {
       try {
-        const res = await authFetch(`/api/cart/${encodeURIComponent(itemId)}`, {
+        const res = await authFetch(`/api/cart/${encodeURIComponent(itemId)}?is_group_buy=${isGroupBuy}`, {
           method: 'DELETE'
         });
         if (!res.ok) throw new Error('DB delete failed');
