@@ -249,8 +249,26 @@ async function runMigrations() {
             ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
             DROP POLICY IF EXISTS "Users can see their own orders" ON public.orders;
             DROP POLICY IF EXISTS "Users can update their own orders" ON public.orders;
+            DROP POLICY IF EXISTS "Users can insert their own orders" ON public.orders;
             CREATE POLICY "Users can see their own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id OR auth.uid() = seller_id);
             CREATE POLICY "Users can update their own orders" ON public.orders FOR UPDATE USING (auth.uid() = user_id OR auth.uid() = seller_id);
+            CREATE POLICY "Users can insert their own orders" ON public.orders FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+            ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "Users can see items of their orders" ON public.order_items;
+            DROP POLICY IF EXISTS "Users can insert items for their own orders" ON public.order_items;
+            CREATE POLICY "Users can see items of their orders" ON public.order_items FOR SELECT USING (
+                exists (
+                    select 1 from public.orders
+                    where orders.id = order_items.order_id and (orders.user_id = auth.uid() OR orders.seller_id = auth.uid())
+                )
+            );
+            CREATE POLICY "Users can insert items for their own orders" ON public.order_items FOR INSERT WITH CHECK (
+                exists (
+                    select 1 from public.orders
+                    where orders.id = order_items.order_id and orders.user_id = auth.uid()
+                )
+            );
 
             ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
             DROP POLICY IF EXISTS "Les utilisateurs peuvent voir leurs propres transactions" ON public.wallet_transactions;
