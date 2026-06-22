@@ -136,6 +136,7 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
   }, [lockedUntil]);
 
   const autoVerifyPin = async (pinToVerify) => {
+    if (verifying) return;
     setVerifying(true);
     try {
       const res = await authFetch('/api/wallet/verify-passcode', {
@@ -236,6 +237,7 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
   // Passcode unlock handler (for manual submit fallback)
   const handleUnlockWallet = async (e) => {
     if (e) e.preventDefault();
+    if (verifying) return;
     if (lockoutCountdown > 0) {
       alert("Votre portefeuille est temporairement verrouillé.");
       return;
@@ -845,7 +847,10 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
               style={{ position: 'relative', width: '100%', height: '48px', cursor: 'pointer' }}
             >
               {/* Visual circles */}
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%', opacity: lockoutCountdown > 0 ? 0.35 : 1 }}>
+              <div 
+                className={verifying ? "verifying-circles" : ""}
+                style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%', opacity: lockoutCountdown > 0 ? 0.35 : 1 }}
+              >
                 {[0, 1, 2, 3, 4, 5].map((index) => {
                   const isFilled = passcodePin.length > index;
                   return (
@@ -930,7 +935,7 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
             }}
           >
             {verifying ? <RefreshCw className="animate-spin" width="16" height="16" /> : <Unlock width="16" height="16" />}
-            <span>Déverrouiller le portefeuille</span>
+            <span>{verifying ? "Vérification en cours..." : "Déverrouiller le portefeuille"}</span>
           </button>
         </form>
 
@@ -2219,6 +2224,15 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
 
       {/* Embedded Dynamic Animations & Mobile Layout Styles */}
       <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes verifyingPulse {
+          0% { opacity: 0.6; transform: scale(0.98); }
+          50% { opacity: 1; transform: scale(1.02); }
+          100% { opacity: 0.6; transform: scale(0.98); }
+        }
+        .verifying-circles {
+          animation: verifyingPulse 1.2s ease-in-out infinite;
+        }
+
         @keyframes walletFadeIn {
           from { opacity: 0; transform: translateY(12px); }
           to { opacity: 1; transform: translateY(0); }

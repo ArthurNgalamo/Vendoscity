@@ -45,11 +45,13 @@ async function verifyPasscodeAndLockout(userId, passcode) {
     const matches = profile.wallet_passcode === hashPasscode(passcode);
 
     if (matches) {
-        // Reset attempts on success
-        await db
-            .from('profiles')
-            .update({ wallet_failed_attempts: 0, wallet_locked_until: null })
-            .eq('id', userId);
+        // Reset attempts on success only if they were not already 0/null
+        if (profile.wallet_failed_attempts > 0 || profile.wallet_locked_until) {
+            await db
+                .from('profiles')
+                .update({ wallet_failed_attempts: 0, wallet_locked_until: null })
+                .eq('id', userId);
+        }
 
         return { valid: true };
     } else {
