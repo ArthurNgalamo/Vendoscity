@@ -85,7 +85,7 @@ export default function RegisterPage() {
               <input
                 id="reg-name"
                 type="text"
-                placeholder="Ex: Jean Bakari"
+                placeholder="Ex: NGALAMO ARTHUR"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required

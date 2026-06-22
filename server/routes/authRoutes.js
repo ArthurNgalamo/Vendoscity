@@ -198,8 +198,8 @@ router.post('/register', registerLimiter, async (req, res) => {
     if (!isValidEmail(email)) {
         return res.status(400).json({ error: 'Email invalide' });
     }
-    if (password.length < 8 || password.length > 72) {
-        return res.status(400).json({ error: 'Mot de passe invalide (8 a 72 caracteres)' });
+    if (password.length < 6 || password.length > 72) {
+        return res.status(400).json({ error: 'Mot de passe invalide (6 a 72 caracteres)' });
     }
     if (name.length < 2 || name.length > 60) {
         return res.status(400).json({ error: 'Nom complet invalide (2 a 60 caracteres)' });

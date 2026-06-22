@@ -611,7 +611,7 @@ export default function MonEspacePage() {
                   <input
                     id="reg-name"
                     type="text"
-                    placeholder="Ex: Jean Dupont"
+                    placeholder="Ex: NGALAMO ARTHUR"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     required
@@ -635,16 +635,17 @@ export default function MonEspacePage() {
               </div>
 
               <div className="input-group">
-                <label htmlFor="reg-password">Mot de passe (8+ car.) *</label>
+                <label htmlFor="reg-password">Mot de passe (6+ car.) *</label>
                 <div className="input-wrapper">
                   <Key width="18" height="18" className="input-icon" />
                   <input
                     id="reg-password"
                     type={showRegPassword ? 'text' : 'password'}
-                    placeholder="Minimum 8 caractères..."
+                    placeholder="Minimum 6 caractères..."
                     value={regPassword}
                     onChange={(e) => setRegPassword(e.target.value)}
                     required
+                    minLength="6"
                   />
                   <button
                     type="button"
