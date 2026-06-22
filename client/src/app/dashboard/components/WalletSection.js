@@ -254,46 +254,194 @@ export default function WalletSection({ authFetch, showToast }) {
   // SCREEN A: Setup PIN passcode
   if (walletInfo && !walletInfo.hasPasscode) {
     return (
-      <div className="check-card" style={{ maxWidth: '420px', margin: '40px auto', padding: '30px', textAlign: 'center' }}>
-        <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: '#fff7ed', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
-          <Lock width="24" height="24" style={{ color: 'var(--brand-accent)' }} />
+      <div style={{ 
+        maxWidth: '440px', 
+        margin: '40px auto', 
+        padding: '36px 30px', 
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        borderRadius: '24px',
+        color: '#fff',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(255, 106, 0, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        fontFamily: '"Inter", sans-serif'
+      }}>
+        <div style={{ 
+          width: '64px', 
+          height: '64px', 
+          borderRadius: '20px', 
+          background: 'rgba(255, 106, 0, 0.12)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          margin: '0 auto 20px auto',
+          border: '1px solid rgba(255, 106, 0, 0.25)',
+          boxShadow: '0 0 20px rgba(255, 106, 0, 0.1)'
+        }}>
+          <Lock width="28" height="28" style={{ color: '#ff6a00' }} />
         </div>
-        <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', fontWeight: 800 }}>Configurer votre Code de Sécurité</h3>
-        <p style={{ fontSize: '0.8rem', color: '#64748b', lineHeight: 1.4, marginBottom: '24px' }}>
-          Pour sécuriser vos transactions (retraits et dépôts), configurez un code secret PIN à 6 chiffres. Ce code vous sera demandé à chaque opération.
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
+          Code de Sécurité
+        </h3>
+        <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '28px', padding: '0 10px' }}>
+          Configurez un code secret PIN à 6 chiffres pour sécuriser vos retraits et dépôts d'argent.
         </p>
 
         <form onSubmit={handleSetupPasscode}>
-          <div style={{ position: 'relative' }}>
-            <input 
-              type={showPin ? 'text' : 'password'}
-              placeholder="Saisir 6 chiffres"
-              value={passcodePin}
-              onChange={(e) => setPasscodePin(e.target.value.replace(/\D/g, '').slice(0,6))}
-              maxLength={6}
-              style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '12px', width: '100%', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '8px', outline: 'none', marginBottom: '12px' }}
-              required
-            />
-            <button 
-              type="button" 
-              onClick={() => setShowPin(!showPin)}
-              style={{ position: 'absolute', right: '12px', top: '15px', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
-            >
-              {showPin ? <EyeOff width="18" height="18" /> : <Eye width="18" height="18" />}
-            </button>
+          <div style={{ marginBottom: '24px', textAlign: 'left' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.05em' }}>
+                Nouveau Code PIN
+              </label>
+              <button 
+                type="button" 
+                onClick={() => setShowPin(!showPin)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: 0 }}
+              >
+                {showPin ? <EyeOff width="14" height="14" /> : <Eye width="14" height="14" />}
+              </button>
+            </div>
+            <div style={{ position: 'relative', width: '100%', height: '48px' }}>
+              {/* Visual circles */}
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%' }}>
+                {[0, 1, 2, 3, 4, 5].map((index) => {
+                  const isFilled = passcodePin.length > index;
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '10px',
+                        border: isFilled 
+                          ? '2px solid #ff6a00' 
+                          : '1px solid rgba(255, 255, 255, 0.15)',
+                        background: isFilled 
+                          ? 'rgba(255, 106, 0, 0.1)' 
+                          : 'rgba(255, 255, 255, 0.03)',
+                        boxShadow: isFilled 
+                          ? '0 0 10px rgba(255, 106, 0, 0.2)' 
+                          : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem',
+                        fontWeight: '800',
+                        color: '#fff',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {isFilled ? (showPin ? passcodePin[index] : '•') : ''}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Transparent input */}
+              <input 
+                type="text"
+                pattern="\d*"
+                inputMode="numeric"
+                value={passcodePin}
+                onChange={(e) => setPasscodePin(e.target.value.replace(/\D/g, '').slice(0,6))}
+                maxLength={6}
+                style={{
+                  position: 'absolute',
+                  opacity: 0,
+                  width: '100%',
+                  height: '100%',
+                  left: 0,
+                  top: 0,
+                  cursor: 'pointer',
+                  zIndex: 2
+                }}
+                required
+              />
+            </div>
           </div>
 
-          <input 
-            type="password"
-            placeholder="Confirmer les 6 chiffres"
-            value={confirmPin}
-            onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0,6))}
-            maxLength={6}
-            style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '12px', width: '100%', fontSize: '1.2rem', textAlign: 'center', letterSpacing: '8px', outline: 'none', marginBottom: '20px' }}
-            required
-          />
+          <div style={{ marginBottom: '28px', textAlign: 'left' }}>
+            <label style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.05em', display: 'block', marginBottom: '8px' }}>
+              Confirmer le Code PIN
+            </label>
+            <div style={{ position: 'relative', width: '100%', height: '48px' }}>
+              {/* Visual circles */}
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%' }}>
+                {[0, 1, 2, 3, 4, 5].map((index) => {
+                  const isFilled = confirmPin.length > index;
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '10px',
+                        border: isFilled 
+                          ? '2px solid #ff6a00' 
+                          : '1px solid rgba(255, 255, 255, 0.15)',
+                        background: isFilled 
+                          ? 'rgba(255, 106, 0, 0.1)' 
+                          : 'rgba(255, 255, 255, 0.03)',
+                        boxShadow: isFilled 
+                          ? '0 0 10px rgba(255, 106, 0, 0.2)' 
+                          : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem',
+                        fontWeight: '800',
+                        color: '#fff',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {isFilled ? (showPin ? confirmPin[index] : '•') : ''}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Transparent input */}
+              <input 
+                type="text"
+                pattern="\d*"
+                inputMode="numeric"
+                value={confirmPin}
+                onChange={(e) => setConfirmPin(e.target.value.replace(/\D/g, '').slice(0,6))}
+                maxLength={6}
+                style={{
+                  position: 'absolute',
+                  opacity: 0,
+                  width: '100%',
+                  height: '100%',
+                  left: 0,
+                  top: 0,
+                  cursor: 'pointer',
+                  zIndex: 2
+                }}
+                required
+              />
+            </div>
+          </div>
 
-          <button type="submit" disabled={verifying} className="checkout-btn">
+          <button 
+            type="submit" 
+            disabled={verifying} 
+            style={{ 
+              width: '100%',
+              padding: '14px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(135deg, #ff6a00 0%, #ee5a00 100%)',
+              color: '#fff',
+              fontWeight: '700',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 8px 16px -4px rgba(255, 106, 0, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+          >
             {verifying ? <RefreshCw className="animate-spin" width="16" height="16" /> : <Unlock width="16" height="16" />}
             <span>Enregistrer mon code PIN</span>
           </button>
@@ -305,38 +453,135 @@ export default function WalletSection({ authFetch, showToast }) {
   // SCREEN B: Verify PIN to unlock
   if (!isUnlocked) {
     return (
-      <div className="check-card" style={{ maxWidth: '420px', margin: '40px auto', padding: '30px', textAlign: 'center' }}>
-        <div style={{ width: '50px', height: '50px', borderRadius: '50%', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px auto' }}>
-          <Lock width="24" height="24" style={{ color: '#2563eb' }} />
+      <div style={{ 
+        maxWidth: '400px', 
+        margin: '40px auto', 
+        padding: '36px 30px', 
+        textAlign: 'center',
+        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+        borderRadius: '24px',
+        color: '#fff',
+        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(59, 130, 246, 0.1)',
+        border: '1px solid rgba(255, 255, 255, 0.08)',
+        fontFamily: '"Inter", sans-serif'
+      }}>
+        <div style={{ 
+          width: '64px', 
+          height: '64px', 
+          borderRadius: '20px', 
+          background: 'rgba(59, 130, 246, 0.12)', 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'center', 
+          margin: '0 auto 20px auto',
+          border: '1px solid rgba(59, 130, 246, 0.25)',
+          boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)'
+        }}>
+          <Lock width="28" height="28" style={{ color: '#3b82f6' }} />
         </div>
-        <h3 style={{ margin: '0 0 10px 0', fontSize: '1.2rem', fontWeight: 800 }}>Portefeuille Sécurisé</h3>
-        <p style={{ fontSize: '0.8rem', color: '#64748b', marginBottom: '24px' }}>
+        <h3 style={{ margin: '0 0 10px 0', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
+          Portefeuille Sécurisé
+        </h3>
+        <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '28px', padding: '0 10px' }}>
           Entrez votre code secret PIN à 6 chiffres pour accéder à votre portefeuille d'entreprise.
         </p>
 
         <form onSubmit={handleUnlockWallet}>
-          <div style={{ position: 'relative', marginBottom: '20px' }}>
-            <input 
-              type={showPin ? 'text' : 'password'}
-              placeholder="******"
-              value={passcodePin}
-              onChange={(e) => setPasscodePin(e.target.value.replace(/\D/g, '').slice(0,6))}
-              maxLength={6}
-              style={{ border: '1px solid #cbd5e1', borderRadius: '8px', padding: '12px', width: '100%', fontSize: '1.4rem', textAlign: 'center', letterSpacing: '8px', outline: 'none' }}
-              required
-            />
-            <button 
-              type="button" 
-              onClick={() => setShowPin(!showPin)}
-              style={{ position: 'absolute', right: '12px', top: '15px', background: 'none', border: 'none', cursor: 'pointer', color: '#64748b' }}
-            >
-              {showPin ? <EyeOff width="18" height="18" /> : <Eye width="18" height="18" />}
-            </button>
+          <div style={{ marginBottom: '28px', textAlign: 'left' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', letterSpacing: '0.05em' }}>
+                Code PIN
+              </label>
+              <button 
+                type="button" 
+                onClick={() => setShowPin(!showPin)}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: 0 }}
+              >
+                {showPin ? <EyeOff width="14" height="14" /> : <Eye width="14" height="14" />}
+              </button>
+            </div>
+            <div style={{ position: 'relative', width: '100%', height: '48px' }}>
+              {/* Visual circles */}
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%' }}>
+                {[0, 1, 2, 3, 4, 5].map((index) => {
+                  const isFilled = passcodePin.length > index;
+                  return (
+                    <div
+                      key={index}
+                      style={{
+                        width: '42px',
+                        height: '42px',
+                        borderRadius: '10px',
+                        border: isFilled 
+                          ? '2px solid #3b82f6' 
+                          : '1px solid rgba(255, 255, 255, 0.15)',
+                        background: isFilled 
+                          ? 'rgba(59, 130, 246, 0.1)' 
+                          : 'rgba(255, 255, 255, 0.03)',
+                        boxShadow: isFilled 
+                          ? '0 0 10px rgba(59, 130, 246, 0.2)' 
+                          : 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontSize: '1.2rem',
+                        fontWeight: '800',
+                        color: '#fff',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      {isFilled ? (showPin ? passcodePin[index] : '•') : ''}
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Transparent input */}
+              <input 
+                type="text"
+                pattern="\d*"
+                inputMode="numeric"
+                value={passcodePin}
+                onChange={(e) => setPasscodePin(e.target.value.replace(/\D/g, '').slice(0,6))}
+                maxLength={6}
+                autoFocus
+                style={{
+                  position: 'absolute',
+                  opacity: 0,
+                  width: '100%',
+                  height: '100%',
+                  left: 0,
+                  top: 0,
+                  cursor: 'pointer',
+                  zIndex: 2
+                }}
+                required
+              />
+            </div>
           </div>
 
-          <button type="submit" disabled={verifying} className="checkout-btn" style={{ background: '#2563eb' }}>
+          <button 
+            type="submit" 
+            disabled={verifying} 
+            style={{ 
+              width: '100%',
+              padding: '14px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              color: '#fff',
+              fontWeight: '700',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              boxShadow: '0 8px 16px -4px rgba(37, 99, 235, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+          >
             {verifying ? <RefreshCw className="animate-spin" width="16" height="16" /> : <Unlock width="16" height="16" />}
-            <span>Déverrouiller mon portefeuille</span>
+            <span>Déverrouiller le portefeuille</span>
           </button>
         </form>
       </div>
