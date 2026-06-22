@@ -242,6 +242,11 @@ export default function DesktopHeader({
                         <Link href="/dashboard?tab=stats" className="menu-link-action">
                           <TrendingUp width="14" height="14" /> Statistiques & Métriques
                         </Link>
+                        {!profile?.is_verified && (
+                          <Link href="/dashboard?tab=seller-application" className="menu-link-action">
+                            <ShieldCheck width="14" height="14" style={{ color: '#3b82f6' }} /> Certifier ma boutique
+                          </Link>
+                        )}
                         <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="menu-link-action">
                           <User width="14" height="14" /> Mon Profil / Boutique
                         </Link>
@@ -250,7 +255,7 @@ export default function DesktopHeader({
                   } else {
                     return (
                       <>
-                        <Link href="/dashboard?tab=seller-area" className="menu-link-action">
+                        <Link href="/dashboard?tab=seller-application" className="menu-link-action">
                           <Store width="14" height="14" /> Devenir Vendeur
                         </Link>
                         <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="menu-link-action">

@@ -13,7 +13,8 @@ import {
   Store,
   QrCode,
   Wallet,
-  TrendingUp
+  TrendingUp,
+  ShieldCheck
 } from 'lucide-react';
 import { GridIcon } from './HeaderIcons';
 import { useTypingPlaceholder, getPersonalizedPhrases } from '../../hooks/useTypingPlaceholder';
@@ -296,6 +297,14 @@ export default function MobileHeader({
                           <span>Statistiques & Métriques</span>
                         </Link>
                       </li>
+                      {!profile?.is_verified && (
+                        <li>
+                          <Link href="/dashboard?tab=seller-application" className="mobile-nav-dashboard">
+                            <ShieldCheck width="16" height="16" style={{ color: '#3b82f6' }} />
+                            <span>Certifier ma boutique</span>
+                          </Link>
+                        </li>
+                      )}
                       <li>
                         <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="mobile-nav-dashboard">
                           <User width="16" height="16" />
@@ -308,7 +317,7 @@ export default function MobileHeader({
                   return (
                     <>
                       <li>
-                        <Link href="/dashboard?tab=seller-area" className="mobile-nav-dashboard">
+                        <Link href="/dashboard?tab=seller-application" className="mobile-nav-dashboard">
                           <Store width="16" height="16" />
                           <span>Devenir Vendeur</span>
                         </Link>

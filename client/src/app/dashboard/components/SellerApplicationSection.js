@@ -1,4 +1,3 @@
-// client/src/app/dashboard/components/SellerApplicationSection.js
 import React, { useState, useEffect } from 'react';
 import { 
   Store, 
@@ -36,11 +35,15 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
   const [logoPreview, setLogoPreview] = useState(null);
   const [documentFile, setDocumentFile] = useState(null);
   const [docName, setDocName] = useState('');
+  const [documentBackFile, setDocumentBackFile] = useState(null);
+  const [docBackName, setDocBackName] = useState('');
   const [managerPhotoFile, setManagerPhotoFile] = useState(null);
   const [managerPhotoPreview, setManagerPhotoPreview] = useState(null);
 
   // Verification progress animation state
   const [verificationStage, setVerificationStage] = useState(null);
+
+  const isAlreadySeller = profile?.seller_status === 'approved';
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -53,6 +56,18 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
       );
     }
   }, []);
+
+  // Prefill details if already a seller
+  useEffect(() => {
+    if (profile) {
+      setShopName(profile.shop_name || '');
+      setWhatsapp(profile.phone || '');
+      setBio(profile.bio || '');
+      if (profile.avatar_url && !logoPreview) {
+        setLogoPreview(profile.avatar_url);
+      }
+    }
+  }, [profile]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -75,7 +90,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     const timer2 = setTimeout(() => setVerificationStage('face_match'), 1200);
     const timer3 = setTimeout(() => setVerificationStage('completing'), 1800);
 
-    const formattedDescription = `[Structure: ${structureType}]\n[Secteur: ${sector}]\n[Logo: ${logoFile ? 'Fourni' : 'Non fourni'}]\n[Document d'enregistrement: ${docName || 'Non fourni'}]\n\nDescription d'activité:\n${description.trim()}`;
+    const formattedDescription = `[Structure: ${structureType}]\n[Secteur: ${sector}]\n[Logo: ${logoFile ? 'Fourni' : 'Non fourni'}]\n[Document d'enregistrement Recto: ${docName || 'Non fourni'}]\n[Document d'enregistrement Verso: ${docBackName || 'Non fourni'}]\n\nDescription d'activité:\n${description.trim()}`;
 
     const formData = new FormData();
     formData.append('shop_name', shopName.trim());
@@ -84,6 +99,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     formData.append('description', formattedDescription);
     if (logoFile) formData.append('logo', logoFile);
     if (documentFile) formData.append('document', documentFile);
+    if (documentBackFile) formData.append('document_back', documentBackFile);
     if (managerPhotoFile) formData.append('manager_photo', managerPhotoFile);
 
     try {
@@ -98,9 +114,9 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
       if (res.ok) {
         const data = await res.json();
         if (data.is_verified) {
-          showToast("Félicitations ! Votre compte vendeur est validé et certifié avec le badge vérifié.");
+          showToast("Félicitations ! Votre boutique est certifiée avec le badge vérifié.");
         } else {
-          showToast("Félicitations ! Votre compte vendeur est désormais validé.");
+          showToast("Félicitations ! Vos informations ont été enregistrées avec succès.");
         }
         onApprovalSuccess(); // Re-fetch profile
       } else {
@@ -159,6 +175,14 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     if (file) {
       setDocumentFile(file);
       setDocName(file.name);
+    }
+  };
+
+  const handleDocBackUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setDocumentBackFile(file);
+      setDocBackName(file.name);
     }
   };
 
@@ -332,22 +356,38 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
         padding: '40px 30px',
         color: '#ffffff',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 10px 30px -10 rgba(15, 23, 42, 0.3)',
+        boxShadow: '0 10px 30px -10px rgba(15, 23, 42, 0.3)',
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
         position: 'relative',
         overflow: 'hidden'
       }}>
-        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '6px 12px', borderRadius: '20px', width: 'fit-content', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          <Award width="14" height="14" /> Portail Onboarding Entreprise
-        </div>
-        <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 850, letterSpacing: '-0.5px' }}>
-          Enregistrez votre structure professionnelle
-        </h1>
-        <p style={{ margin: 0, fontSize: '0.92rem', color: '#94a3b8', lineHeight: 1.5, maxWidth: '700px' }}>
-          Rejoignez le réseau Vendoscity Pro. Bénéficiez d'une visibilité nationale pour vos produits, sécurisez vos paiements via notre système de séquestre automatisé et gérez votre trésorerie d'entreprise en toute confiance.
-        </p>
+        {isAlreadySeller ? (
+          <>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '6px 12px', borderRadius: '20px', width: 'fit-content', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <ShieldCheck width="14" height="14" style={{ color: '#3b82f6' }} /> Certification de Boutique
+            </div>
+            <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 850, letterSpacing: '-0.5px' }}>
+              Obtenez votre Badge de Confiance Certifié
+            </h1>
+            <p style={{ margin: 0, fontSize: '0.92rem', color: '#94a3b8', lineHeight: 1.5, maxWidth: '700px' }}>
+              Téléversez vos pièces d'identité (CNI recto-verso ou Registre du commerce) et votre photo de responsable pour faire certifier votre boutique <strong style={{ color: '#3b82f6' }}>{shopName}</strong> et afficher le badge vérifié bleu.
+            </p>
+          </>
+        ) : (
+          <>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(59, 130, 246, 0.15)', color: '#3b82f6', padding: '6px 12px', borderRadius: '20px', width: 'fit-content', fontSize: '0.78rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              <Award width="14" height="14" /> Portail Onboarding Entreprise
+            </div>
+            <h1 style={{ margin: 0, fontSize: '1.8rem', fontWeight: 850, letterSpacing: '-0.5px' }}>
+              Enregistrez votre structure professionnelle
+            </h1>
+            <p style={{ margin: 0, fontSize: '0.92rem', color: '#94a3b8', lineHeight: 1.5, maxWidth: '700px' }}>
+              Rejoignez le réseau Vendoscity Pro. Bénéficiez d'une visibilité nationale pour vos produits, sécurisez vos paiements via notre système de séquestre automatisé et gérez votre trésorerie d'entreprise en toute confiance.
+            </p>
+          </>
+        )}
 
         {/* Abstract design shape */}
         <div style={{
@@ -367,141 +407,145 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
         
         <h2 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#0f172a', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '10px', borderBottom: '1px solid #f1f5f9', paddingBottom: '15px' }}>
           <Building2 width="22" height="22" style={{ color: 'var(--primary-blue)' }} />
-          Formulaire de demande de partenariat commercial
+          {isAlreadySeller ? "Pièces justificatives pour la certification" : "Formulaire de demande de partenariat commercial"}
         </h2>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '28px' }}>
           
           {/* Section 1: Structure Type Selection */}
-          <div>
-            <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
-              1. Type de structure commerciale *
-            </label>
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-              gap: '12px'
-            }}>
-              {structureTypes.map((type) => {
-                const isSelected = structureType === type.name;
-                return (
-                  <div
-                    key={type.name}
-                    onClick={() => setStructureType(type.name)}
-                    style={{
-                      border: isSelected ? '2px solid var(--primary-blue)' : '1px solid #cbd5e1',
-                      background: isSelected ? 'rgba(18, 18, 147, 0.02)' : '#fff',
-                      padding: '16px',
-                      borderRadius: '10px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      boxShadow: isSelected ? '0 4px 12px rgba(18,18,147,0.05)' : 'none',
-                      position: 'relative'
-                    }}
-                  >
-                    {isSelected && (
-                      <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--primary-blue)', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <Check width="10" height="10" />
-                      </div>
-                    )}
-                    <h4 style={{ margin: '0 0 4px 0', fontSize: '0.9rem', fontWeight: 750, color: isSelected ? 'var(--primary-blue)' : '#1e293b' }}>{type.name}</h4>
-                    <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.3 }}>{type.desc}</p>
-                  </div>
-                );
-              })}
+          {!isAlreadySeller && (
+            <div>
+              <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
+                1. Type de structure commerciale *
+              </label>
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '12px'
+              }}>
+                {structureTypes.map((type) => {
+                  const isSelected = structureType === type.name;
+                  return (
+                    <div
+                      key={type.name}
+                      onClick={() => setStructureType(type.name)}
+                      style={{
+                        border: isSelected ? '2px solid var(--primary-blue)' : '1px solid #cbd5e1',
+                        background: isSelected ? 'rgba(18, 18, 147, 0.02)' : '#fff',
+                        padding: '16px',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s',
+                        boxShadow: isSelected ? '0 4px 12px rgba(18,18,147,0.05)' : 'none',
+                        position: 'relative'
+                      }}
+                    >
+                      {isSelected && (
+                        <div style={{ position: 'absolute', top: '10px', right: '10px', background: 'var(--primary-blue)', color: '#fff', borderRadius: '50%', width: '18px', height: '18px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Check width="10" height="10" />
+                        </div>
+                      )}
+                      <h4 style={{ margin: '0 0 4px 0', fontSize: '0.9rem', fontWeight: 750, color: isSelected ? 'var(--primary-blue)' : '#1e293b' }}>{type.name}</h4>
+                      <p style={{ margin: 0, fontSize: '0.72rem', color: '#64748b', lineHeight: 1.3 }}>{type.desc}</p>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Section 2: Contact & Identity Info */}
-          <div>
-            <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
-              2. Informations légales et contacts
-            </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
-              
-              {/* Nom de l'entreprise */}
-              <div>
-                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Nom commercial / Raison sociale *</label>
-                <div style={{ position: 'relative' }}>
-                  <Building2 width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                  <input 
-                    type="text" 
-                    placeholder="Ex: Arthur Créations SARL"
-                    value={shopName}
-                    onChange={(e) => setShopName(e.target.value)}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '12px 12px 12px 38px',
-                      borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.9rem',
-                      fontFamily: 'inherit',
-                      background: '#f8fafc'
-                    }}
-                  />
+          {!isAlreadySeller && (
+            <div>
+              <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
+                2. Informations légales et contacts
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+                
+                {/* Nom de l'entreprise */}
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Nom commercial / Raison sociale *</label>
+                  <div style={{ position: 'relative' }}>
+                    <Building2 width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <input 
+                      type="text" 
+                      placeholder="Ex: Arthur Créations SARL"
+                      value={shopName}
+                      onChange={(e) => setShopName(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px 12px 12px 38px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.9rem',
+                        fontFamily: 'inherit',
+                        background: '#f8fafc'
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* WhatsApp */}
-              <div>
-                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>WhatsApp professionnel *</label>
-                <div style={{ position: 'relative' }}>
-                  <Store width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                  <input 
-                    type="tel" 
-                    placeholder="Ex: +23769XXXXXXX"
-                    value={whatsapp}
-                    onChange={(e) => setWhatsapp(e.target.value)}
-                    required
-                    style={{
-                      width: '100%',
-                      padding: '12px 12px 12px 38px',
-                      borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.9rem',
-                      fontFamily: 'inherit',
-                      background: '#f8fafc'
-                    }}
-                  />
+                {/* WhatsApp */}
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>WhatsApp professionnel *</label>
+                  <div style={{ position: 'relative' }}>
+                    <Store width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <input 
+                      type="tel" 
+                      placeholder="Ex: +23769XXXXXXX"
+                      value={whatsapp}
+                      onChange={(e) => setWhatsapp(e.target.value)}
+                      required
+                      style={{
+                        width: '100%',
+                        padding: '12px 12px 12px 38px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.9rem',
+                        fontFamily: 'inherit',
+                        background: '#f8fafc'
+                      }}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              {/* Secteur d'activité */}
-              <div>
-                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Secteur d'activité principal *</label>
-                <div style={{ position: 'relative' }}>
-                  <Briefcase width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-                  <select
-                    value={sector}
-                    onChange={(e) => setSector(e.target.value)}
-                    style={{
-                      width: '100%',
-                      padding: '12px 12px 12px 38px',
-                      borderRadius: '8px',
-                      border: '1px solid #cbd5e1',
-                      fontSize: '0.9rem',
-                      fontFamily: 'inherit',
-                      background: '#f8fafc',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    {sectors.map(s => (
-                      <option key={s.value} value={s.value}>{s.label}</option>
-                    ))}
-                  </select>
+                {/* Secteur d'activité */}
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Secteur d'activité principal *</label>
+                  <div style={{ position: 'relative' }}>
+                    <Briefcase width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                    <select
+                      value={sector}
+                      onChange={(e) => setSector(e.target.value)}
+                      style={{
+                        width: '100%',
+                        padding: '12px 12px 12px 38px',
+                        borderRadius: '8px',
+                        border: '1px solid #cbd5e1',
+                        fontSize: '0.9rem',
+                        fontFamily: 'inherit',
+                        background: '#f8fafc',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      {sectors.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
-              </div>
 
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Section 3: Professional Files Upload Mockup */}
+          {/* Section 3: Professional Files Upload Area */}
           <div>
             <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
-              3. Pièces justificatives (Recommandé pour accélérer la validation et obtenir le badge vérifié)
+              {isAlreadySeller ? "1. Téléverser les pièces de certification (Recommandé)" : "3. Pièces justificatives (Recommandé pour accélérer la validation et obtenir le badge vérifié)"}
             </label>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '20px' }}>
               
               {/* Logo Upload area */}
               <div>
@@ -545,9 +589,9 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
                 </div>
               </div>
 
-              {/* Legal Doc Upload Area */}
+              {/* Legal Doc Upload Area (Recto) */}
               <div>
-                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Registre du Commerce / CNI</label>
+                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>CNI (Recto / Face A) ou Registre</label>
                 <div 
                   onClick={() => document.getElementById('doc-file-input').click()}
                   style={{
@@ -583,7 +627,51 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
                   ) : (
                     <>
                       <UploadCloud width="24" height="24" style={{ color: '#94a3b8', marginBottom: '6px' }} />
-                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>CNI ou Registre</span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>Pièce Recto</span>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Legal Doc Back Upload Area (Verso) */}
+              <div>
+                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>CNI (Verso / Face B) - Optionnel</label>
+                <div 
+                  onClick={() => document.getElementById('doc-back-file-input').click()}
+                  style={{
+                    border: '2px dashed #cbd5e1',
+                    borderRadius: '10px',
+                    padding: '20px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    background: '#f8fafc',
+                    transition: 'all 0.2s',
+                    minHeight: '110px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                  className="upload-hover"
+                >
+                  <input 
+                    type="file" 
+                    id="doc-back-file-input" 
+                    accept=".pdf,.png,.jpg,.jpeg" 
+                    onChange={handleDocBackUpload} 
+                    style={{ display: 'none' }} 
+                  />
+                  {docBackName ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0 10px' }}>
+                      <FileText width="24" height="24" style={{ color: '#3b82f6', flexShrink: 0 }} />
+                      <span style={{ fontSize: '0.72rem', color: '#10b981', fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        {docBackName}
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <UploadCloud width="24" height="24" style={{ color: '#94a3b8', marginBottom: '6px' }} />
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>CNI Verso uniquement</span>
                     </>
                   )}
                 </div>
@@ -638,58 +726,60 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
           </div>
 
           {/* Section 4: Bio and Details */}
-          <div>
-            <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
-              4. Profil d'activité
-            </label>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              
-              <div>
-                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>
-                  Slogan ou courte biographie *
-                </label>
-                <input 
-                  type="text"
-                  placeholder="Ex: Fabricant de chaussures en cuir sur mesure à Yaoundé."
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  required
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '0.9rem',
-                    fontFamily: 'inherit',
-                    background: '#f8fafc'
-                  }}
-                />
-              </div>
+          {!isAlreadySeller && (
+            <div>
+              <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
+                4. Profil d'activité
+              </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>
+                    Slogan ou courte biographie *
+                  </label>
+                  <input 
+                    type="text"
+                    placeholder="Ex: Fabricant de chaussures en cuir sur mesure à Yaoundé."
+                    value={bio}
+                    onChange={(e) => setBio(e.target.value)}
+                    required
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      fontFamily: 'inherit',
+                      background: '#f8fafc'
+                    }}
+                  />
+                </div>
 
-              <div>
-                <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>
-                  Description de votre catalogue de produits
-                </label>
-                <textarea 
-                  placeholder="Quels types d'articles fabriquez ou vendez-vous ? Précisez l'origine des matériaux."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    borderRadius: '8px',
-                    border: '1px solid #cbd5e1',
-                    fontSize: '0.9rem',
-                    fontFamily: 'inherit',
-                    background: '#f8fafc',
-                    minHeight: '100px',
-                    resize: 'vertical'
-                  }}
-                />
-              </div>
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>
+                    Description de votre catalogue de produits
+                  </label>
+                  <textarea 
+                    placeholder="Quels types d'articles fabriquez ou vendez-vous ? Précisez l'origine des matériaux."
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '12px',
+                      borderRadius: '8px',
+                      border: '1px solid #cbd5e1',
+                      fontSize: '0.9rem',
+                      fontFamily: 'inherit',
+                      background: '#f8fafc',
+                      minHeight: '100px',
+                      resize: 'vertical'
+                    }}
+                  />
+                </div>
 
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Guidelines Info */}
           <div style={{ display: 'flex', gap: '12px', padding: '16px', background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
@@ -722,7 +812,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
             }}
           >
             {loading ? <RefreshCw className="animate-spin" width="18" height="18" /> : <ShieldCheck width="20" height="20" />}
-            <span>Soumettre mon dossier d'entreprise</span>
+            <span>{isAlreadySeller ? "Soumettre mes pièces de certification" : "Soumettre mon dossier d'entreprise"}</span>
           </button>
         </form>
 

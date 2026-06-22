@@ -322,6 +322,7 @@ router.put('/profile/avatar', authenticate, upload.single('avatar'), async (req,
 router.post('/apply-seller', authenticate, upload.fields([
     { name: 'logo', maxCount: 1 },
     { name: 'document', maxCount: 1 },
+    { name: 'document_back', maxCount: 1 },
     { name: 'manager_photo', maxCount: 1 }
 ]), async (req, res) => {
     const { shop_name, phone, bio, description } = req.body;
@@ -331,6 +332,19 @@ router.post('/apply-seller', authenticate, upload.fields([
     }
 
     try {
+        // Retrieve current profile to merge seller application data
+        const { data: currentProfile, error: fetchError } = await db
+            .from('profiles')
+            .select('seller_application_data, avatar_url, bio, shop_name, phone, is_verified, seller_status')
+            .eq('id', req.user.id)
+            .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {
+            console.error('Error fetching profile in apply-seller:', fetchError);
+        }
+
+        const existingData = currentProfile?.seller_application_data || {};
+
         const localAllowedMimes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'application/pdf']);
         const localExtensions = {
             'image/jpeg': 'jpg',
@@ -368,6 +382,7 @@ router.post('/apply-seller', authenticate, upload.fields([
         // 1. Upload des fichiers
         let logoUrl = null;
         let documentUrl = null;
+        let documentBackUrl = null;
         let managerPhotoUrl = null;
 
         if (req.files?.logo?.[0]) {
@@ -376,15 +391,27 @@ router.post('/apply-seller', authenticate, upload.fields([
         if (req.files?.document?.[0]) {
             documentUrl = await uploadToBucket(req.files.document[0], 'doc');
         }
+        if (req.files?.document_back?.[0]) {
+            documentBackUrl = await uploadToBucket(req.files.document_back[0], 'doc_back');
+        }
         if (req.files?.manager_photo?.[0]) {
             managerPhotoUrl = await uploadToBucket(req.files.manager_photo[0], 'manager');
         }
 
         // 2. Algorithme de vérification biométrique/OCR simulé
-        let isVerifiedOnApproval = false;
-        let verificationDetails = {};
+        const finalLogoUrl = logoUrl || existingData.logo_url || currentProfile?.avatar_url || '';
+        const finalDocumentUrl = documentUrl || existingData.document_url || '';
+        const finalDocumentBackUrl = documentBackUrl || existingData.document_back_url || '';
+        const finalManagerPhotoUrl = managerPhotoUrl || existingData.manager_photo_url || '';
+        
+        const finalDescription = (currentProfile?.seller_status === 'approved') 
+            ? (existingData.description || '') 
+            : (description || '');
 
-        if (documentUrl && managerPhotoUrl) {
+        let isVerifiedOnApproval = currentProfile?.is_verified || false;
+        let verificationDetails = existingData.verification_details || {};
+
+        if (!isVerifiedOnApproval && finalDocumentUrl && finalManagerPhotoUrl) {
             // Simulation d'une lourde analyse serveur de 2 secondes (comparaison faciale & OCR)
             await new Promise(resolve => setTimeout(resolve, 2000));
 
@@ -405,27 +432,29 @@ router.post('/apply-seller', authenticate, upload.fields([
         // 3. Mise à jour automatique et approbation immédiate
         const updatePayload = {
             seller_status: 'approved',
-            shop_name,
-            phone,
-            bio: bio || '',
+            shop_name: shop_name || currentProfile?.shop_name || '',
+            phone: phone || currentProfile?.phone || '',
+            bio: bio || currentProfile?.bio || '',
             is_verified: isVerifiedOnApproval,
             seller_application_data: {
-                shop_name,
-                phone,
-                bio: bio || '',
-                description: description || '',
-                logo_url: logoUrl || '',
-                document_url: documentUrl || '',
-                manager_photo_url: managerPhotoUrl || '',
+                shop_name: shop_name || currentProfile?.shop_name || existingData.shop_name || '',
+                phone: phone || currentProfile?.phone || existingData.phone || '',
+                bio: bio || currentProfile?.bio || existingData.bio || '',
+                description: finalDescription,
+                logo_url: finalLogoUrl,
+                document_url: finalDocumentUrl,
+                document_back_url: finalDocumentBackUrl,
+                manager_photo_url: finalManagerPhotoUrl,
                 is_verified_on_approval: isVerifiedOnApproval,
                 verification_details: verificationDetails,
-                request_date: new Date().toISOString()
+                request_date: existingData.request_date || new Date().toISOString(),
+                update_date: new Date().toISOString()
             }
         };
 
-        // Si un logo a été fourni, il est directement rattaché comme avatar du profil
-        if (logoUrl) {
-            updatePayload.avatar_url = logoUrl;
+        // Si un logo a été fourni ou existait déjà, il est directement rattaché comme avatar du profil
+        if (finalLogoUrl) {
+            updatePayload.avatar_url = finalLogoUrl;
         }
 
         const { error } = await db

@@ -366,6 +366,23 @@ export default function MonEspacePage() {
                   </div>
                   <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
                 </Link>
+
+                {/* Certifier ma boutique */}
+                {isSellerApproved && !profile?.is_verified && (
+                  <Link href="/dashboard?tab=seller-application" onClick={() => {
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('vc_dashboard_active_tab', 'seller-application');
+                    }
+                  }} className="premium-link">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                      <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <ShieldCheck width="18" height="18" style={{ color: '#3b82f6' }} />
+                      </div>
+                      <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Certifier ma boutique</span>
+                    </div>
+                    <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+                  </Link>
+                )}
               </>
             ) : (
               /* Devenir Vendeur */

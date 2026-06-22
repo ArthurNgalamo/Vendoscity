@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getApiBaseUrl, fetchWithTimeout, normalizeSupabaseImageUrl, formatCurrency, compressImage } from '../../core/api';
 import { shareLink } from '../../core/share';
-import { LayoutDashboard, Store, User, TrendingUp, QrCode, Wallet } from 'lucide-react';
+import { LayoutDashboard, Store, User, TrendingUp, QrCode, Wallet, ShieldCheck } from 'lucide-react';
 
 import { POPULAR_NEIGHBORHOODS, parsePhoneNumber } from './constants';
 import ProfileSection from './components/ProfileSection';
@@ -71,7 +71,7 @@ function DashboardContent() {
     if (loading || !user) return;
 
     const validTabs = isSellerApproved
-      ? ['profile', 'stats', 'seller-area', 'orders', 'wallet']
+      ? ['profile', 'stats', 'seller-area', 'orders', 'wallet', ...(!profile?.is_verified ? ['seller-application'] : [])]
       : ['profile', 'seller-application'];
 
     let target = tab;
@@ -578,6 +578,15 @@ function DashboardContent() {
                 >
                   <TrendingUp width="18" height="18" /> Statistiques & Métriques
                 </button>
+                {isSellerApproved && !profile?.is_verified && (
+                  <button
+                    onClick={() => setActiveSection('seller-application')}
+                    className={`dashboard-menu-item ${activeSection === 'seller-application' ? 'active' : ''}`}
+                    style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                  >
+                    <ShieldCheck width="18" height="18" style={{ color: '#3b82f6' }} /> Certifier ma boutique
+                  </button>
+                )}
               </>
             ) : (
               <button
@@ -637,7 +646,7 @@ function DashboardContent() {
           )}
 
           {/* Section: Seller Application */}
-          {!isSellerApproved && activeSection === 'seller-application' && (
+          {((!isSellerApproved && activeSection === 'seller-application') || (isSellerApproved && !profile?.is_verified && activeSection === 'seller-application')) && (
             <SellerApplicationSection 
               profile={profile}
               onApprovalSuccess={fetchProfile}
