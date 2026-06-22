@@ -30,18 +30,7 @@ function DashboardContent() {
   const [activeSection, setActiveSection] = useState('seller-area'); // 'seller-area' or 'profile'
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-  // Set tab from query parameter or localStorage
-  useEffect(() => {
-    const validTabs = ['profile', 'stats', 'seller-area', 'orders', 'wallet', 'seller-application'];
-    if (tab && validTabs.includes(tab)) {
-      setActiveSection(tab);
-    } else {
-      const storedTab = typeof window !== 'undefined' ? localStorage.getItem('vc_dashboard_active_tab') : null;
-      if (storedTab && validTabs.includes(storedTab)) {
-        setActiveSection(storedTab);
-      }
-    }
-  }, [tab]);
+  // (Redirection combined below with unified hook)
 
   // Update localStorage when activeSection changes
   useEffect(() => {
@@ -77,18 +66,28 @@ function DashboardContent() {
     profile?.seller_status === 'approved' || 
     (profile && !profile.seller_status && (profile.shop_name || profile.phone || myProducts.length > 0));
 
-  // Redirect to valid tab if seller status changes or tab is invalid for current user status
+  // Set and validate tab in a single unified hook to prevent state update race conditions
   useEffect(() => {
     if (loading || !user) return;
-    
+
     const validTabs = isSellerApproved
       ? ['profile', 'stats', 'seller-area', 'orders', 'wallet']
       : ['profile', 'seller-application'];
 
-    if (!validTabs.includes(activeSection)) {
-      setActiveSection(isSellerApproved ? 'seller-area' : 'profile');
+    let target = tab;
+    if (!target || !validTabs.includes(target)) {
+      const storedTab = typeof window !== 'undefined' ? localStorage.getItem('vc_dashboard_active_tab') : null;
+      if (storedTab && validTabs.includes(storedTab)) {
+        target = storedTab;
+      } else {
+        target = isSellerApproved ? 'seller-area' : 'profile';
+      }
     }
-  }, [isSellerApproved, activeSection, loading, user]);
+
+    if (activeSection !== target) {
+      setActiveSection(target);
+    }
+  }, [tab, isSellerApproved, loading, user, activeSection]);
 
   // Add/Edit Product form states
   const [isEditingProduct, setIsEditingProduct] = useState(false);
