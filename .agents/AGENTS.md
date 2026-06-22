@@ -19,5 +19,9 @@ Ce fichier contient l'historique des choix d'architecture clés, des correctifs 
 
 ## 🗄️ Choix d'Architecture
 
-- **Marketplace WhatsApp-First :** La plateforme met en relation directe les acheteurs et vendeurs via WhatsApp. Aucun flux de paiement complexe ou Stripe n'est conservé dans la version actuelle du panier.
+- **Marketplace WhatsApp-First & Séquestre Hybride :** La plateforme met en relation directe via WhatsApp, mais intègre également un système de paiement par tiers de confiance (séquestre) facultatif pour sécuriser les transactions de proximité.
 - **Routage Next.js / Express Backend :** Le frontend Next.js redirige les requêtes d'API vers le backend Express via des rewrites dans `next.config.mjs` en production pour assurer un fonctionnement fluide en même-origine.
+- **Séquestre Mobile Money (MTN/Orange) :** Réception centralisée des fonds sur les numéros administratifs de la plateforme (Arthur Romi Ngalamo Kekenou) via génération dynamique de code USSD. Détection et validation automatiques via un webhook de réception SMS (simulation de passerelle).
+- **Validation Physique par QR Code :** Système de déblocage sécurisé des fonds du séquestre vers le portefeuille du vendeur via scan de QR Code de commande unique (ou code secret à 6 chiffres) par l'appareil photo du dashboard vendeur.
+- **Portefeuille Vendeur Sécurisé par PIN :** Solde virtuel pour les vendeurs avec historique de transactions, système de dépôts et demandes de retraits, le tout protégé par un code d'accès PIN à 6 chiffres.
+- **Aplatissement des menus (Desktop/Mobile) :** Remplacement du lien générique "Tableau de Bord" par des liens directs vers ses sous-onglets dans les en-têtes principaux pour une expérience utilisateur à plat. Synchronisation d'état réactive gérée via `useSearchParams` et `<Suspense>` sous Next.js.

@@ -69,9 +69,38 @@ Ce document résume l'ensemble des corrections, refactorings et optimisations de
 | `6413e4f` | `style(footer): rendre le footer desktop plus sobre et elegant (fond neutre #111827 et accents argent/blanc)` |
 | `4f41858` | `fix(header): animer le placeholder de la barre de recherche compacte (sticky) avec les messages rotatifs` |
 | `3939830` | `perf(messagerie): transition progressive au pixel pres du header selon la position de scroll` |
+| `2f2d8f3` | `feat: flatten dashboard sub-menus directly into main desktop and mobile headers and sync tabs reactively` |
+
+---
+
+## 🔒 Nouvelles Fonctionnalités de Paiement, Séquestre, Portefeuille et Navigation
+
+### 1. Système de Paiement Interne par Séquestre MTN/Orange MoMo
+*   **Paiement Séquestre** : Intégration d'un système de séquestre sécurisé. L'acheteur dépose les fonds en exécutant un code USSD généré dynamiquement sur les numéros administrateurs (MTN `681570075`, Orange `641458777` - Arthur Romi Ngalamo Kekenou).
+*   **Webhooks SMS Callback** : Un endpoint de callback backend `/api/payments/sms-callback` écoute et valide les messages SMS de transferts de fonds.
+*   **Ajustement de Solde** : Gestion automatique des sous-paiements (demande de complément) et sur-paiements (crédit du surplus dans le portefeuille de l'acheteur).
+
+### 2. Livraison Sécurisée par QR Code
+*   **Génération QR Code** : L'acheteur dispose d'un QR code unique de livraison (et code secret à 6 chiffres) sur sa page `/commandes`.
+*   **Scan et Libération** : Le vendeur scanne ce QR code via la caméra (bibliothèque `html5-qrcode` intégrée au dashboard) pour valider la livraison et débloquer instantanément les fonds du séquestre vers son portefeuille.
+*   **Facturation** : Option de téléchargement de la facture au format PDF.
+
+### 3. Portefeuille Virtuel Vendeur (Wallet)
+*   **Sécurisation par code PIN** : L'accès au solde et aux retraits est verrouillé par un code PIN à 6 chiffres configuré par le vendeur.
+*   **Opérations financières** : Support des dépôts et demandes de retraits (sur numéro MoMo/Orange configuré) avec historique de transactions complet.
+
+### 4. Demande de Statut Vendeur et Bypass
+*   **Formulaire d'adhésion** : Les utilisateurs demandent à être vendeurs via un formulaire professionnel (Nom, Tél, Bio).
+*   **Simulation Admin** : Bouton de simulation d'approbation instantanée en développement local.
+*   **Bypass hérité** : Les anciens comptes déjà actifs avec boutique, WhatsApp ou articles publiés obtiennent automatiquement le statut approuvé.
+
+### 5. Aplatissement des Menus de Navigation
+*   **Liens directs** : Remplacement du lien unique "Tableau de Bord" dans les en-têtes desktop et mobile par les sections directes : *Espace Vendeur*, *Commandes Reçues*, *Mon Portefeuille*, *Statistiques & Métriques*, *Mon Profil*.
+*   **Navigation sans rechargement** : Le dashboard écoute dynamiquement la query `tab` de l'URL via `useSearchParams()` et bascule réactivement d'onglet. La page `/dashboard` a été enveloppée dans une zone `<Suspense>` pour se conformer au rendu statique de Next.js.
 
 ---
 
 ## Vérification et Validation
 - ✅ Build Next.js (`npm run build`) validé avec succès.
-- ✅ Correctifs testés et validés localement sans erreurs CORS ni blocages sur iPhone.
+- ✅ Correctifs et fonctionnalités de paiement testés et validés localement sans erreurs CORS ni blocages sur iPhone.
+- ✅ Navigation à plat vérifiée et validée avec succès sur Desktop et Mobile.
