@@ -46,7 +46,10 @@ export default function CheckoutPage() {
   const RECIPIENT_MTN = "681570075";
   const RECIPIENT_ORANGE = "641458777";
 
+  const [hasMounted, setHasMounted] = useState(false);
+
   useEffect(() => {
+    setHasMounted(true);
     const raw = localStorage.getItem('checkout_data');
     if (raw) {
       try {
@@ -74,6 +77,14 @@ export default function CheckoutPage() {
       default: return 'Non défini';
     }
   };
+
+  if (!hasMounted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0', color: '#64748b' }}>
+        <p>Chargement de la commande...</p>
+      </div>
+    );
+  }
 
   if (!checkoutData) {
     return (
