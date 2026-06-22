@@ -56,7 +56,7 @@ export default function MonEspacePage() {
 
   const isSellerApproved = 
     profile?.seller_status === 'approved' || 
-    (profile && (profile.shop_name || profile.phone || myProducts.length > 0));
+    (profile && !profile.seller_status && (profile.shop_name || profile.phone || myProducts.length > 0));
 
   const handleAvatarUploadDirect = async (file) => {
     if (!file) return;
