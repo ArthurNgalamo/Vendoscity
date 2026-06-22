@@ -98,7 +98,6 @@ export default function MonEspacePage() {
   // Register fields
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
-  const [regWhatsapp, setRegWhatsapp] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [showRegPassword, setShowRegPassword] = useState(false);
   const [submittingReg, setSubmittingReg] = useState(false);
@@ -127,13 +126,13 @@ export default function MonEspacePage() {
   // Direct register submit handler
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (!regName.trim() || !regEmail.trim() || !regWhatsapp.trim() || !regPassword.trim()) {
+    if (!regName.trim() || !regEmail.trim() || !regPassword.trim()) {
       showToast('Veuillez remplir tous les champs.');
       return;
     }
     setSubmittingReg(true);
     try {
-      await register(regName, regEmail, regPassword, regWhatsapp);
+      await register(regName, regEmail, regPassword, '');
       // Automatically log them in after registration
       await login(regEmail, regPassword);
       showToast('Inscription et connexion réussies !');
@@ -362,9 +361,9 @@ export default function MonEspacePage() {
               </>
             ) : (
               /* Devenir Vendeur */
-              <Link href="/dashboard?tab=seller-area" onClick={() => {
+              <Link href="/dashboard?tab=seller-application" onClick={() => {
                 if (typeof window !== 'undefined') {
-                  localStorage.setItem('vc_dashboard_active_tab', 'seller-area');
+                  localStorage.setItem('vc_dashboard_active_tab', 'seller-application');
                 }
               }} className="premium-link">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
@@ -377,16 +376,33 @@ export default function MonEspacePage() {
               </Link>
             )}
 
-            {/* Link 2: Mon Profil */}
-            <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="premium-link">
+            {/* Modifier mon profil (Paramètres) */}
+            <Link href="/dashboard?tab=profile" onClick={() => {
+              if (typeof window !== 'undefined') {
+                localStorage.setItem('vc_dashboard_active_tab', 'profile');
+              }
+            }} className="premium-link">
               <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <User width="18" height="18" style={{ color: '#ef4444' }} />
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#f3e8ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <User width="18" height="18" style={{ color: '#a855f7' }} />
                 </div>
-                <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Mon Profil / WhatsApp</span>
+                <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Modifier mon profil (Paramètres)</span>
               </div>
               <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
             </Link>
+
+            {/* Link 2: Mon Profil (Show only if seller approved) */}
+            {isSellerApproved && (
+              <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="premium-link">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <User width="18" height="18" style={{ color: '#ef4444' }} />
+                  </div>
+                  <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Mon Profil / WhatsApp</span>
+                </div>
+                <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+              </Link>
+            )}
 
             {/* Link 3: Messagerie */}
             <Link href="/messagerie" className="premium-link">
@@ -589,13 +605,13 @@ export default function MonEspacePage() {
           {activeTab === 'register' && (
             <form onSubmit={handleRegisterSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div className="input-group">
-                <label htmlFor="reg-name">Nom de la boutique / Pseudo *</label>
+                <label htmlFor="reg-name">Nom complet / Pseudo *</label>
                 <div className="input-wrapper">
-                  <Store width="18" height="18" className="input-icon" />
+                  <User width="18" height="18" className="input-icon" />
                   <input
                     id="reg-name"
                     type="text"
-                    placeholder="Ex: Boutique de Yaoundé"
+                    placeholder="Ex: Jean Dupont"
                     value={regName}
                     onChange={(e) => setRegName(e.target.value)}
                     required
@@ -610,24 +626,9 @@ export default function MonEspacePage() {
                   <input
                     id="reg-email"
                     type="email"
-                    placeholder="vendeur@example.com"
+                    placeholder="votre@email.com"
                     value={regEmail}
                     onChange={(e) => setRegEmail(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-
-              <div className="input-group">
-                <label htmlFor="reg-whatsapp">Numéro WhatsApp (+237...) *</label>
-                <div className="input-wrapper">
-                  <Phone width="18" height="18" className="input-icon" />
-                  <input
-                    id="reg-whatsapp"
-                    type="tel"
-                    placeholder="+2376xxxxxxxx"
-                    value={regWhatsapp}
-                    onChange={(e) => setRegWhatsapp(e.target.value)}
                     required
                   />
                 </div>

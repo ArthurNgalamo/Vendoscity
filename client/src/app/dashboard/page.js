@@ -32,7 +32,7 @@ function DashboardContent() {
 
   // Set tab from query parameter or localStorage
   useEffect(() => {
-    const validTabs = ['profile', 'stats', 'seller-area', 'orders', 'wallet'];
+    const validTabs = ['profile', 'stats', 'seller-area', 'orders', 'wallet', 'seller-application'];
     if (tab && validTabs.includes(tab)) {
       setActiveSection(tab);
     } else {
@@ -72,6 +72,23 @@ function DashboardContent() {
   // Seller Products list
   const [myProducts, setMyProducts] = useState([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
+
+  const isSellerApproved = 
+    profile?.seller_status === 'approved' || 
+    (profile && (profile.shop_name || profile.phone || myProducts.length > 0));
+
+  // Redirect to valid tab if seller status changes or tab is invalid for current user status
+  useEffect(() => {
+    if (loading || !user) return;
+    
+    const validTabs = isSellerApproved
+      ? ['profile', 'stats', 'seller-area', 'orders', 'wallet']
+      : ['profile', 'seller-application'];
+
+    if (!validTabs.includes(activeSection)) {
+      setActiveSection(isSellerApproved ? 'seller-area' : 'profile');
+    }
+  }, [isSellerApproved, activeSection, loading, user]);
 
   // Add/Edit Product form states
   const [isEditingProduct, setIsEditingProduct] = useState(false);
@@ -510,10 +527,6 @@ function DashboardContent() {
     }
   };
 
-  const isSellerApproved = 
-    profile?.seller_status === 'approved' || 
-    (profile && (profile.shop_name || profile.phone || myProducts.length > 0));
-
   if (loading) {
     return (
       <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
@@ -534,7 +547,7 @@ function DashboardContent() {
         <aside className="dashboard-sidebar">
           <h3>Menu</h3>
           <div className="dashboard-menu">
-            {isSellerApproved && (
+            {isSellerApproved ? (
               <>
                 <button
                   onClick={() => setActiveSection('seller-area')}
@@ -565,54 +578,75 @@ function DashboardContent() {
                   <TrendingUp width="18" height="18" /> Statistiques & Métriques
                 </button>
               </>
+            ) : (
+              <button
+                onClick={() => setActiveSection('seller-application')}
+                className={`dashboard-menu-item ${activeSection === 'seller-application' ? 'active' : ''}`}
+                style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+              >
+                <Store width="18" height="18" /> Devenir Vendeur
+              </button>
             )}
-            <Link
-              href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`}
-              className="dashboard-menu-item"
-              style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}
+            <button
+              onClick={() => setActiveSection('profile')}
+              className={`dashboard-menu-item ${activeSection === 'profile' ? 'active' : ''}`}
+              style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
             >
-              <User width="18" height="18" /> Mon Profil / Boutique
-            </Link>
+              <User width="18" height="18" /> Modifier mon profil
+            </button>
+            {isSellerApproved && (
+              <Link
+                href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`}
+                className="dashboard-menu-item"
+                style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}
+              >
+                <User width="18" height="18" /> Ma Boutique (Public)
+              </Link>
+            )}
           </div>
         </aside>
 
         {/* Dynamic section display */}
         <div className="dashboard-content">
           
-          {!isSellerApproved ? (
+          {/* Section: Profile */}
+          {activeSection === 'profile' && (
+            <ProfileSection
+              profileData={profileData}
+              setProfileData={setProfileData}
+              isEditingProfile={isEditingProfile}
+              setIsEditingProfile={setIsEditingProfile}
+              submittingProfile={submittingProfile}
+              selectedCountry={selectedCountry}
+              setSelectedCountry={setSelectedCountry}
+              nationalPhone={nationalPhone}
+              setNationalPhone={setNationalPhone}
+              countryDropdownOpen={countryDropdownOpen}
+              setCountryDropdownOpen={setCountryDropdownOpen}
+              countrySearchQuery={countrySearchQuery}
+              setCountrySearchQuery={setCountrySearchQuery}
+              newPassword={newPassword}
+              setNewPassword={setNewPassword}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+              handleProfileSave={handleProfileSave}
+              handleAvatarUpload={handleAvatarUpload}
+              isSellerApproved={isSellerApproved}
+            />
+          )}
+
+          {/* Section: Seller Application */}
+          {!isSellerApproved && activeSection === 'seller-application' && (
             <SellerApplicationSection 
               profile={profile}
               onApprovalSuccess={fetchProfile}
               showToast={showToast}
               authFetch={authFetch}
             />
-          ) : (
-            <>
-              {/* Section: Profile */}
-              {activeSection === 'profile' && (
-                <ProfileSection
-                  profileData={profileData}
-                  setProfileData={setProfileData}
-                  isEditingProfile={isEditingProfile}
-                  setIsEditingProfile={setIsEditingProfile}
-                  submittingProfile={submittingProfile}
-                  selectedCountry={selectedCountry}
-                  setSelectedCountry={setSelectedCountry}
-                  nationalPhone={nationalPhone}
-                  setNationalPhone={setNationalPhone}
-                  countryDropdownOpen={countryDropdownOpen}
-                  setCountryDropdownOpen={setCountryDropdownOpen}
-                  countrySearchQuery={countrySearchQuery}
-                  setCountrySearchQuery={setCountrySearchQuery}
-                  newPassword={newPassword}
-                  setNewPassword={setNewPassword}
-                  showPassword={showPassword}
-                  setShowPassword={setShowPassword}
-                  handleProfileSave={handleProfileSave}
-                  handleAvatarUpload={handleAvatarUpload}
-                />
-              )}
+          )}
 
+          {isSellerApproved && (
+            <>
               {/* Section: Stats & Metrics */}
               {activeSection === 'stats' && (
                 <StatsSection

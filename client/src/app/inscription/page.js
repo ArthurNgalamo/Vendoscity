@@ -16,7 +16,6 @@ export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [whatsapp, setWhatsapp] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -29,7 +28,7 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !email.trim() || !password.trim() || !whatsapp.trim()) {
+    if (!name.trim() || !email.trim() || !password.trim()) {
       showToast('Veuillez remplir tous les champs.');
       return;
     }
@@ -41,7 +40,7 @@ export default function RegisterPage() {
 
     setSubmitting(true);
     try {
-      await register(name, email, password, whatsapp);
+      await register(name, email, password, '');
       router.push('/connexion');
     } catch (err) {
       showToast(err?.message || "Une erreur s'est produite.");
@@ -63,10 +62,10 @@ export default function RegisterPage() {
       >
         <div style={{ textAlign: 'center', marginBottom: '25px' }}>
           <h1 style={{ fontSize: '1.6rem', color: '#111', fontWeight: '800', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
-            <UserPlus width="24" height="24" style={{ color: 'var(--primary-blue)' }} /> Inscription Vendeur
+            <UserPlus width="24" height="24" style={{ color: 'var(--primary-blue)' }} /> Inscription
           </h1>
           <p style={{ color: '#666', fontSize: '0.9rem', margin: 0 }}>
-            Rejoignez Vendoscity et commencez à publier vos articles
+            Rejoignez Vendoscity pour commander et suivre vos achats
           </p>
         </div>
 
@@ -75,7 +74,7 @@ export default function RegisterPage() {
           {/* Nom complet */}
           <div>
             <label htmlFor="reg-name" style={{ fontSize: '0.85rem', color: '#555', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
-              Nom complet ou Raison sociale
+              Nom complet
             </label>
             <div style={{ position: 'relative' }}>
               <User
@@ -86,7 +85,7 @@ export default function RegisterPage() {
               <input
                 id="reg-name"
                 type="text"
-                placeholder="Ex: Jean Bakari ou Ma Boutique Sarl"
+                placeholder="Ex: Jean Bakari"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
@@ -130,39 +129,6 @@ export default function RegisterPage() {
                 }}
               />
             </div>
-          </div>
-
-          {/* WhatsApp */}
-          <div>
-            <label htmlFor="reg-whatsapp" style={{ fontSize: '0.85rem', color: '#555', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
-              Numéro WhatsApp (avec indicatif pays ex: +237...)
-            </label>
-            <div style={{ position: 'relative' }}>
-              <MessageCircle
-                width="16"
-                height="16"
-                style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#999' }}
-              />
-              <input
-                id="reg-whatsapp"
-                type="tel"
-                placeholder="Ex: +237681570075"
-                value={whatsapp}
-                onChange={(e) => setWhatsapp(e.target.value)}
-                required
-                style={{
-                  width: '100%',
-                  padding: '12px 12px 12px 38px',
-                  borderRadius: '8px',
-                  border: '1px solid #ccc',
-                  fontSize: '0.95rem',
-                  fontFamily: 'inherit'
-                }}
-              />
-            </div>
-            <small style={{ display: 'block', color: '#666', marginTop: '4px', fontSize: '0.75rem' }}>
-              Ce numéro sera utilisé par les clients pour vous contacter après commande.
-            </small>
           </div>
 
           {/* Password */}

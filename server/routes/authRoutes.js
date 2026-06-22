@@ -190,10 +190,10 @@ router.post('/register', registerLimiter, async (req, res) => {
     const email = String(req.body?.email || '').trim();
     const password = String(req.body?.password || '');
     const name = String(req.body?.name || '').trim();
-    const whatsapp = normalizePhone(req.body?.whatsapp);
+    const whatsapp = req.body?.whatsapp ? normalizePhone(req.body.whatsapp) : '';
 
-    if (!email || !password || !name || !whatsapp) {
-        return res.status(400).json({ error: 'Tous les champs sont obligatoires' });
+    if (!email || !password || !name) {
+        return res.status(400).json({ error: 'Tous les champs (nom, email, mot de passe) sont obligatoires' });
     }
     if (!isValidEmail(email)) {
         return res.status(400).json({ error: 'Email invalide' });
@@ -202,54 +202,36 @@ router.post('/register', registerLimiter, async (req, res) => {
         return res.status(400).json({ error: 'Mot de passe invalide (8 a 72 caracteres)' });
     }
     if (name.length < 2 || name.length > 60) {
-        return res.status(400).json({ error: 'Nom de boutique invalide' });
+        return res.status(400).json({ error: 'Nom complet invalide (2 a 60 caracteres)' });
     }
-    if (whatsapp.length < 6 || whatsapp.length > 20) {
+    if (whatsapp && (whatsapp.length < 6 || whatsapp.length > 20)) {
         return res.status(400).json({ error: 'Numero WhatsApp invalide' });
     }
 
-    const shopName = String(name || '').trim();
-    if (shopName.length < 2) {
-        return res.status(400).json({ error: 'Nom de boutique invalide' });
-    }
-
-    // Best-effort uniqueness pre-check (works with service role; may be blocked by RLS on some setups).
-    try {
-        const { data: existing, error: existsErr } = await db
-            .from('profiles')
-            .select('id,shop_name,first_name')
-            .ilike('shop_name', shopName)
-            .limit(1);
-        if (!existsErr && Array.isArray(existing) && existing.length > 0) {
-            return res.status(409).json({ error: 'Ce nom de boutique est déjà utilisé. Choisissez un autre nom.' });
-        }
-    } catch (_) {
-        // ignore: rely on DB unique index if present
-    }
-    
     try {
         let result;
         
         if (!isProd) {
             // Mock auth
-            result = await signUpUnified(email, password, { name: shopName, shop_name: shopName, whatsapp, role: 'seller' });
+            result = await signUpUnified(email, password, { name, whatsapp, role: 'user' });
             
             // CORRECTIF: En local, on doit aussi créer le profil manuellement (pas de trigger)
             if (!result.error) {
                 console.log('👤 Création du profil local pour:', email);
                 const insert1 = await db.from('profiles').insert([{
                     id: result.data.user.id,
-                    first_name: shopName,
+                    first_name: name,
                     last_name: '',
                     phone: whatsapp,
-                    shop_name: shopName,
+                    shop_name: '',
+                    seller_status: 'none',
                     created_at: new Date(),
                     updated_at: new Date()
                 }]);
                 if (insert1?.error && isMissingColumn(insert1.error, 'shop_name')) {
                     const fallback = await db.from('profiles').insert([{
                         id: result.data.user.id,
-                        first_name: shopName,
+                        first_name: name,
                         last_name: '',
                         phone: whatsapp,
                         created_at: new Date(),
@@ -258,7 +240,7 @@ router.post('/register', registerLimiter, async (req, res) => {
                     if (fallback?.error && isMissingColumn(fallback.error, 'updated_at')) {
                         await db.from('profiles').insert([{
                             id: result.data.user.id,
-                            first_name: shopName,
+                            first_name: name,
                             last_name: '',
                             phone: whatsapp,
                             created_at: new Date()
@@ -267,10 +249,10 @@ router.post('/register', registerLimiter, async (req, res) => {
                 } else if (insert1?.error && isMissingColumn(insert1.error, 'updated_at')) {
                     await db.from('profiles').insert([{
                         id: result.data.user.id,
-                        first_name: shopName,
+                        first_name: name,
                         last_name: '',
                         phone: whatsapp,
-                        shop_name: shopName,
+                        shop_name: '',
                         created_at: new Date()
                     }]);
                 }
@@ -281,7 +263,7 @@ router.post('/register', registerLimiter, async (req, res) => {
                 email,
                 password,
                 options: {
-                    data: { name: shopName, shop_name: shopName, whatsapp, role: 'seller' }
+                    data: { name, whatsapp, role: 'user' }
                 }
             });
             result = error ? { error: error.message } : { data };

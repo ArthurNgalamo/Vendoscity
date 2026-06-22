@@ -23,7 +23,8 @@ export default function ProfileSection({
   showPassword,
   setShowPassword,
   handleProfileSave,
-  handleAvatarUpload
+  handleAvatarUpload,
+  isSellerApproved
 }) {
   return (
     <div className="dashboard-section active">
@@ -133,21 +134,26 @@ export default function ProfileSection({
           </div>
         </div>
 
-        <div className="form-group">
-          <label htmlFor="shopName">Nom de la Boutique</label>
-          <input
-            type="text"
-            id="shopName"
-            value={profileData.shopName}
-            onChange={(e) => setProfileData({ ...profileData, shopName: e.target.value })}
-            required
-            disabled={!isEditingProfile}
-            style={{ backgroundColor: !isEditingProfile ? '#f3f4f6' : '#fff' }}
-          />
-        </div>
+        {isSellerApproved && (
+          <div className="form-group">
+            <label htmlFor="shopName">Nom de la Boutique</label>
+            <input
+              type="text"
+              id="shopName"
+              value={profileData.shopName}
+              onChange={(e) => setProfileData({ ...profileData, shopName: e.target.value })}
+              required={isSellerApproved}
+              disabled={!isEditingProfile}
+              style={{ backgroundColor: !isEditingProfile ? '#f3f4f6' : '#fff' }}
+            />
+          </div>
+        )}
 
         <div className="form-group">
-          <label htmlFor="phone">WhatsApp (commandes) <span className="field-hint">(ex: 681570075)</span></label>
+          <label htmlFor="phone">
+            {isSellerApproved ? 'WhatsApp (commandes) *' : 'Numéro de téléphone (optionnel)'}
+            {!isSellerApproved && <span className="field-hint"> (ex: 681570075)</span>}
+          </label>
           {isEditingProfile ? (
             <div className="phone-selector-wrapper" style={{ display: 'flex', gap: '8px', position: 'relative' }}>
               <div className={`country-selector ${countryDropdownOpen ? 'open' : ''}`} style={{ position: 'relative' }}>
@@ -205,7 +211,7 @@ export default function ProfileSection({
                 placeholder="6XXXXXXX"
                 value={nationalPhone}
                 onChange={(e) => setNationalPhone(e.target.value.replace(/\D/g, ''))}
-                required
+                required={isSellerApproved}
                 style={{ border: '2px solid #ddd', borderRadius: '5px', padding: '12px', fontSize: '1rem', flex: 1 }}
               />
             </div>
@@ -220,18 +226,20 @@ export default function ProfileSection({
           )}
         </div>
 
-        <div className="form-group">
-          <label htmlFor="bio">Biographie</label>
-          <textarea
-            id="bio"
-            placeholder="Présentez votre boutique..."
-            value={profileData.bio}
-            onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
-            disabled={!isEditingProfile}
-            rows="4"
-            style={{ backgroundColor: !isEditingProfile ? '#f3f4f6' : '#fff', fontFamily: 'inherit' }}
-          />
-        </div>
+        {isSellerApproved && (
+          <div className="form-group">
+            <label htmlFor="bio">Biographie</label>
+            <textarea
+              id="bio"
+              placeholder="Présentez votre boutique..."
+              value={profileData.bio}
+              onChange={(e) => setProfileData({ ...profileData, bio: e.target.value })}
+              disabled={!isEditingProfile}
+              rows="4"
+              style={{ backgroundColor: !isEditingProfile ? '#f3f4f6' : '#fff', fontFamily: 'inherit' }}
+            />
+          </div>
+        )}
 
         {isEditingProfile && (
           <div className="form-group">
