@@ -106,3 +106,27 @@ Ce document résume l'ensemble des corrections, refactorings et optimisations de
 - ✅ Build Next.js (`npm run build`) validé avec succès.
 - ✅ Correctifs et fonctionnalités de paiement testés et validés localement sans erreurs CORS ni blocages sur iPhone.
 - ✅ Navigation à plat vérifiée et validée avec succès sur Desktop et Mobile.
+
+---
+
+## 👥 Nouvelles Fonctionnalités Logistiques, Panier Responsive et Achat Groupé
+
+### 1. Correction du Client Mock Postgres Local
+- **Problème** : Lors de la création de commandes ou de modifications de profils, le client SQL local retournait un tableau de résultats au lieu d'un objet unique même si la méthode `.single()` était chaînée, causant des erreurs où `newOrder.id` n'était pas défini.
+- **Solution** : Correction de [localPostgres.js](file:///c:/Users/Administrator/Downloads/Vendoscity-main/Vendoscity-main/server/config/localPostgres.js) afin que `this.isSingle` retourne la première ligne au lieu du tableau entier.
+
+### 2. Responsivité du Panier sur Mobile
+- **Problème** : Les boutons d'action du panier mobile chevauchaient ou passaient à la ligne de façon inesthétique sur certains téléphones.
+- **Solution** : Ajustement du point de rupture CSS dans [panier.css](file:///c:/Users/Administrator/Downloads/Vendoscity-main/Vendoscity-main/client/src/app/panier/panier.css) à `640px` (au lieu de `480px`) afin de masquer plus tôt les textes longs d'actions (les remplaçant par des icônes) sur les écrans intermédiaires.
+
+### 3. Logique d'Achat Groupé (Group Buy)
+- **Interface Produit** : Intégration de sélecteurs par onglets permettant à l'acheteur de choisir entre "Achat Individuel" (tarif classique) et "Achat Groupé" (tarif réduit `group_price` à condition d'avoir au moins 3 participants).
+- **Context & Panier** : Séparation des articles individuels et groupés au sein du `CartContext` et affichage d'un badge distinctif "Achat Groupé" sur les articles du panier.
+- **Auto-Groupement au Checkout** : Lorsque l'achat groupé est validé, le backend Express associe automatiquement la commande à un groupe existant ouvert pour ce produit/vendeur, ou génère un nouveau code de groupe. Lorsque le seuil de participants (ex: 3) est atteint, le groupe passe à l'état `'completed'`.
+
+### 4. Hubs Logistiques et Points de Distribution
+- **Sélection au Checkout** : L'acheteur peut choisir la livraison en Point de Distribution (Yaoundé Poste Centrale, Yaoundé Mvan, Douala Akwa, Douala Bonabéri) avec des frais fixes bas (500 FCFA). Cette option est imposée pour les achats groupés.
+- **Vidage du Panier** : Le panier est correctement réinitialisé une fois la commande validée pour tous les modes de paiement (séquestre ou direct WhatsApp).
+- **Mise à jour Logistique Vendeur** : Ajout d'une route `PUT /api/orders/:id/distribution-status` permettant aux vendeurs de faire avancer l'expédition logistique (À expédier -> Expédié au Hub -> Arrivé au Hub -> Récupéré).
+- **Suivi Client** : Affichage transparent dans l'historique acheteur des informations logistiques du hub et du progrès du groupe d'achat.
+
