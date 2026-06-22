@@ -52,7 +52,7 @@ app.use(cors({
     // We use Bearer tokens, not cookies. Avoid credentialed cross-site requests by default.
     credentials: false,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept', 'X-SMS-Gateway-Token']
 }));
 
 // Basic security headers for API responses
