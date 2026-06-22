@@ -77,7 +77,7 @@ router.get('/balance', authenticate, async (req, res) => {
         // 1. Recupere le solde disponible depuis le profil
         const { data: profile, error: profileErr } = await db
             .from('profiles')
-            .select('wallet_balance, wallet_phone')
+            .select('wallet_balance, wallet_phone, wallet_passcode')
             .eq('id', req.user.id)
             .single();
 
