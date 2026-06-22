@@ -29,6 +29,7 @@ function DashboardContent() {
 
   const [activeSection, setActiveSection] = useState('seller-area'); // 'seller-area' or 'profile'
   const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [isWalletUnlocked, setIsWalletUnlocked] = useState(false);
 
   // (Redirection combined below with unified hook)
 
@@ -542,79 +543,81 @@ function DashboardContent() {
     <div style={{ background: '#f4f7f6', minHeight: '80vh', paddingTop: '20px' }}>
 
       {/* Main dashboard body */}
-      <div className="dashboard-container">
+      <div className="dashboard-container" style={{ gridTemplateColumns: (activeSection === 'wallet' && isWalletUnlocked) ? '1fr' : '250px 1fr' }}>
         
         {/* Sidebar menu */}
-        <aside className="dashboard-sidebar">
-          <h3>Menu</h3>
-          <div className="dashboard-menu">
-            {isSellerApproved ? (
-              <>
-                <button
-                  onClick={() => setActiveSection('seller-area')}
-                  className={`dashboard-menu-item ${activeSection === 'seller-area' ? 'active' : ''}`}
-                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-                >
-                  <Store width="18" height="18" /> Espace Vendeur
-                </button>
-                <button
-                  onClick={() => setActiveSection('orders')}
-                  className={`dashboard-menu-item ${activeSection === 'orders' ? 'active' : ''}`}
-                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-                >
-                  <QrCode width="18" height="18" /> Commandes Reçues
-                </button>
-                <button
-                  onClick={() => setActiveSection('wallet')}
-                  className={`dashboard-menu-item ${activeSection === 'wallet' ? 'active' : ''}`}
-                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-                >
-                  <Wallet width="18" height="18" /> Mon Portefeuille
-                </button>
-                <button
-                  onClick={() => setActiveSection('stats')}
-                  className={`dashboard-menu-item ${activeSection === 'stats' ? 'active' : ''}`}
-                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-                >
-                  <TrendingUp width="18" height="18" /> Statistiques & Métriques
-                </button>
-                {isSellerApproved && !profile?.is_verified && (
+        {!(activeSection === 'wallet' && isWalletUnlocked) && (
+          <aside className="dashboard-sidebar">
+            <h3>Menu</h3>
+            <div className="dashboard-menu">
+              {isSellerApproved ? (
+                <>
                   <button
-                    onClick={() => setActiveSection('seller-application')}
-                    className={`dashboard-menu-item ${activeSection === 'seller-application' ? 'active' : ''}`}
+                    onClick={() => setActiveSection('seller-area')}
+                    className={`dashboard-menu-item ${activeSection === 'seller-area' ? 'active' : ''}`}
                     style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
                   >
-                    <ShieldCheck width="18" height="18" style={{ color: '#3b82f6' }} /> Certifier ma boutique
+                    <Store width="18" height="18" /> Espace Vendeur
                   </button>
-                )}
-              </>
-            ) : (
+                  <button
+                    onClick={() => setActiveSection('orders')}
+                    className={`dashboard-menu-item ${activeSection === 'orders' ? 'active' : ''}`}
+                    style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                  >
+                    <QrCode width="18" height="18" /> Commandes Reçues
+                  </button>
+                  <button
+                    onClick={() => setActiveSection('wallet')}
+                    className={`dashboard-menu-item ${activeSection === 'wallet' ? 'active' : ''}`}
+                    style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                  >
+                    <Wallet width="18" height="18" /> Mon Portefeuille
+                  </button>
+                  <button
+                    onClick={() => setActiveSection('stats')}
+                    className={`dashboard-menu-item ${activeSection === 'stats' ? 'active' : ''}`}
+                    style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                  >
+                    <TrendingUp width="18" height="18" /> Statistiques & Métriques
+                  </button>
+                  {isSellerApproved && !profile?.is_verified && (
+                    <button
+                      onClick={() => setActiveSection('seller-application')}
+                      className={`dashboard-menu-item ${activeSection === 'seller-application' ? 'active' : ''}`}
+                      style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                    >
+                      <ShieldCheck width="18" height="18" style={{ color: '#3b82f6' }} /> Certifier ma boutique
+                    </button>
+                  )}
+                </>
+              ) : (
+                <button
+                  onClick={() => setActiveSection('seller-application')}
+                  className={`dashboard-menu-item ${activeSection === 'seller-application' ? 'active' : ''}`}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                >
+                  <Store width="18" height="18" /> Devenir Vendeur
+                </button>
+              )}
               <button
-                onClick={() => setActiveSection('seller-application')}
-                className={`dashboard-menu-item ${activeSection === 'seller-application' ? 'active' : ''}`}
+                onClick={() => setActiveSection('profile')}
+                className={`dashboard-menu-item ${activeSection === 'profile' ? 'active' : ''}`}
                 style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
               >
-                <Store width="18" height="18" /> Devenir Vendeur
+                <User width="18" height="18" /> Modifier mon profil
               </button>
-            )}
-            <button
-              onClick={() => setActiveSection('profile')}
-              className={`dashboard-menu-item ${activeSection === 'profile' ? 'active' : ''}`}
-              style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-            >
-              <User width="18" height="18" /> Modifier mon profil
-            </button>
-            {isSellerApproved && (
-              <Link
-                href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`}
-                className="dashboard-menu-item"
-                style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}
-              >
-                <User width="18" height="18" /> Ma Boutique (Public)
-              </Link>
-            )}
-          </div>
-        </aside>
+              {isSellerApproved && (
+                <Link
+                  href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`}
+                  className="dashboard-menu-item"
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none', color: 'inherit' }}
+                >
+                  <User width="18" height="18" /> Ma Boutique (Public)
+                </Link>
+              )}
+            </div>
+          </aside>
+        )}
 
         {/* Dynamic section display */}
         <div className="dashboard-content">
@@ -680,6 +683,8 @@ function DashboardContent() {
                 <WalletSection 
                   authFetch={authFetch}
                   showToast={showToast}
+                  isUnlocked={isWalletUnlocked}
+                  setIsUnlocked={setIsWalletUnlocked}
                 />
               )}
 
