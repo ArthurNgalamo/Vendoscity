@@ -8,13 +8,16 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getApiBaseUrl, fetchWithTimeout, normalizeSupabaseImageUrl, formatCurrency, compressImage } from '../../core/api';
 import { shareLink } from '../../core/share';
-import { LayoutDashboard, Store, User, TrendingUp } from 'lucide-react';
+import { LayoutDashboard, Store, User, TrendingUp, QrCode, Wallet } from 'lucide-react';
 
 import { POPULAR_NEIGHBORHOODS, parsePhoneNumber } from './constants';
 import ProfileSection from './components/ProfileSection';
 import ProductsListSection from './components/ProductsListSection';
 import ProductFormSection from './components/ProductFormSection';
 import StatsSection from './components/StatsSection';
+import SellerApplicationSection from './components/SellerApplicationSection';
+import OrdersSection from './components/OrdersSection';
+import WalletSection from './components/WalletSection';
 import './dashboard.css';
 
 export default function DashboardPage() {
@@ -528,20 +531,38 @@ export default function DashboardPage() {
         <aside className="dashboard-sidebar">
           <h3>Menu</h3>
           <div className="dashboard-menu">
-            <button
-              onClick={() => setActiveSection('seller-area')}
-              className={`dashboard-menu-item ${activeSection === 'seller-area' ? 'active' : ''}`}
-              style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-            >
-              <Store width="18" height="18" /> Espace Vendeur
-            </button>
-            <button
-              onClick={() => setActiveSection('stats')}
-              className={`dashboard-menu-item ${activeSection === 'stats' ? 'active' : ''}`}
-              style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
-            >
-              <TrendingUp width="18" height="18" /> Statistiques & Métriques
-            </button>
+            {profile?.seller_status === 'approved' && (
+              <>
+                <button
+                  onClick={() => setActiveSection('seller-area')}
+                  className={`dashboard-menu-item ${activeSection === 'seller-area' ? 'active' : ''}`}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                >
+                  <Store width="18" height="18" /> Espace Vendeur
+                </button>
+                <button
+                  onClick={() => setActiveSection('orders')}
+                  className={`dashboard-menu-item ${activeSection === 'orders' ? 'active' : ''}`}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                >
+                  <QrCode width="18" height="18" /> Commandes Reçues
+                </button>
+                <button
+                  onClick={() => setActiveSection('wallet')}
+                  className={`dashboard-menu-item ${activeSection === 'wallet' ? 'active' : ''}`}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                >
+                  <Wallet width="18" height="18" /> Mon Portefeuille
+                </button>
+                <button
+                  onClick={() => setActiveSection('stats')}
+                  className={`dashboard-menu-item ${activeSection === 'stats' ? 'active' : ''}`}
+                  style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                >
+                  <TrendingUp width="18" height="18" /> Statistiques & Métriques
+                </button>
+              </>
+            )}
             <Link
               href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`}
               className="dashboard-menu-item"
@@ -555,93 +576,119 @@ export default function DashboardPage() {
         {/* Dynamic section display */}
         <div className="dashboard-content">
           
-          {/* Section: Profile */}
-          {activeSection === 'profile' && (
-            <ProfileSection
-              profileData={profileData}
-              setProfileData={setProfileData}
-              isEditingProfile={isEditingProfile}
-              setIsEditingProfile={setIsEditingProfile}
-              submittingProfile={submittingProfile}
-              selectedCountry={selectedCountry}
-              setSelectedCountry={setSelectedCountry}
-              nationalPhone={nationalPhone}
-              setNationalPhone={setNationalPhone}
-              countryDropdownOpen={countryDropdownOpen}
-              setCountryDropdownOpen={setCountryDropdownOpen}
-              countrySearchQuery={countrySearchQuery}
-              setCountrySearchQuery={setCountrySearchQuery}
-              newPassword={newPassword}
-              setNewPassword={setNewPassword}
-              showPassword={showPassword}
-              setShowPassword={setShowPassword}
-              handleProfileSave={handleProfileSave}
-              handleAvatarUpload={handleAvatarUpload}
+          {profile?.seller_status !== 'approved' ? (
+            <SellerApplicationSection 
+              profile={profile}
+              onApprovalSuccess={fetchProfile}
+              showToast={showToast}
             />
-          )}
-
-          {/* Section: Stats & Metrics */}
-          {activeSection === 'stats' && (
-            <StatsSection
-              myProducts={myProducts}
-              profileData={profileData}
-              formatCurrency={formatCurrency}
-              authFetch={authFetch}
-            />
-          )}
-
-          {/* Section: Seller Area */}
-          {activeSection === 'seller-area' && (
+          ) : (
             <>
-              {!(isEditingProduct || isAddingProduct) ? (
-                <ProductsListSection
+              {/* Section: Profile */}
+              {activeSection === 'profile' && (
+                <ProfileSection
                   profileData={profileData}
-                  user={user}
-                  handleShareShop={handleShareShop}
-                  logout={logout}
-                  loadingProducts={loadingProducts}
+                  setProfileData={setProfileData}
+                  isEditingProfile={isEditingProfile}
+                  setIsEditingProfile={setIsEditingProfile}
+                  submittingProfile={submittingProfile}
+                  selectedCountry={selectedCountry}
+                  setSelectedCountry={setSelectedCountry}
+                  nationalPhone={nationalPhone}
+                  setNationalPhone={setNationalPhone}
+                  countryDropdownOpen={countryDropdownOpen}
+                  setCountryDropdownOpen={setCountryDropdownOpen}
+                  countrySearchQuery={countrySearchQuery}
+                  setCountrySearchQuery={setCountrySearchQuery}
+                  newPassword={newPassword}
+                  setNewPassword={setNewPassword}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                  handleProfileSave={handleProfileSave}
+                  handleAvatarUpload={handleAvatarUpload}
+                />
+              )}
+
+              {/* Section: Stats & Metrics */}
+              {activeSection === 'stats' && (
+                <StatsSection
                   myProducts={myProducts}
-                  handleStartEditProduct={handleStartEditProduct}
-                  handleDeleteProduct={handleDeleteProduct}
-                  normalizeSupabaseImageUrl={normalizeSupabaseImageUrl}
+                  profileData={profileData}
                   formatCurrency={formatCurrency}
-                  onAddNewProduct={() => setIsAddingProduct(true)}
+                  authFetch={authFetch}
                 />
-              ) : (
-                <ProductFormSection
-                  isEditingProduct={isEditingProduct}
-                  handleProductSubmit={handleProductSubmit}
-                  prodTitle={prodTitle}
-                  setProdTitle={setProdTitle}
-                  prodCategory={prodCategory}
-                  setProdCategory={setProdCategory}
-                  selectVal={selectVal}
-                  handleSelectQuartierChange={handleSelectQuartierChange}
-                  customQuartier={customQuartier}
-                  handleCustomQuartierChange={handleCustomQuartierChange}
-                  prodPrice={prodPrice}
-                  setProdPrice={setProdPrice}
-                  prodOldPrice={prodOldPrice}
-                  setProdOldPrice={setProdOldPrice}
-                  prodDesc={prodDesc}
-                  setProdDesc={setProdDesc}
-                  prodSpecsPaste={prodSpecsPaste}
-                  setProdSpecsPaste={setProdSpecsPaste}
-                  handlePasteSpecs={handlePasteSpecs}
-                  prodSpecs={prodSpecs}
-                  handleSpecChange={handleSpecChange}
-                  handleRemoveSpecRow={handleRemoveSpecRow}
-                  handleAddSpecRow={handleAddSpecRow}
-                  fileInputRef={fileInputRef}
-                  handleImageChange={handleImageChange}
-                  selectedImages={selectedImages}
-                  handleRemoveImage={handleRemoveImage}
-                  existingImages={existingImages}
-                  handleRemoveExistingImage={handleRemoveExistingImage}
-                  submittingProduct={submittingProduct}
-                  handleCancelProductEdit={handleCancelProductEdit}
-                  normalizeSupabaseImageUrl={normalizeSupabaseImageUrl}
+              )}
+
+              {/* Section: Orders */}
+              {activeSection === 'orders' && (
+                <OrdersSection 
+                  authFetch={authFetch}
+                  showToast={showToast}
                 />
+              )}
+
+              {/* Section: Wallet */}
+              {activeSection === 'wallet' && (
+                <WalletSection 
+                  authFetch={authFetch}
+                  showToast={showToast}
+                />
+              )}
+
+              {/* Section: Seller Area */}
+              {activeSection === 'seller-area' && (
+                <>
+                  {!(isEditingProduct || isAddingProduct) ? (
+                    <ProductsListSection
+                      profileData={profileData}
+                      user={user}
+                      handleShareShop={handleShareShop}
+                      logout={logout}
+                      loadingProducts={loadingProducts}
+                      myProducts={myProducts}
+                      handleStartEditProduct={handleStartEditProduct}
+                      handleDeleteProduct={handleDeleteProduct}
+                      normalizeSupabaseImageUrl={normalizeSupabaseImageUrl}
+                      formatCurrency={formatCurrency}
+                      onAddNewProduct={() => setIsAddingProduct(true)}
+                    />
+                  ) : (
+                    <ProductFormSection
+                      isEditingProduct={isEditingProduct}
+                      handleProductSubmit={handleProductSubmit}
+                      prodTitle={prodTitle}
+                      setProdTitle={setProdTitle}
+                      prodCategory={prodCategory}
+                      setProdCategory={setProdCategory}
+                      selectVal={selectVal}
+                      handleSelectQuartierChange={handleSelectQuartierChange}
+                      customQuartier={customQuartier}
+                      handleCustomQuartierChange={handleCustomQuartierChange}
+                      prodPrice={prodPrice}
+                      setProdPrice={setProdPrice}
+                      prodOldPrice={prodOldPrice}
+                      setProdOldPrice={setProdOldPrice}
+                      prodDesc={prodDesc}
+                      setProdDesc={setProdDesc}
+                      prodSpecsPaste={prodSpecsPaste}
+                      setProdSpecsPaste={setProdSpecsPaste}
+                      handlePasteSpecs={handlePasteSpecs}
+                      prodSpecs={prodSpecs}
+                      handleSpecChange={handleSpecChange}
+                      handleRemoveSpecRow={handleRemoveSpecRow}
+                      handleAddSpecRow={handleAddSpecRow}
+                      fileInputRef={fileInputRef}
+                      handleImageChange={handleImageChange}
+                      selectedImages={selectedImages}
+                      handleRemoveImage={handleRemoveImage}
+                      existingImages={existingImages}
+                      handleRemoveExistingImage={handleRemoveExistingImage}
+                      submittingProduct={submittingProduct}
+                      handleCancelProductEdit={handleCancelProductEdit}
+                      normalizeSupabaseImageUrl={normalizeSupabaseImageUrl}
+                    />
+                  )}
+                </>
               )}
             </>
           )}

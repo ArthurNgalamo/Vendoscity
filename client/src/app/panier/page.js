@@ -117,59 +117,28 @@ export default function PanierPage() {
     showToast(`${item.title} sauvegardé pour plus tard !`);
   };
 
-  // Per-seller checkout via WhatsApp
+  // Per-seller checkout redirecting to unified checkout page
   const handleCheckoutSeller = (sellerName, items) => {
-    const orderId = `VC-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const sellerId = items[0]?.seller_id || '';
     const sellerWhatsApp = items[0]?.whatsapp || '';
     if (!sellerWhatsApp) {
       alert("Ce vendeur n'a pas renseigné son numéro WhatsApp.");
       return;
     }
 
-    const lines = [];
-    lines.push(`*📦 COMMANDE VENDOSCITY*`);
-    lines.push(`Référence : *${orderId}*`);
-    lines.push(`Boutique : *${sellerName}*`);
-    lines.push(`=========================`);
+    // Save order data to localStorage to pass to the checkout page
+    const checkoutData = {
+      sellerId,
+      sellerName,
+      sellerWhatsApp,
+      items,
+      deliveryLocation,
+      appliedPromo
+    };
+    localStorage.setItem('checkout_data', JSON.stringify(checkoutData));
     
-    items.forEach(item => {
-      lines.push(`• *${item.title}* x${item.quantity} (${formatCurrency(item.price)})`);
-    });
-    
-    lines.push(`=========================`);
-    const sellerSubtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
-    lines.push(`Sous-total : ${formatCurrency(sellerSubtotal)}`);
-    
-    // Delivery info
-    let delCost = getShippingCost(deliveryLocation);
-    if (appliedPromo?.code === 'MARCHE237') {
-      lines.push(`Livraison : ${getShippingLabel(deliveryLocation)} (Gratuit via code promo)`);
-    } else {
-      lines.push(`Livraison : ${getShippingLabel(deliveryLocation)} (+${formatCurrency(delCost)})`);
-    }
-
-    // Promo
-    let sellerDiscount = 0;
-    if (appliedPromo) {
-      if (appliedPromo.code === 'VENDOS10') {
-        sellerDiscount = Math.round(sellerSubtotal * 0.1);
-        lines.push(`Code promo : *VENDOS10* (-10% : -${formatCurrency(sellerDiscount)})`);
-      } else if (appliedPromo.code === 'WELCOME500') {
-        sellerDiscount = 500;
-        lines.push(`Code promo : *WELCOME500* (-500 FCFA : -${formatCurrency(sellerDiscount)})`);
-      } else if (appliedPromo.code === 'MARCHE237') {
-        sellerDiscount = delCost;
-        lines.push(`Code promo : *MARCHE237* (Livraison gratuite : -${formatCurrency(sellerDiscount)})`);
-      }
-    }
-
-    const sellerTotal = sellerSubtotal + (appliedPromo?.code === 'MARCHE237' ? 0 : delCost) - (appliedPromo?.code === 'MARCHE237' ? 0 : sellerDiscount);
-    lines.push(`*TOTAL À PAYER : ${formatCurrency(Math.max(0, sellerTotal))}*`);
-    lines.push(`=========================`);
-    lines.push(`Négocié en direct sur Vendoscity.com`);
-
-    const waUrl = `https://wa.me/${sellerWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(lines.join('\n'))}`;
-    window.open(waUrl, '_blank');
+    // Redirect to the checkout page
+    window.location.href = '/checkout';
   };
 
   return (
@@ -306,8 +275,9 @@ export default function PanierPage() {
                       <button 
                         onClick={() => handleCheckoutSeller(sellerName, items)}
                         className="seller-whatsapp-btn"
+                        style={{ background: 'var(--brand-accent)' }}
                       >
-                        <Sparkles width="16" height="16" /> Commander par WhatsApp
+                        <Sparkles width="16" height="16" /> Passer la commande
                       </button>
                     </div>
                   </div>

@@ -21,7 +21,8 @@ import {
   EyeOff, 
   Store,
   ArrowRight,
-  TrendingUp
+  TrendingUp,
+  Truck
 } from 'lucide-react';
 import { getApiBaseUrl, fetchWithTimeout, getUserAvatarUrl, compressImage } from '../../core/api';
 
@@ -318,6 +319,17 @@ export default function MonEspacePage() {
                   <MessageSquare width="18" height="18" style={{ color: '#10b981' }} />
                 </div>
                 <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Messagerie (Chat)</span>
+              </div>
+              <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+            </Link>
+
+            {/* Link 3.5: Suivi de mes commandes */}
+            <Link href="/commandes" className="premium-link">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Truck width="18" height="18" style={{ color: '#3b82f6' }} />
+                </div>
+                <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Suivi de mes commandes (Séquestre)</span>
               </div>
               <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
             </Link>

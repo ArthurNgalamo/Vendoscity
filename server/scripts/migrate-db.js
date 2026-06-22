@@ -144,6 +144,104 @@ async function runMigrations() {
         await pool.query('CREATE INDEX IF NOT EXISTS idx_messages_receiver_id ON public.messages(receiver_id);');
         await pool.query('CREATE INDEX IF NOT EXISTS idx_messages_created_at ON public.messages(created_at DESC);');
 
+        // New Escrow & Wallet Migrations
+        console.log('💳 Migrating wallet & escrow columns on "profiles" and "orders"...');
+        await pool.query(`
+            -- Ensure orders table exists
+            CREATE TABLE IF NOT EXISTS public.orders (
+                id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                user_id UUID REFERENCES auth.users(id) NOT NULL,
+                total_amount NUMERIC NOT NULL,
+                status TEXT DEFAULT 'en cours',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+            );
+
+            -- Ensure order_items table exists
+            CREATE TABLE IF NOT EXISTS public.order_items (
+                id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                order_id UUID REFERENCES public.orders(id) ON DELETE CASCADE,
+                product_id UUID REFERENCES public.products(id),
+                quantity INTEGER NOT NULL,
+                price NUMERIC NOT NULL
+            );
+        `);
+
+        await pool.query(`
+            DO $$
+            BEGIN
+                -- Update profiles table
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='profiles') THEN
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS wallet_balance NUMERIC DEFAULT 0.0;
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS wallet_passcode TEXT;
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS wallet_phone TEXT;
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_status VARCHAR(50) DEFAULT 'none';
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_application_data JSONB DEFAULT '{}'::jsonb;
+                END IF;
+
+                -- Update orders table
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='orders') THEN
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS seller_id UUID REFERENCES public.profiles(id);
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS payment_method VARCHAR(50) DEFAULT 'direct_whatsapp';
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS escrow_status VARCHAR(50) DEFAULT 'none';
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS amount_paid NUMERIC DEFAULT 0.0;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS buyer_phone_payeur TEXT;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS escrow_qr_code TEXT;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS buyer_validated BOOLEAN DEFAULT false;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS seller_validated BOOLEAN DEFAULT false;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS buyer_validated_at TIMESTAMP WITH TIME ZONE;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS seller_validated_at TIMESTAMP WITH TIME ZONE;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS escrow_released_at TIMESTAMP WITH TIME ZONE;
+                END IF;
+            END $$;
+        `);
+
+        // Create new wallet transactions and withdrawals tables
+        console.log('🏦 Creating wallet tables...');
+        await pool.query(`
+            CREATE TABLE IF NOT EXISTS public.wallet_transactions (
+                id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+                order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
+                type VARCHAR(50) NOT NULL,
+                amount NUMERIC NOT NULL,
+                status VARCHAR(50) DEFAULT 'completed',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+            );
+            
+            CREATE TABLE IF NOT EXISTS public.wallet_withdrawals (
+                id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+                seller_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+                amount NUMERIC NOT NULL,
+                payment_method VARCHAR(50) NOT NULL,
+                phone_number VARCHAR(50) NOT NULL,
+                status VARCHAR(50) DEFAULT 'pending',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+                processed_at TIMESTAMP WITH TIME ZONE
+            );
+        `);
+
+        // Enable RLS and setup policies
+        console.log('🔒 Configuring Row Level Security on orders, transactions, and withdrawals...');
+        await pool.query(`
+            ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "Users can see their own orders" ON public.orders;
+            DROP POLICY IF EXISTS "Users can update their own orders" ON public.orders;
+            CREATE POLICY "Users can see their own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id OR auth.uid() = seller_id);
+            CREATE POLICY "Users can update their own orders" ON public.orders FOR UPDATE USING (auth.uid() = user_id OR auth.uid() = seller_id);
+
+            ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "Les utilisateurs peuvent voir leurs propres transactions" ON public.wallet_transactions;
+            DROP POLICY IF EXISTS "Les utilisateurs peuvent inserer leurs propres transactions" ON public.wallet_transactions;
+            CREATE POLICY "Les utilisateurs peuvent voir leurs propres transactions" ON public.wallet_transactions FOR SELECT USING (auth.uid() = profile_id);
+            CREATE POLICY "Les utilisateurs peuvent inserer leurs propres transactions" ON public.wallet_transactions FOR INSERT WITH CHECK (auth.uid() = profile_id);
+
+            ALTER TABLE public.wallet_withdrawals ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "Les utilisateurs peuvent voir leurs propres retraits" ON public.wallet_withdrawals;
+            DROP POLICY IF EXISTS "Les utilisateurs peuvent inserer leurs propres retraits" ON public.wallet_withdrawals;
+            CREATE POLICY "Les utilisateurs peuvent voir leurs propres retraits" ON public.wallet_withdrawals FOR SELECT USING (auth.uid() = seller_id);
+            CREATE POLICY "Les utilisateurs peuvent inserer leurs propres retraits" ON public.wallet_withdrawals FOR INSERT WITH CHECK (auth.uid() = seller_id);
+        `);
+
         console.log('🎉 Database migration completed successfully!');
         await pool.end();
         process.exit(0);

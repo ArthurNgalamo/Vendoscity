@@ -1,0 +1,193 @@
+/* client/src/app/commandes/commandes.css */
+
+.order-page-wrap {
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 0 16px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+.order-title {
+  font-size: 1.5rem;
+  font-weight: 850;
+  color: #0f172a;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.order-row-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.01);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.order-row-card:hover {
+  border-color: #cbd5e1;
+  transform: translateY(-1px);
+}
+
+.order-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.order-id-badge {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #ff6a00;
+  background: #fff8f2;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+
+.order-status-badge {
+  font-size: 0.72rem;
+  font-weight: 750;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.order-status-badge.held {
+  background: #e0f2fe;
+  color: #0369a1;
+}
+
+.order-status-badge.released {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.order-status-badge.pending_payment {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.order-date-text {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.order-price-txt {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.order-details-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.order-details-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  max-width: 500px;
+  width: 100%;
+  padding: 24px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: #f1f5f9;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: #475569;
+}
+
+.qr-display-box {
+  background: #f8fafc;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 20px;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.qr-image {
+  margin: 10px auto;
+  display: block;
+  border: 4px solid white;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.confirm-btn {
+  width: 100%;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.confirm-btn:hover {
+  background: #059669;
+}
+
+.print-btn {
+  width: 100%;
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #475569;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 750;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.print-btn:hover {
+  background: #f8fafc;
+}

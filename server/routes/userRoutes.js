@@ -315,4 +315,80 @@ router.put('/profile/avatar', authenticate, upload.single('avatar'), async (req,
     res.json(result);
 });
 
+/**
+ * POST /api/user/apply-seller
+ * Demande d'activation du statut vendeur
+ */
+router.post('/apply-seller', authenticate, async (req, res) => {
+    const { shop_name, phone, bio, description } = req.body;
+
+    if (!shop_name || !phone) {
+        return res.status(400).json({ error: 'Shop name and WhatsApp phone number are required' });
+    }
+
+    try {
+        const { error } = await db
+            .from('profiles')
+            .update({
+                seller_status: 'pending',
+                seller_application_data: {
+                    shop_name,
+                    phone,
+                    bio: bio || '',
+                    description: description || '',
+                    request_date: new Date().toISOString()
+                }
+            })
+            .eq('id', req.user.id);
+
+        if (error) throw error;
+        res.json({ success: true, message: 'Seller application submitted' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * POST /api/user/simulate-approve-seller
+ * Simule l'approbation admin d'une demande vendeur
+ */
+router.post('/simulate-approve-seller', authenticate, async (req, res) => {
+    try {
+        // 1. Lire les donnees de demande
+        const { data: profile, error: getErr } = await db
+            .from('profiles')
+            .select('seller_application_data')
+            .eq('id', req.user.id)
+            .single();
+
+        if (getErr || !profile) {
+            return res.status(404).json({ error: 'Profile not found' });
+        }
+
+        const appData = profile.seller_application_data || {};
+        
+        // Si les donnees de candidature sont vides, on utilise des fallbacks
+        const shop_name = appData.shop_name || 'Ma Boutique';
+        const phone = appData.phone || '';
+        const bio = appData.bio || 'Bienvenue dans ma boutique !';
+
+        // 2. Mettre le statut à approved et copier les donnees
+        const { error: updateErr } = await db
+            .from('profiles')
+            .update({
+                seller_status: 'approved',
+                shop_name,
+                phone,
+                bio
+            })
+            .eq('id', req.user.id);
+
+        if (updateErr) throw updateErr;
+
+        res.json({ success: true, message: 'Seller status approved successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 module.exports = router;

@@ -8,6 +8,11 @@ CREATE TABLE public.profiles (
     last_name TEXT,
     phone TEXT,
     bio TEXT,
+    wallet_balance NUMERIC DEFAULT 0.0,
+    wallet_passcode TEXT,
+    wallet_phone TEXT,
+    seller_status VARCHAR(50) DEFAULT 'none',
+    seller_application_data JSONB DEFAULT '{}'::jsonb,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
@@ -135,13 +140,25 @@ CREATE POLICY "Users can manage their favorites" ON public.favorites
 CREATE TABLE public.orders (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     user_id UUID REFERENCES auth.users(id) NOT NULL,
+    seller_id UUID REFERENCES public.profiles(id),
     total_amount NUMERIC NOT NULL,
     status TEXT DEFAULT 'en cours',
+    payment_method VARCHAR(50) DEFAULT 'direct_whatsapp',
+    escrow_status VARCHAR(50) DEFAULT 'none',
+    amount_paid NUMERIC DEFAULT 0.0,
+    buyer_phone_payeur TEXT,
+    escrow_qr_code TEXT,
+    buyer_validated BOOLEAN DEFAULT false,
+    seller_validated BOOLEAN DEFAULT false,
+    buyer_validated_at TIMESTAMP WITH TIME ZONE,
+    seller_validated_at TIMESTAMP WITH TIME ZONE,
+    escrow_released_at TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Users can see their own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id);
+CREATE POLICY "Users can see their own orders" ON public.orders FOR SELECT USING (auth.uid() = user_id OR auth.uid() = seller_id);
+CREATE POLICY "Users can update their own orders" ON public.orders FOR UPDATE USING (auth.uid() = user_id OR auth.uid() = seller_id);
 
 -- 5. Table: Order Items (Articles de la Commande)
 CREATE TABLE public.order_items (
@@ -200,4 +217,37 @@ CREATE TABLE public.cart_items (
 ALTER TABLE public.cart_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Les utilisateurs peuvent voir leur propre panier" ON public.cart_items FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "Les utilisateurs peuvent modifier leur propre panier" ON public.cart_items FOR ALL USING (auth.uid() = user_id);
+
+
+-- 9. Table: Wallet Transactions (Historique financier)
+CREATE TABLE IF NOT EXISTS public.wallet_transactions (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    profile_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    order_id UUID REFERENCES public.orders(id) ON DELETE SET NULL,
+    type VARCHAR(50) NOT NULL, -- 'deposit', 'payout', 'withdrawal', 'refund'
+    amount NUMERIC NOT NULL,
+    status VARCHAR(50) DEFAULT 'completed', -- 'pending', 'completed', 'failed'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+ALTER TABLE public.wallet_transactions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Les utilisateurs peuvent voir leurs propres transactions" ON public.wallet_transactions FOR SELECT USING (auth.uid() = profile_id);
+CREATE POLICY "Les utilisateurs peuvent inserer leurs propres transactions" ON public.wallet_transactions FOR INSERT WITH CHECK (auth.uid() = profile_id);
+
+-- 10. Table: Wallet Withdrawals (Demandes de retraits)
+CREATE TABLE IF NOT EXISTS public.wallet_withdrawals (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    seller_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+    amount NUMERIC NOT NULL,
+    payment_method VARCHAR(50) NOT NULL, -- 'momo', 'orange'
+    phone_number VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending', -- 'pending', 'approved', 'rejected'
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    processed_at TIMESTAMP WITH TIME ZONE
+);
+
+ALTER TABLE public.wallet_withdrawals ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Les utilisateurs peuvent voir leurs propres retraits" ON public.wallet_withdrawals FOR SELECT USING (auth.uid() = seller_id);
+CREATE POLICY "Les utilisateurs peuvent inserer leurs propres retraits" ON public.wallet_withdrawals FOR INSERT WITH CHECK (auth.uid() = seller_id);
+
 

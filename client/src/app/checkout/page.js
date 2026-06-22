@@ -1,285 +1,335 @@
 // client/src/app/checkout/page.js
 'use client';
 
-import React from 'react';
-import { ShoppingCart, MessageSquare, Send, CheckCircle, ShieldAlert, DollarSign, Truck, Info, ArrowRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '../../context/ToastContext';
+import { getApiBaseUrl } from '../../core/api';
 
-export default function CheckoutGuidePage() {
+import CheckoutSummary from './components/CheckoutSummary';
+import PaymentMethodSelector from './components/PaymentMethodSelector';
+import EscrowPaymentForm from './components/EscrowPaymentForm';
+import UssdPaymentCard from './components/UssdPaymentCard';
+import PaymentSuccessBox from './components/PaymentSuccessBox';
+import './checkout.css';
+
+export default function CheckoutPage() {
+  const showToast = useToast();
+  const [checkoutData, setCheckoutData] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState(''); // 'whatsapp' or 'escrow'
+  const [operator, setOperator] = useState('mtn'); // 'mtn' or 'orange'
+  const [buyerPhone, setBuyerPhone] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [createdOrder, setCreatedOrder] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState('idle'); // 'idle', 'pending_sms', 'success', 'partial'
+  const [simulatedAmount, setSimulatedAmount] = useState(0);
+  const [pollingActive, setPollingActive] = useState(false);
+
+  // Recipient details
+  const RECIPIENT_MTN = "681570075";
+  const RECIPIENT_ORANGE = "641458777";
+
+  useEffect(() => {
+    const raw = localStorage.getItem('checkout_data');
+    if (raw) {
+      try {
+        setCheckoutData(JSON.parse(raw));
+      } catch (_) {}
+    }
+  }, []);
+
+  // Shipping cost helper
+  const getShippingCost = (loc) => {
+    switch (loc) {
+      case 'standard-yde': return 1500;
+      case 'standard-dla': return 1500;
+      case 'express': return 3000;
+      default: return 0;
+    }
+  };
+
+  const getShippingLabel = (loc) => {
+    switch (loc) {
+      case 'pickup': return 'Retrait sur place (Gratuit)';
+      case 'standard-yde': return 'Livraison standard Yaoundé (+1 500 FCFA)';
+      case 'standard-dla': return 'Livraison standard Douala (+1 500 FCFA)';
+      case 'express': return 'Livraison Express (+3 000 FCFA)';
+      default: return 'Non défini';
+    }
+  };
+
+  if (!checkoutData) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '80px auto', padding: '0 20px', textAlign: 'center' }}>
+        <h2>Votre panier est vide</h2>
+        <p>Veuillez d'abord ajouter des articles au panier avant de procéder au paiement.</p>
+        <Link href="/panier" className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '20px', textDecoration: 'none', color: '#ff6a00', fontWeight: 'bold' }}>
+          <ArrowLeft width="16" height="16" /> Retour au panier
+        </Link>
+      </div>
+    );
+  }
+
+  const { items, sellerName, sellerWhatsApp, sellerId, deliveryLocation, appliedPromo } = checkoutData;
+
+  // Totals calculations
+  const subtotal = items.reduce((sum, it) => sum + it.price * it.quantity, 0);
+  const shippingCost = appliedPromo?.code === 'MARCHE237' ? 0 : getShippingCost(deliveryLocation);
+  let discount = 0;
+  if (appliedPromo) {
+    if (appliedPromo.code === 'VENDOS10') {
+      discount = Math.round(subtotal * 0.1);
+    } else if (appliedPromo.code === 'WELCOME500') {
+      discount = 500;
+    } else if (appliedPromo.code === 'MARCHE237') {
+      discount = getShippingCost(deliveryLocation);
+    }
+  }
+  const totalAmount = Math.max(0, subtotal + shippingCost - discount);
+
+  // Traditional WhatsApp Checkout
+  const handleProceedWhatsApp = () => {
+    const orderId = `VC-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const lines = [
+      `*📦 COMMANDE VENDOSCITY*`,
+      `Référence : *${orderId}*`,
+      `Boutique : *${sellerName}*`,
+      `=========================`,
+    ];
+    
+    items.forEach(item => {
+      lines.push(`• *${item.title}* x${item.quantity} (${item.price.toLocaleString('fr-FR')} FCFA)`);
+    });
+    
+    lines.push(`=========================`);
+    lines.push(`Sous-total : ${subtotal.toLocaleString('fr-FR')} FCFA`);
+    lines.push(`Livraison : ${getShippingLabel(deliveryLocation)}`);
+    if (discount > 0) {
+      lines.push(`Remise : -${discount.toLocaleString('fr-FR')} FCFA`);
+    }
+    lines.push(`*TOTAL À PAYER : ${totalAmount.toLocaleString('fr-FR')} FCFA*`);
+    lines.push(`=========================`);
+    lines.push(`Méthode de paiement : Négociation en direct WhatsApp`);
+    lines.push(`Acheteur sur Vendoscity.com`);
+ 
+    const waUrl = `https://wa.me/${sellerWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(lines.join('\n'))}`;
+    window.open(waUrl, '_blank');
+  };
+
+  // Secure Escrow Order Creation
+  const handleCreateEscrowOrder = async (e) => {
+    e.preventDefault();
+    if (!buyerPhone || buyerPhone.trim().length < 9) {
+      alert("Veuillez saisir un numéro de téléphone valide à 9 chiffres.");
+      return;
+    }
+
+    setLoading(true);
+    const token = localStorage.getItem('token');
+    const apiBase = getApiBaseUrl();
+
+    try {
+      const orderItems = items.map(it => ({
+        product_id: it.id,
+        quantity: it.quantity,
+        price: it.price
+      }));
+
+      const res = await fetch(`${apiBase}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          seller_id: sellerId,
+          total_amount: totalAmount,
+          payment_method: `escrow_${operator}`,
+          buyer_phone_payeur: buyerPhone.trim(),
+          items: orderItems
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error || "Impossible de créer la commande.");
+      }
+
+      const order = await res.json();
+      setCreatedOrder(order);
+      setPaymentStatus('pending_sms');
+      setPollingActive(true);
+      showToast("Commande en séquestre initiée !");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Poll order status
+  useEffect(() => {
+    if (!pollingActive || !createdOrder) return;
+
+    const token = localStorage.getItem('token');
+    const apiBase = getApiBaseUrl();
+    
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(`${apiBase}/api/orders`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const orders = await res.json();
+          const target = orders.find(o => o.id === createdOrder.id);
+          if (target) {
+            setCreatedOrder(target);
+            if (target.escrow_status === 'held') {
+              setPaymentStatus('success');
+              setPollingActive(false);
+              showToast("Paiement séquestre validé !");
+              // Clear cart local storage
+              localStorage.removeItem('checkout_data');
+            } else if (parseFloat(target.amount_paid) > 0) {
+              setPaymentStatus('partial');
+              setSimulatedAmount(parseFloat(target.amount_paid));
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Polling error:', err);
+      }
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [pollingActive, createdOrder]);
+
+  // Copy USSD code helper
+  const getUssdCode = () => {
+    const num = operator === 'mtn' ? RECIPIENT_MTN : RECIPIENT_ORANGE;
+    if (operator === 'mtn') {
+      return `*126*1*1*${num}*${totalAmount}#`;
+    } else {
+      return `*150*1*1*${num}*${totalAmount}#`;
+    }
+  };
+
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(getUssdCode());
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+    showToast("Code USSD copié !");
+  };
+
+  // Mock SMS Listener Webhook Simulation
+  const handleSimulateWebhook = async (factor) => {
+    const apiBase = getApiBaseUrl();
+    const targetVal = totalAmount * factor;
+    const ref = `TX-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+
+    try {
+      const res = await fetch(`${apiBase}/api/payments/sms-callback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-SMS-Gateway-Token': 'dev_momo_secret_token'
+        },
+        body: JSON.stringify({
+          sender: buyerPhone,
+          amount: targetVal,
+          transaction_ref: ref,
+          raw_sms: `Paiement Mobile Money de ${targetVal} FCFA recu avec succes de ${buyerPhone} pour Arthur Romi Ngalamo Kekenou. Ref: ${ref}.`
+        })
+      });
+
+      if (res.ok) {
+        showToast(`Simulation SMS envoyée (${targetVal} FCFA) !`);
+      } else {
+        const err = await res.json();
+        alert(err.message || "Erreur lors de la simulation.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Le serveur n'a pas pu être contacté pour la simulation.");
+    }
+  };
+
+  const apiBaseUrl = getApiBaseUrl();
+
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: `
-        .checkout-hero {
-          background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2));
-          color: white;
-          padding: 60px 20px;
-          text-align: center;
-        }
-        .checkout-hero h1 {
-          font-size: 2.5rem;
-          margin-bottom: 15px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-        }
-        .checkout-hero p {
-          font-size: 1.1rem;
-          max-width: 700px;
-          margin: 0 auto;
-        }
-        .checkout-container {
-          max-width: 1000px;
-          margin: 40px auto;
-          padding: 0 20px;
-        }
-        .checkout-card {
-          background: white;
-          border-radius: 12px;
-          padding: 30px;
-          box-shadow: 0 4px 15px rgba(0,0,0,0.03);
-          margin-bottom: 30px;
-          border: 1px solid #eee;
-        }
-        .info-box {
-          background: #e3f2fd;
-          border-left: 5px solid #2196f3;
-          padding: 20px;
-          border-radius: 8px;
-          margin-bottom: 30px;
-          color: #0d47a1;
-          line-height: 1.6;
-        }
-        .info-box h3 {
-          margin-top: 0;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 1.15rem;
-          color: #0d47a1;
-        }
-        .steps-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 20px;
-          margin: 30px 0;
-        }
-        .step-card {
-          background: #f8fafc;
-          padding: 20px;
-          border-radius: 8px;
-          text-align: center;
-          border: 1px solid #e2e8f0;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-        }
-        .step-number {
-          font-size: 1.8rem;
-          font-weight: 800;
-          color: var(--color-yellow);
-          margin-bottom: 10px;
-        }
-        .step-card h4 {
-          color: var(--primary-blue);
-          font-size: 1.05rem;
-          margin-bottom: 8px;
-          font-weight: 700;
-        }
-        .step-card p {
-          font-size: 0.85rem;
-          color: #666;
-          line-height: 1.4;
-          margin: 0;
-        }
-        .section-title {
-          font-size: 1.4rem;
-          color: var(--primary-blue);
-          margin-bottom: 20px;
-          padding-bottom: 10px;
-          border-bottom: 2px solid #eee;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-weight: 700;
-        }
-        .guide-list {
-          padding-left: 0;
-          list-style: none;
-          margin: 20px 0;
-        }
-        .guide-list li {
-          display: flex;
-          align-items: flex-start;
-          gap: 12px;
-          margin-bottom: 15px;
-          font-size: 0.95rem;
-          color: #444;
-          line-height: 1.6;
-        }
-        .guide-list li svg {
-          margin-top: 3px;
-          color: var(--primary-blue);
-          flex-shrink: 0;
-        }
-        .warning-box {
-          background: #fff3cd;
-          border-left: 5px solid #ffc107;
-          padding: 20px;
-          border-radius: 8px;
-          margin-top: 20px;
-          color: #664d03;
-        }
-        .warning-box h4 {
-          margin-top: 0;
-          margin-bottom: 8px;
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          font-size: 1.05rem;
-          font-weight: 700;
-        }
-        .warning-box p {
-          margin: 0;
-          font-size: 0.9rem;
-          line-height: 1.5;
-        }
-        .checkout-cta-bar {
-          display: flex;
-          justify-content: center;
-          margin-top: 40px;
-        }
-        .checkout-cta-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          background: var(--color-green);
-          color: white;
-          padding: 15px 35px;
-          border-radius: 8px;
-          font-weight: 700;
-          font-size: 1.1rem;
-          text-decoration: none;
-          transition: background 0.2s, transform 0.2s;
-          box-shadow: 0 4px 12px rgba(18, 18, 147, 0.05);
-        }
-        .checkout-cta-btn:hover {
-          background: #00764d;
-          transform: translateY(-2px);
-        }
-      ` }} />
-
-      <main style={{ backgroundColor: '#f4f7f6', minHeight: '100vh', paddingBottom: '60px' }}>
-        <div className="checkout-hero">
-          <h1>
-            <Send width="30" height="30" /> Comment Commander ?
-          </h1>
-          <p>
-            Sur Vendoscity, vous achetez en direct sur WhatsApp. Aucun paiement n'est effectué en ligne, la remise et le paiement se font de gré à gré entre vous et le vendeur.
-          </p>
-        </div>
-
-        <div className="checkout-container">
-          {/* Info intro box */}
-          <div className="info-box">
-            <h3>
-              <Info width="18" height="18" /> Mise en relation 100% Directe
-            </h3>
-            <p>
-              Vendoscity n'intervient pas comme intermédiaire de paiement et ne prélève aucune commission. Vous êtes mis en relation immédiate avec le vendeur pour valider les conditions de vente en toute liberté.
-            </p>
-          </div>
-
-          {/* Steps */}
-          <div className="checkout-card">
-            <h2 className="section-title">
-              <CheckCircle width="20" height="20" /> Le processus en 4 étapes
-            </h2>
-            
-            <div className="steps-grid">
-              <div className="step-card">
-                <div className="step-number">1</div>
-                <h4>Remplir votre panier</h4>
-                <p>Parcourez la boutique et ajoutez les articles souhaités dans votre panier.</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">2</div>
-                <h4>Saisir votre WhatsApp</h4>
-                <p>Ouvrez le panier, entrez votre numéro de téléphone et validez la commande.</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">3</div>
-                <h4>Envoyer le récapitulatif</h4>
-                <p>Un message pré-rempli s'ouvre sur WhatsApp. Cliquez sur envoyer pour contacter le vendeur.</p>
-              </div>
-              <div className="step-card">
-                <div className="step-number">4</div>
-                <h4>Conclure l'achat</h4>
-                <p>Convenez avec le vendeur de l'heure, du lieu de remise et du mode de paiement.</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Delivery & Payment details */}
-          <div className="checkout-card">
-            <h2 className="section-title">
-              <Truck width="20" height="20" /> Livraison & Réception
-            </h2>
-            <p>Le mode de remise est à définir lors de votre échange sur WhatsApp :</p>
-            <ul className="guide-list">
-              <li>
-                <ArrowRight width="16" height="16" />
-                <span><strong>Remise en main propre :</strong> Nous vous conseillons de vous retrouver dans un lieu public sécurisé (station, supermarché) pour inspecter l'article avant de payer.</span>
-              </li>
-              <li>
-                <ArrowRight width="16" height="16" />
-                <span><strong>Livraison à domicile ou bureau :</strong> Le vendeur peut proposer son propre livreur ou faire appel à un service de livraison externe à vos frais.</span>
-              </li>
-              <li>
-                <ArrowRight width="16" height="16" />
-                <span><strong>Aide Vendoscity :</strong> Sur demande du vendeur ou de votre part, Vendoscity peut aider à organiser la livraison dans les principales villes (Yaoundé, Douala).</span>
-              </li>
-            </ul>
-          </div>
-
-          <div className="checkout-card">
-            <h2 className="section-title">
-              <DollarSign width="20" height="20" /> Modalités de Paiement
-            </h2>
-            <p>Le paiement s'effectue directement auprès du vendeur, après confirmation de la commande :</p>
-            <ul className="guide-list">
-              <li>
-                <ArrowRight width="16" height="16" />
-                <span><strong>Paiement Mobile Money (MOMO / Orange Money) :</strong> Méthode rapide et traçable, idéale si le vendeur expédie le colis par agence.</span>
-              </li>
-              <li>
-                <ArrowRight width="16" height="16" />
-                <span><strong>Paiement en espèces (Cash) :</strong> Recommandé pour les remises physiques en main propre, après vérification de la conformité du produit.</span>
-              </li>
-              <li>
-                <ArrowRight width="16" height="16" />
-                <span><strong>Virement bancaire :</strong> Adapté aux transactions de montants importants ou aux achats professionnels.</span>
-              </li>
-            </ul>
-
-            <div className="warning-box">
-              <h4>
-                <ShieldAlert width="18" height="18" /> Conseils de sécurité essentiels
-              </h4>
-              <p>
-                Ne versez jamais d'acompte important à un vendeur sans garantie. Privilégiez les remises physiques pour tester le matériel (téléphones, ordinateurs) et vérifier la qualité des vêtements ou accessoires avant de finaliser la transaction.
-              </p>
-            </div>
-          </div>
-
-          {/* CTA Button */}
-          <div className="checkout-cta-bar">
-            <Link href="/boutique" className="checkout-cta-btn">
-              <ShoppingCart width="20" height="20" /> Commencer mes achats
-            </Link>
+    <main style={{ backgroundColor: '#fafafb', minHeight: '100vh', paddingBottom: '60px' }}>
+      <div style={{ background: 'linear-gradient(135deg, var(--primary-blue), var(--primary-blue-2))', color: 'white', padding: '40px 16px', textAlign: 'center' }}>
+        <div style={{ maxWidth: '1100px', margin: '0 auto', textAlign: 'left', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <Link href="/panier" style={{ color: 'white', display: 'flex', alignItems: 'center' }} title="Panier">
+            <ArrowLeft width="22" height="22" />
+          </Link>
+          <div>
+            <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800 }}>Validation de votre commande</h1>
+            <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', opacity: 0.85 }}>Boutique : {sellerName}</p>
           </div>
         </div>
-      </main>
-    </>
+      </div>
+
+      <div className="check-container">
+        {paymentStatus === 'success' ? (
+          <PaymentSuccessBox 
+            totalAmount={totalAmount}
+            createdOrder={createdOrder}
+            apiBaseUrl={apiBaseUrl}
+          />
+        ) : (
+          <div className="check-grid">
+            {/* Left Column: Form / Steps */}
+            <div>
+              {paymentStatus === 'pending_sms' || paymentStatus === 'partial' ? (
+                <UssdPaymentCard
+                  operator={operator}
+                  getUssdCode={getUssdCode}
+                  handleCopyCode={handleCopyCode}
+                  copied={copied}
+                  paymentStatus={paymentStatus}
+                  simulatedAmount={simulatedAmount}
+                  totalAmount={totalAmount}
+                  buyerPhone={buyerPhone}
+                  handleSimulateWebhook={handleSimulateWebhook}
+                />
+              ) : (
+                <>
+                  <PaymentMethodSelector
+                    paymentMethod={paymentMethod}
+                    setPaymentMethod={setPaymentMethod}
+                    handleProceedWhatsApp={handleProceedWhatsApp}
+                  />
+
+                  {paymentMethod === 'escrow' && (
+                    <EscrowPaymentForm
+                      operator={operator}
+                      setOperator={setOperator}
+                      buyerPhone={buyerPhone}
+                      setBuyerPhone={setBuyerPhone}
+                      loading={loading}
+                      handleCreateEscrowOrder={handleCreateEscrowOrder}
+                    />
+                  )}
+                </>
+              )}
+            </div>
+
+            {/* Right Column: Order Summary Info */}
+            <div>
+              <CheckoutSummary
+                items={items}
+                subtotal={subtotal}
+                shippingCost={shippingCost}
+                discount={discount}
+                totalAmount={totalAmount}
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </main>
   );
 }
