@@ -32,7 +32,10 @@ import {
   Store, 
   Award, 
   Star,
-  MessageSquare
+  MessageSquare,
+  QrCode,
+  Wallet,
+  TrendingUp
 } from 'lucide-react';
 import { CATEGORIES } from './constants';
 import Sparkles from '../Sparkles';
@@ -219,9 +222,44 @@ export default function DesktopHeader({
                   <span>{profile?.email || user.email}</span>
                 </div>
                 <hr className="menu-divider" />
-                <Link href="/dashboard" className="menu-link-action">
-                  <LayoutDashboard width="14" height="14" /> Tableau de Bord
-                </Link>
+                {(() => {
+                  const isSellerApproved = 
+                    profile?.seller_status === 'approved' || 
+                    (profile && (profile.shop_name || profile.phone));
+                  
+                  if (isSellerApproved) {
+                    return (
+                      <>
+                        <Link href="/dashboard?tab=seller-area" className="menu-link-action">
+                          <Store width="14" height="14" /> Espace Vendeur
+                        </Link>
+                        <Link href="/dashboard?tab=orders" className="menu-link-action">
+                          <QrCode width="14" height="14" /> Commandes Reçues
+                        </Link>
+                        <Link href="/dashboard?tab=wallet" className="menu-link-action">
+                          <Wallet width="14" height="14" /> Mon Portefeuille
+                        </Link>
+                        <Link href="/dashboard?tab=stats" className="menu-link-action">
+                          <TrendingUp width="14" height="14" /> Statistiques & Métriques
+                        </Link>
+                        <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="menu-link-action">
+                          <User width="14" height="14" /> Mon Profil / Boutique
+                        </Link>
+                      </>
+                    );
+                  } else {
+                    return (
+                      <>
+                        <Link href="/dashboard?tab=seller-area" className="menu-link-action">
+                          <Store width="14" height="14" /> Devenir Vendeur
+                        </Link>
+                        <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="menu-link-action">
+                          <User width="14" height="14" /> Mon Profil
+                        </Link>
+                      </>
+                    );
+                  }
+                })()}
                 <Link href="/messagerie" className="menu-link-action" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <MessageSquare width="14" height="14" /> Messagerie

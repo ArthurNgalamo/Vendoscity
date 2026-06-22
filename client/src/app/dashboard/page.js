@@ -1,9 +1,9 @@
 // client/src/app/dashboard/page.js
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getApiBaseUrl, fetchWithTimeout, normalizeSupabaseImageUrl, formatCurrency, compressImage } from '../../core/api';
@@ -20,29 +20,28 @@ import OrdersSection from './components/OrdersSection';
 import WalletSection from './components/WalletSection';
 import './dashboard.css';
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user, profile, setProfile, fetchProfile, loading, logout, authFetch } = useAuth();
   const showToast = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const tab = searchParams ? searchParams.get('tab') : null;
 
   const [activeSection, setActiveSection] = useState('seller-area'); // 'seller-area' or 'profile'
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-  // Set tab from query parameter or localStorage on mount
+  // Set tab from query parameter or localStorage
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search);
-      const tab = params.get('tab');
-      if (tab === 'profile' || tab === 'stats' || tab === 'seller-area') {
-        setActiveSection(tab);
-      } else {
-        const storedTab = localStorage.getItem('vc_dashboard_active_tab');
-        if (storedTab === 'profile' || storedTab === 'stats' || storedTab === 'seller-area') {
-          setActiveSection(storedTab);
-        }
+    const validTabs = ['profile', 'stats', 'seller-area', 'orders', 'wallet'];
+    if (tab && validTabs.includes(tab)) {
+      setActiveSection(tab);
+    } else {
+      const storedTab = typeof window !== 'undefined' ? localStorage.getItem('vc_dashboard_active_tab') : null;
+      if (storedTab && validTabs.includes(storedTab)) {
+        setActiveSection(storedTab);
       }
     }
-  }, []);
+  }, [tab]);
 
   // Update localStorage when activeSection changes
   useEffect(() => {
@@ -700,5 +699,17 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
+        <div className="loading">Chargement...</div>
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   );
 }

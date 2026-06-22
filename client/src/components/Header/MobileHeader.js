@@ -9,7 +9,11 @@ import {
   LayoutDashboard, 
   LogOut, 
   LogIn,
-  MessageSquare
+  MessageSquare,
+  Store,
+  QrCode,
+  Wallet,
+  TrendingUp
 } from 'lucide-react';
 import { GridIcon } from './HeaderIcons';
 import { useTypingPlaceholder, getPersonalizedPhrases } from '../../hooks/useTypingPlaceholder';
@@ -260,12 +264,65 @@ export default function MobileHeader({
 
           {user ? (
             <>
-              <li>
-                <Link href="/dashboard" className="mobile-nav-dashboard">
-                  <LayoutDashboard width="16" height="16" />
-                  <span>Tableau de Bord</span>
-                </Link>
-              </li>
+              {(() => {
+                const isSellerApproved = 
+                  profile?.seller_status === 'approved' || 
+                  (profile && (profile.shop_name || profile.phone));
+                
+                if (isSellerApproved) {
+                  return (
+                    <>
+                      <li>
+                        <Link href="/dashboard?tab=seller-area" className="mobile-nav-dashboard">
+                          <Store width="16" height="16" />
+                          <span>Espace Vendeur</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/dashboard?tab=orders" className="mobile-nav-dashboard">
+                          <QrCode width="16" height="16" />
+                          <span>Commandes Reçues</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/dashboard?tab=wallet" className="mobile-nav-dashboard">
+                          <Wallet width="16" height="16" />
+                          <span>Mon Portefeuille</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/dashboard?tab=stats" className="mobile-nav-dashboard">
+                          <TrendingUp width="16" height="16" />
+                          <span>Statistiques & Métriques</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="mobile-nav-dashboard">
+                          <User width="16" height="16" />
+                          <span>Mon Profil / Boutique</span>
+                        </Link>
+                      </li>
+                    </>
+                  );
+                } else {
+                  return (
+                    <>
+                      <li>
+                        <Link href="/dashboard?tab=seller-area" className="mobile-nav-dashboard">
+                          <Store width="16" height="16" />
+                          <span>Devenir Vendeur</span>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="mobile-nav-dashboard">
+                          <User width="16" height="16" />
+                          <span>Mon Profil</span>
+                        </Link>
+                      </li>
+                    </>
+                  );
+                }
+              })()}
               <li>
                 <Link href="/messagerie" className="mobile-nav-dashboard" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>

@@ -22,7 +22,9 @@ import {
   Store,
   ArrowRight,
   TrendingUp,
-  Truck
+  Truck,
+  Wallet,
+  QrCode
 } from 'lucide-react';
 import { getApiBaseUrl, fetchWithTimeout, getUserAvatarUrl, compressImage } from '../../core/api';
 
@@ -30,6 +32,31 @@ export default function MonEspacePage() {
   const { user, profile, setProfile, authFetch, loading, login, register, logout } = useAuth();
   const showToast = useToast();
   const router = useRouter();
+
+  const [myProducts, setMyProducts] = useState([]);
+
+  const loadMyProducts = async () => {
+    if (!user) return;
+    try {
+      const res = await authFetch('/api/products/me');
+      if (res.ok) {
+        const products = await res.json();
+        setMyProducts(products || []);
+      }
+    } catch (err) {
+      console.error('Error loading my products:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadMyProducts();
+    }
+  }, [user]);
+
+  const isSellerApproved = 
+    profile?.seller_status === 'approved' || 
+    (profile && (profile.shop_name || profile.phone || myProducts.length > 0));
 
   const handleAvatarUploadDirect = async (file) => {
     if (!file) return;
@@ -271,35 +298,84 @@ export default function MonEspacePage() {
               Menu principal
             </h3>
 
-            {/* Link 1: Tableau de Bord */}
-            <Link href="/dashboard?tab=seller-area" onClick={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('vc_dashboard_active_tab', 'seller-area');
-              }
-            }} className="premium-link">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <LayoutDashboard width="18" height="18" style={{ color: '#3b82f6' }} />
-                </div>
-                <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Tableau de Bord</span>
-              </div>
-              <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
-            </Link>
+            {isSellerApproved ? (
+              <>
+                {/* Espace Vendeur */}
+                <Link href="/dashboard?tab=seller-area" onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('vc_dashboard_active_tab', 'seller-area');
+                  }
+                }} className="premium-link">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff8f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Store width="18" height="18" style={{ color: '#ff6a00' }} />
+                    </div>
+                    <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Espace Vendeur</span>
+                  </div>
+                  <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+                </Link>
 
-            {/* Link: Statistiques & Métriques */}
-            <Link href="/dashboard?tab=stats" onClick={() => {
-              if (typeof window !== 'undefined') {
-                localStorage.setItem('vc_dashboard_active_tab', 'stats');
-              }
-            }} className="premium-link">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <TrendingUp width="18" height="18" style={{ color: '#a16207' }} />
+                {/* Commandes Reçues */}
+                <Link href="/dashboard?tab=orders" onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('vc_dashboard_active_tab', 'orders');
+                  }
+                }} className="premium-link">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#eff6ff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <QrCode width="18" height="18" style={{ color: '#3b82f6' }} />
+                    </div>
+                    <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Commandes Reçues (Ventes)</span>
+                  </div>
+                  <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+                </Link>
+
+                {/* Mon Portefeuille */}
+                <Link href="/dashboard?tab=wallet" onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('vc_dashboard_active_tab', 'wallet');
+                  }
+                }} className="premium-link">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#ecfdf5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <Wallet width="18" height="18" style={{ color: '#10b981' }} />
+                    </div>
+                    <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Mon Portefeuille</span>
+                  </div>
+                  <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+                </Link>
+
+                {/* Statistiques & Métriques */}
+                <Link href="/dashboard?tab=stats" onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    localStorage.setItem('vc_dashboard_active_tab', 'stats');
+                  }
+                }} className="premium-link">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef9c3', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <TrendingUp width="18" height="18" style={{ color: '#a16207' }} />
+                    </div>
+                    <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Statistiques & Métriques</span>
+                  </div>
+                  <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+                </Link>
+              </>
+            ) : (
+              /* Devenir Vendeur */
+              <Link href="/dashboard?tab=seller-area" onClick={() => {
+                if (typeof window !== 'undefined') {
+                  localStorage.setItem('vc_dashboard_active_tab', 'seller-area');
+                }
+              }} className="premium-link">
+                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                  <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fff8f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <Store width="18" height="18" style={{ color: '#ff6a00' }} />
+                  </div>
+                  <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Devenir Vendeur</span>
                 </div>
-                <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Statistiques & Métriques</span>
-              </div>
-              <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
-            </Link>
+                <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
+              </Link>
+            )}
 
             {/* Link 2: Mon Profil */}
             <Link href={`/vendeur/${profile?.id || user?.sub || user?.user_id || user?.uid || ''}`} className="premium-link">
