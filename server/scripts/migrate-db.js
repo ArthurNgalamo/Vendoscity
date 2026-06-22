@@ -58,6 +58,8 @@ async function runMigrations() {
                     ALTER TABLE public.products ADD COLUMN IF NOT EXISTS discount_amount NUMERIC DEFAULT 0;
                     ALTER TABLE public.products ADD COLUMN IF NOT EXISTS old_price NUMERIC DEFAULT 0;
                     ALTER TABLE public.products ADD COLUMN IF NOT EXISTS is_featured BOOLEAN DEFAULT false;
+                    ALTER TABLE public.products ADD COLUMN IF NOT EXISTS group_price NUMERIC DEFAULT 0;
+                    ALTER TABLE public.products ADD COLUMN IF NOT EXISTS group_min_participants INTEGER DEFAULT 3;
                 END IF;
                 
                 -- Support legacy "produits" table if it exists
@@ -191,6 +193,14 @@ async function runMigrations() {
                     ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS buyer_validated_at TIMESTAMP WITH TIME ZONE;
                     ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS seller_validated_at TIMESTAMP WITH TIME ZONE;
                     ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS escrow_released_at TIMESTAMP WITH TIME ZONE;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS is_group_buy BOOLEAN DEFAULT false;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS group_buy_id VARCHAR(100);
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS group_buy_min_participants INTEGER DEFAULT 3;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS group_buy_status VARCHAR(50) DEFAULT 'open';
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS is_distribution BOOLEAN DEFAULT false;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS distribution_point_id VARCHAR(100);
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS distribution_point_name TEXT;
+                    ALTER TABLE public.orders ADD COLUMN IF NOT EXISTS distribution_status VARCHAR(50) DEFAULT 'none';
                 END IF;
             END $$;
         `);

@@ -26,6 +26,38 @@ export default function OrderDetailsModal({
           <div><strong>Déjà payé :</strong> {formatCurrency(selectedOrder.amount_paid || 0)}</div>
         </div>
 
+        {(selectedOrder.is_group_buy || selectedOrder.is_distribution) && (
+          <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px', padding: '12px', marginBottom: '16px', fontSize: '0.8rem', lineHeight: '1.4' }}>
+            {selectedOrder.is_group_buy && (
+              <div style={{ marginBottom: selectedOrder.is_distribution ? '8px' : '0' }}>
+                <strong style={{ color: '#0369a1' }}>👥 Options Achat Groupé :</strong>
+                <div style={{ marginLeft: '8px', marginTop: '2px' }}>
+                  Statut : <span style={{ fontWeight: 'bold' }}>
+                    {selectedOrder.group_buy_status === 'open' ? 'En attente de participants' : selectedOrder.group_buy_status === 'completed' ? 'Groupe Complet / Validé' : 'Annulé'}
+                  </span>
+                  <div>ID de groupe : <code>{selectedOrder.group_buy_id}</code></div>
+                  <div>Participants min requis : {selectedOrder.group_buy_min_participants || 3}</div>
+                </div>
+              </div>
+            )}
+            {selectedOrder.is_distribution && (
+              <div>
+                <strong style={{ color: '#0f172a' }}>📍 Point de Retrait / Hub :</strong>
+                <div style={{ marginLeft: '8px', marginTop: '2px' }}>
+                  Lieu : <span style={{ fontWeight: 'bold' }}>{selectedOrder.distribution_point_name}</span>
+                  <div>Statut logistique : <span className={`order-status-badge ${selectedOrder.distribution_status}`} style={{ fontSize: '0.65rem', padding: '2px 6px', display: 'inline-block', marginTop: '2px' }}>
+                    {selectedOrder.distribution_status === 'none' && 'Non défini'}
+                    {selectedOrder.distribution_status === 'pending_dispatch' && "En attente d'expédition par le vendeur"}
+                    {selectedOrder.distribution_status === 'dispatched' && 'En cours d\'acheminement vers le point de retrait'}
+                    {selectedOrder.distribution_status === 'arrived' && 'Arrivé au point de retrait (Prêt pour retrait)'}
+                    {selectedOrder.distribution_status === 'collected' && 'Colis récupéré'}
+                  </span></div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {selectedOrder.escrow_status === 'pending_payment' && (
           <div style={{ background: '#fff3cd', border: '1px solid #ffeeba', borderRadius: '8px', padding: '12px', color: '#856404', fontSize: '0.82rem', display: 'flex', gap: '8px', alignItems: 'flex-start' }}>
             <Clock width="16" height="16" style={{ marginTop: '2px', flexShrink: 0 }} />

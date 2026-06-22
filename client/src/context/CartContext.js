@@ -144,7 +144,8 @@ export function CartProvider({ children }) {
       image: product?.image || '',
       images,
       seller_id: product?.seller_id || product?.seller?.id || '',
-      shop_name: product?.seller?.shop_name || product?.seller?.first_name || product?.shop_name || product?.seller_name || 'Boutique'
+      shop_name: product?.seller?.shop_name || product?.seller?.first_name || product?.shop_name || product?.seller_name || 'Boutique',
+      is_group_buy: !!product?.is_group_buy
     };
 
     if (!item.id || !Number.isFinite(item.price) || item.price <= 0) {
@@ -156,7 +157,7 @@ export function CartProvider({ children }) {
 
     // Update UI state optimistically
     setCart((prevCart) => {
-      const idx = prevCart.findIndex((x) => String(x.id) === String(item.id));
+      const idx = prevCart.findIndex((x) => String(x.id) === String(item.id) && !!x.is_group_buy === !!item.is_group_buy);
       let nextCart;
 
       if (idx >= 0) {

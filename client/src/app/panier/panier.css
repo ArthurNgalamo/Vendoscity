@@ -647,6 +647,18 @@
     }
 }
 
+@media (max-width: 640px) {
+    .item-action-btn span {
+        display: none;
+    }
+
+    .item-action-btn {
+        padding: 6px 8px;
+        background: #f1f5f9;
+        border-radius: 6px;
+    }
+}
+
 @media (max-width: 480px) {
     .cart-page-wrapper {
         padding: 15px 10px 60px;
@@ -682,16 +694,6 @@
 
     .cart-item-total-price {
         font-size: 0.95rem;
-    }
-
-    .item-action-btn span {
-        display: none;
-    }
-
-    .item-action-btn {
-        padding: 6px 8px;
-        background: #f1f5f9;
-        border-radius: 6px;
     }
 
     .seller-checkout-actions {

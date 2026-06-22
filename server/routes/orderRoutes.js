@@ -50,7 +50,19 @@ router.get('/seller', authenticate, async (req, res) => {
  * Cree une nouvelle commande (avec ou sans sequestre)
  */
 router.post('/', authenticate, async (req, res) => {
-    const { seller_id, total_amount, payment_method, buyer_phone_payeur, items } = req.body;
+    const { 
+        seller_id, 
+        total_amount, 
+        payment_method, 
+        buyer_phone_payeur, 
+        items,
+        is_group_buy,
+        group_buy_id,
+        group_buy_min_participants,
+        is_distribution,
+        distribution_point_id,
+        distribution_point_name
+    } = req.body;
 
     if (!seller_id || !total_amount || !items || !items.length) {
         return res.status(400).json({ error: 'Missing required order fields' });
@@ -60,6 +72,26 @@ router.post('/', authenticate, async (req, res) => {
     const isEscrow = payment_method !== 'direct_whatsapp';
 
     try {
+        // Group Buy Auto-Grouping Logic
+        let finalGroupBuyId = group_buy_id;
+        if (is_group_buy && !finalGroupBuyId) {
+            // Find existing open group buy for the same seller
+            const { data: existingGroups, error: groupsErr } = await db
+                .from('orders')
+                .select('group_buy_id')
+                .eq('is_group_buy', true)
+                .eq('group_buy_status', 'open')
+                .eq('seller_id', seller_id)
+                .limit(1);
+
+            if (!groupsErr && existingGroups && existingGroups.length > 0) {
+                finalGroupBuyId = existingGroups[0].group_buy_id;
+            } else {
+                // Generate a new group code
+                finalGroupBuyId = 'GB-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+            }
+        }
+
         // 1. Inserer la commande
         const orderData = {
             user_id: req.user.id,
@@ -70,7 +102,19 @@ router.post('/', authenticate, async (req, res) => {
             escrow_status: isEscrow ? 'pending_payment' : 'none',
             amount_paid: 0.0,
             buyer_phone_payeur: isEscrow ? buyer_phone_payeur : null,
-            escrow_qr_code: isEscrow ? escrowCode : null
+            escrow_qr_code: isEscrow ? escrowCode : null,
+            
+            // Group buy fields
+            is_group_buy: !!is_group_buy,
+            group_buy_id: is_group_buy ? finalGroupBuyId : null,
+            group_buy_min_participants: is_group_buy ? (group_buy_min_participants || 3) : 3,
+            group_buy_status: is_group_buy ? 'open' : 'none',
+
+            // Distribution fields
+            is_distribution: !!is_distribution,
+            distribution_point_id: is_distribution ? distribution_point_id : null,
+            distribution_point_name: is_distribution ? distribution_point_name : null,
+            distribution_status: is_distribution ? 'pending_dispatch' : 'none'
         };
 
         const { data: newOrder, error: orderErr } = await db
@@ -95,7 +139,25 @@ router.post('/', authenticate, async (req, res) => {
 
         if (itemsErr) throw itemsErr;
 
-        // 3. Notifier le vendeur (seulement si paiement direct pour convenir de la livraison)
+        // 3. Update group status if minimum participants met
+        if (is_group_buy && finalGroupBuyId) {
+            const { data: groupOrders, error: countErr } = await db
+                .from('orders')
+                .select('id')
+                .eq('group_buy_id', finalGroupBuyId);
+
+            if (!countErr && groupOrders) {
+                const minRequired = group_buy_min_participants || 3;
+                if (groupOrders.length >= minRequired) {
+                    await db
+                        .from('orders')
+                        .update({ group_buy_status: 'completed' })
+                        .eq('group_buy_id', finalGroupBuyId);
+                }
+            }
+        }
+
+        // 4. Notifier le vendeur (seulement si paiement direct pour convenir de la livraison)
         if (!isEscrow) {
             await db.from('messages').insert({
                 sender_id: req.user.id,
@@ -303,6 +365,74 @@ router.get('/:id/invoice', authenticate, async (req, res) => {
         });
 
     } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * GET /api/orders/group/:group_buy_id
+ * Recupere les participants d'un groupe d'achat
+ */
+router.get('/group/:group_buy_id', authenticate, async (req, res) => {
+    const { group_buy_id } = req.params;
+
+    try {
+        const { data: orders, error: fetchErr } = await db
+            .from('orders')
+            .select(`
+                *,
+                user:profiles (first_name, last_name, phone)
+            `)
+            .eq('group_buy_id', group_buy_id);
+
+        if (fetchErr) throw fetchErr;
+
+        res.json(orders);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * PUT /api/orders/:id/distribution-status
+ * Met a jour le statut logistique du point de distribution
+ */
+router.put('/:id/distribution-status', authenticate, async (req, res) => {
+    const { id } = req.params;
+    const { distribution_status } = req.body;
+
+    const validStatuses = ['none', 'pending_dispatch', 'dispatched', 'arrived', 'collected'];
+    if (!validStatuses.includes(distribution_status)) {
+        return res.status(400).json({ error: 'Statut de distribution invalide' });
+    }
+
+    try {
+        const { data: order, error: fetchErr } = await db
+            .from('orders')
+            .select('*')
+            .eq('id', id)
+            .single();
+
+        if (fetchErr || !order) {
+            return res.status(404).json({ error: 'Commande non trouvee' });
+        }
+
+        if (req.user.id !== order.seller_id) {
+            return res.status(403).json({ error: 'Non autorise a modifier cette commande' });
+        }
+
+        const { data: updatedOrder, error: updateErr } = await db
+            .from('orders')
+            .update({ distribution_status })
+            .eq('id', id)
+            .select()
+            .single();
+
+        if (updateErr) throw updateErr;
+
+        res.json(updatedOrder);
+    } catch (error) {
+        console.error('❌ Erreur de mise a jour du statut de distribution :', error);
         res.status(500).json({ error: error.message });
     }
 });

@@ -250,7 +250,8 @@ class LocalPostgresClient {
                     const { rows } = await pool.query(insertSql, rowValues);
                     results.push(rows[0]);
                 }
-                return onSuccess({ data: results, error: null });
+                const data = this.isSingle ? results[0] : results;
+                return onSuccess({ data, error: null });
             } else if (this.operation === 'UPDATE') {
                 const keys = Object.keys(this.dataToUpdate);
                 const updateValues = Object.values(this.dataToUpdate);
@@ -264,7 +265,8 @@ class LocalPostgresClient {
                 }
                 sql += ' RETURNING *';
                 const { rows } = await pool.query(sql, updateValues);
-                return onSuccess({ data: rows, error: null });
+                const data = this.isSingle ? rows[0] : rows;
+                return onSuccess({ data, error: null });
             } else if (this.operation === 'DELETE') {
                 sql = `DELETE FROM ${schema}.${this.tableName}`;
                 if (this.filters.length > 0) {

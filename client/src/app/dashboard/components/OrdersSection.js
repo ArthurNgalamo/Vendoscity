@@ -68,14 +68,10 @@ export default function OrdersSection({ authFetch, showToast }) {
     }
 
     try {
-      const apiBase = getApiBaseUrl();
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`${apiBase}/api/orders/${targetId}/validate-escrow`, {
+      const res = await authFetch(`/api/orders/${targetId}/validate-escrow`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ qr_code: code })
       });
@@ -106,14 +102,10 @@ export default function OrdersSection({ authFetch, showToast }) {
 
     setValidating(true);
     try {
-      const apiBase = getApiBaseUrl();
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`${apiBase}/api/orders/${orderId}/validate-escrow`, {
+      const res = await authFetch(`/api/orders/${orderId}/validate-escrow`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ action: 'deliver' })
       });
@@ -128,6 +120,33 @@ export default function OrdersSection({ authFetch, showToast }) {
     } catch (e) {
       console.error(e);
       alert("Erreur serveur.");
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  // Update distribution status
+  const handleUpdateDistributionStatus = async (orderId, nextStatus) => {
+    setValidating(true);
+    try {
+      const res = await authFetch(`/api/orders/${orderId}/distribution-status`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ distribution_status: nextStatus })
+      });
+
+      if (res.ok) {
+        showToast("Statut de distribution mis à jour avec succès !");
+        fetchOrders();
+      } else {
+        const err = await res.json();
+        alert(err.error || "Impossible de mettre à jour le statut de distribution.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de la mise à jour logistique.");
     } finally {
       setValidating(false);
     }
@@ -197,13 +216,8 @@ export default function OrdersSection({ authFetch, showToast }) {
 
   // Print Invoice popup
   const handlePrintInvoice = async (orderId) => {
-    const token = localStorage.getItem('token');
-    const apiBase = getApiBaseUrl();
-
     try {
-      const res = await fetch(`${apiBase}/api/orders/${orderId}/invoice`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await authFetch(`/api/orders/${orderId}/invoice`);
 
       if (!res.ok) throw new Error("Facture introuvable.");
       const data = await res.json();
@@ -402,11 +416,27 @@ export default function OrdersSection({ authFetch, showToast }) {
             <tbody>
               {filteredOrders.map(order => (
                 <tr key={order.id} style={{ borderBottom: '1px solid #f1f5f9', color: '#1e293b' }}>
-                  <td style={{ padding: '12px 8px', fontWeight: 'bold' }}>
-                    #{order.id.substring(0, 8)}
+                  <td style={{ padding: '12px 8px' }}>
+                    <span style={{ fontWeight: 'bold', display: 'block' }}>#{order.id.substring(0, 8)}</span>
+                    {order.is_group_buy && (
+                      <span style={{ display: 'inline-block', fontSize: '0.65rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', marginTop: '4px', fontWeight: 'bold' }}>
+                        👥 Achat Groupé (Réf: {order.group_buy_id ? order.group_buy_id.substring(0,8) : 'N/A'})
+                      </span>
+                    )}
                   </td>
                   <td style={{ padding: '12px 8px' }}>
-                    {order.buyer_phone_payeur || 'WhatsApp Direct'}
+                    <div style={{ fontWeight: '600' }}>{order.buyer_phone_payeur || 'WhatsApp Direct'}</div>
+                    {order.is_distribution && (
+                      <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: '4px' }}>
+                        📍 Point: <strong>{order.distribution_point_name}</strong>
+                        <span className={`order-status-badge ${order.distribution_status}`} style={{ fontSize: '0.65rem', padding: '1px 4px', marginLeft: '6px' }}>
+                          {order.distribution_status === 'pending_dispatch' ? 'À expédier' : 
+                           order.distribution_status === 'dispatched' ? 'Expédié au Hub' : 
+                           order.distribution_status === 'arrived' ? 'Arrivé au Hub' : 
+                           order.distribution_status === 'collected' ? 'Récupéré' : 'En attente'}
+                        </span>
+                      </div>
+                    )}
                   </td>
                   <td style={{ padding: '12px 8px', fontWeight: 'bold' }}>
                     {parseFloat(order.total_amount).toLocaleString('fr-FR')} F
@@ -417,7 +447,31 @@ export default function OrdersSection({ authFetch, showToast }) {
                     </span>
                   </td>
                   <td style={{ padding: '12px 8px', textAlign: 'right' }}>
-                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
+                      {/* Distribution Logistics updates */}
+                      {order.is_distribution && order.escrow_status === 'held' && (
+                        <>
+                          {order.distribution_status === 'pending_dispatch' && (
+                            <button
+                              onClick={() => handleUpdateDistributionStatus(order.id, 'dispatched')}
+                              className="checkout-btn"
+                              style={{ width: 'auto', padding: '4px 8px', fontSize: '0.72rem', background: '#8b5cf6' }}
+                            >
+                              Expédier au Hub
+                            </button>
+                          )}
+                          {order.distribution_status === 'dispatched' && (
+                            <button
+                              onClick={() => handleUpdateDistributionStatus(order.id, 'arrived')}
+                              className="checkout-btn"
+                              style={{ width: 'auto', padding: '4px 8px', fontSize: '0.72rem', background: '#10b981' }}
+                            >
+                              Marquer Arrivé
+                            </button>
+                          )}
+                        </>
+                      )}
+
                       {order.escrow_status === 'held' && !order.seller_validated && (
                         <button 
                           onClick={() => handleConfirmDelivery(order.id)}
@@ -440,7 +494,7 @@ export default function OrdersSection({ authFetch, showToast }) {
                           Saisir Code
                         </button>
                       )}
-
+                      
                       {order.escrow_status === 'released' && (
                         <button 
                           onClick={() => handlePrintInvoice(order.id)}

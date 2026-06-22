@@ -204,7 +204,14 @@ export default function PanierPage() {
 
                         {/* Details */}
                         <div className="cart-item-info">
-                          <h4 className="cart-item-title">{item.title}</h4>
+                          <h4 className="cart-item-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                            <span>{item.title}</span>
+                            {item.is_group_buy && (
+                              <span style={{ fontSize: '0.65rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
+                                Achat Groupé
+                              </span>
+                            )}
+                          </h4>
                           <span className="cart-item-category">{item.category}</span>
                           <div className="cart-item-price-unit">{formatCurrency(item.price)} / unité</div>
                         </div>

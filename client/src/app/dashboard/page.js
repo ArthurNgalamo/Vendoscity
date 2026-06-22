@@ -584,6 +584,7 @@ function DashboardContent() {
               profile={profile}
               onApprovalSuccess={fetchProfile}
               showToast={showToast}
+              authFetch={authFetch}
             />
           ) : (
             <>

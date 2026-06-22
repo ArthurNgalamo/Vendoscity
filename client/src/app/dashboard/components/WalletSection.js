@@ -87,13 +87,10 @@ export default function WalletSection({ authFetch, showToast }) {
 
     setVerifying(true);
     try {
-      const apiBase = getApiBaseUrl();
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${apiBase}/api/wallet/setup-passcode`, {
+      const res = await authFetch('/api/wallet/setup-passcode', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ passcode: passcodePin })
       });
@@ -126,13 +123,10 @@ export default function WalletSection({ authFetch, showToast }) {
 
     setVerifying(true);
     try {
-      const apiBase = getApiBaseUrl();
-      const token = localStorage.getItem('token');
-      const res = await fetch(`${apiBase}/api/wallet/verify-passcode`, {
+      const res = await authFetch('/api/wallet/verify-passcode', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ passcode: passcodePin })
       });
@@ -166,14 +160,10 @@ export default function WalletSection({ authFetch, showToast }) {
 
     setSubmittingTx(true);
     try {
-      const apiBase = getApiBaseUrl();
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`${apiBase}/api/wallet/withdraw`, {
+      const res = await authFetch('/api/wallet/withdraw', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           amount: parseFloat(amount),
@@ -211,14 +201,10 @@ export default function WalletSection({ authFetch, showToast }) {
 
     setSubmittingTx(true);
     try {
-      const apiBase = getApiBaseUrl();
-      const token = localStorage.getItem('token');
-
-      const res = await fetch(`${apiBase}/api/wallet/deposit`, {
+      const res = await authFetch('/api/wallet/deposit', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           amount: parseFloat(amount),

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Store, ShieldCheck, Clock, RefreshCw, CheckCircle2, Award, Zap, BarChart3, Link2, AlertCircle } from 'lucide-react';
 import { getApiBaseUrl } from '../../../core/api';
 
-export default function SellerApplicationSection({ profile, onApprovalSuccess, showToast }) {
+export default function SellerApplicationSection({ profile, onApprovalSuccess, showToast, authFetch }) {
   const [shopName, setShopName] = useState('');
   const [whatsapp, setWhatsapp] = useState(profile?.phone || '');
   const [bio, setBio] = useState('');
@@ -31,15 +31,12 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     }
 
     setLoading(true);
-    const token = localStorage.getItem('token');
-    const apiBase = getApiBaseUrl();
 
     try {
-      const res = await fetch(`${apiBase}/api/user/apply-seller`, {
+      const res = await authFetch('/api/user/apply-seller', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           shop_name: shopName.trim(),
@@ -66,15 +63,10 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
 
   const handleSimulateApproval = async () => {
     setLoading(true);
-    const token = localStorage.getItem('token');
-    const apiBase = getApiBaseUrl();
 
     try {
-      const res = await fetch(`${apiBase}/api/user/simulate-approve-seller`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      const res = await authFetch('/api/user/simulate-approve-seller', {
+        method: 'POST'
       });
 
       if (res.ok) {

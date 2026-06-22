@@ -6,6 +6,7 @@ import { AlertCircle, ArrowLeft, Truck } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '../../context/ToastContext';
 import { getApiBaseUrl, formatCurrency } from '../../core/api';
+import { useAuth } from '../../context/AuthContext';
 
 import OrderRowCard from './components/OrderRowCard';
 import OrderDetailsModal from './components/OrderDetailsModal';
@@ -13,6 +14,7 @@ import './commandes.css';
 
 export default function CommandesPage() {
   const showToast = useToast();
+  const { authFetch } = useAuth();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -20,12 +22,8 @@ export default function CommandesPage() {
 
   const fetchOrders = async () => {
     setLoading(true);
-    const token = localStorage.getItem('token');
-    const apiBase = getApiBaseUrl();
     try {
-      const res = await fetch(`${apiBase}/api/orders`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await authFetch('/api/orders');
       if (res.ok) {
         const data = await res.json();
         setOrders(data || []);
@@ -47,15 +45,12 @@ export default function CommandesPage() {
     }
 
     setValidatingId(orderId);
-    const token = localStorage.getItem('token');
-    const apiBase = getApiBaseUrl();
 
     try {
-      const res = await fetch(`${apiBase}/api/orders/${orderId}/validate-escrow`, {
+      const res = await authFetch(`/api/orders/${orderId}/validate-escrow`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Content-Type': 'application/json'
         },
         body: JSON.stringify({ action: 'receive' })
       });
@@ -78,13 +73,8 @@ export default function CommandesPage() {
 
   // Printable Invoice function (self-contained popup print)
   const handlePrintInvoice = async (orderId) => {
-    const token = localStorage.getItem('token');
-    const apiBase = getApiBaseUrl();
-
     try {
-      const res = await fetch(`${apiBase}/api/orders/${orderId}/invoice`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const res = await authFetch(`/api/orders/${orderId}/invoice`);
 
       if (!res.ok) throw new Error("Facture introuvable.");
       const data = await res.json();
