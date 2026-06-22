@@ -166,10 +166,10 @@ export default function DashboardPage() {
   };
 
   useEffect(() => {
-    if ((activeSection === 'seller-area' || activeSection === 'stats') && user) {
+    if (user) {
       loadMyProducts();
     }
-  }, [activeSection, user]);
+  }, [user]);
 
   const handleShareShop = async () => {
     if (!user) return;
@@ -511,6 +511,10 @@ export default function DashboardPage() {
     }
   };
 
+  const isSellerApproved = 
+    profile?.seller_status === 'approved' || 
+    (profile && (profile.shop_name || profile.phone || myProducts.length > 0));
+
   if (loading) {
     return (
       <div style={{ maxWidth: '1200px', margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
@@ -531,7 +535,7 @@ export default function DashboardPage() {
         <aside className="dashboard-sidebar">
           <h3>Menu</h3>
           <div className="dashboard-menu">
-            {profile?.seller_status === 'approved' && (
+            {isSellerApproved && (
               <>
                 <button
                   onClick={() => setActiveSection('seller-area')}
@@ -576,7 +580,7 @@ export default function DashboardPage() {
         {/* Dynamic section display */}
         <div className="dashboard-content">
           
-          {profile?.seller_status !== 'approved' ? (
+          {!isSellerApproved ? (
             <SellerApplicationSection 
               profile={profile}
               onApprovalSuccess={fetchProfile}
