@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { GridIcon } from './HeaderIcons';
 import { useTypingPlaceholder, getPersonalizedPhrases } from '../../hooks/useTypingPlaceholder';
+import Sparkles from '../Sparkles';
 
 // Mêmes phrases que le desktop — cohérence de l'expérience
 const SEARCH_PHRASES = [
@@ -72,8 +73,9 @@ export default function MobileHeader({
               type="button" 
               className={`mobile-tab-item ${activeSearchTab === 'ai' ? 'active' : ''}`}
               onClick={() => handleTabClick('ai')}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', justifyContent: 'center' }}
             >
-              AI Mode
+              AI Mode <Sparkles width="12" height="12" />
             </button>
             <button 
               type="button" 

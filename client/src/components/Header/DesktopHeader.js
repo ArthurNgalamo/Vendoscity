@@ -35,6 +35,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { CATEGORIES } from './constants';
+import Sparkles from '../Sparkles';
 
 export default function DesktopHeader({
   user,
@@ -313,8 +314,9 @@ export default function DesktopHeader({
                 type="button" 
                 className={`search-tab-item ${activeSearchTab === 'ai' ? 'active' : ''}`}
                 onClick={() => handleTabClick('ai')}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
               >
-                AI Mode ✨
+                AI Mode <Sparkles width="12" height="12" />
               </button>
               <button 
                 type="button" 
