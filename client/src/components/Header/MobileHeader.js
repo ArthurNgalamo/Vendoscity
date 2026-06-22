@@ -89,13 +89,6 @@ export default function MobileHeader({
             >
               Vendeurs
             </button>
-            <button 
-              type="button" 
-              className={`mobile-tab-item ${activeSearchTab === 'global' ? 'active' : ''}`}
-              onClick={() => handleTabClick('global')}
-            >
-              Mondial
-            </button>
           </div>
 
           {/* ROW 2: Search Bar */}
@@ -135,7 +128,7 @@ export default function MobileHeader({
               </div>
               <span className="mobile-shortcut-text">Explorer par<br/>catégories</span>
             </Link>
-            <a href="https://wa.me/237690000000" target="_blank" rel="noopener noreferrer" className="mobile-shortcut-card">
+            <Link href="/ai-mode?message=Je%20souhaite%20demander%20un%20devis%20pour%20les%20produits%20suivants%20%3A%20" className="mobile-shortcut-card">
               <div className="mobile-shortcut-icon">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
                   <circle cx="12" cy="12" r="10" />
@@ -144,8 +137,8 @@ export default function MobileHeader({
                 </svg>
               </div>
               <span className="mobile-shortcut-text">Demander un<br/>devis</span>
-            </a>
-            <Link href="/boutique?sort=recommended" className="mobile-shortcut-card">
+            </Link>
+            <Link href="/top-classement" className="mobile-shortcut-card">
               <div className="mobile-shortcut-icon">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
                   <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
@@ -188,37 +181,39 @@ export default function MobileHeader({
             </div>
           </div>
 
-          {/* ROW 5: Filters pills */}
-          <div className="mobile-filters-row">
-            <button 
-              type="button" 
-              className={`mobile-filter-pill ${(!urlParams.sort && !urlParams.custom) ? 'active' : ''}`}
-              onClick={() => router.push('/boutique')}
-            >
-              <Heart width="12" height="12" className="mobile-filter-icon" fill="currentColor" />
-              <span>Tous</span>
-            </button>
-            <button 
-              type="button" 
-              className={`mobile-filter-pill ${urlParams.sort === 'recommended' ? 'active' : ''}`}
-              onClick={() => router.push('/boutique?sort=recommended')}
-            >
-              <svg viewBox="0 0 24 24" width="12" height="12" className="mobile-filter-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-              </svg>
-              <span>Meilleures offres</span>
-            </button>
-            <button 
-              type="button" 
-              className={`mobile-filter-pill ${urlParams.custom === 'custom' ? 'active' : ''}`}
-              onClick={() => router.push('/boutique?custom=custom')}
-            >
-              <svg viewBox="0 0 24 24" width="12" height="12" className="mobile-filter-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
-                <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
-              </svg>
-              <span>Personnalisation</span>
-            </button>
-          </div>
+          {/* ROW 5: Filters pills (Hidden on homepage) */}
+          {pathname !== '/' && (
+            <div className="mobile-filters-row">
+              <button 
+                type="button" 
+                className={`mobile-filter-pill ${(!urlParams.sort && !urlParams.custom) ? 'active' : ''}`}
+                onClick={() => router.push('/boutique')}
+              >
+                <Heart width="12" height="12" className="mobile-filter-icon" fill="currentColor" />
+                <span>Tous</span>
+              </button>
+              <button 
+                type="button" 
+                className={`mobile-filter-pill ${urlParams.sort === 'recommended' ? 'active' : ''}`}
+                onClick={() => router.push('/boutique?sort=recommended')}
+              >
+                <svg viewBox="0 0 24 24" width="12" height="12" className="mobile-filter-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
+                <span>Meilleures offres</span>
+              </button>
+              <button 
+                type="button" 
+                className={`mobile-filter-pill ${urlParams.custom === 'custom' ? 'active' : ''}`}
+                onClick={() => router.push('/boutique?custom=custom')}
+              >
+                <svg viewBox="0 0 24 24" width="12" height="12" className="mobile-filter-icon" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 20h9M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+                </svg>
+                <span>Personnalisation</span>
+              </button>
+            </div>
+          )}
         </>
       )}
 

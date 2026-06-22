@@ -330,13 +330,6 @@ export default function DesktopHeader({
               >
                 Fabricants <span className="tab-badge-verified">Verified</span>
               </button>
-              <button 
-                type="button" 
-                className={`search-tab-item ${activeSearchTab === 'global' ? 'active' : ''}`}
-                onClick={() => handleTabClick('global')}
-              >
-                Mondial
-              </button>
             </div>
 
             {/* Alibaba Search Box */}
@@ -383,15 +376,12 @@ export default function DesktopHeader({
             <strong>Bienvenue sur Vendoscity.com</strong>
           </div>
           <div className="welcome-right">
-            <span className="welcome-item">
+            <Link href="/ai-mode?message=Je%20souhaite%20demander%20un%20devis%20personnalis%C3%A9%20pour%20les%20produits%20suivants%20%3A%20" className="welcome-item" style={{ textDecoration: 'none', color: 'inherit' }}>
               <Store width="14" height="14" /> Demander un devis
-            </span>
-            <span className="welcome-item">
+            </Link>
+            <Link href="/top-classement" className="welcome-item" style={{ textDecoration: 'none', color: 'inherit' }}>
               <Award width="14" height="14" /> Top du classement
-            </span>
-            <span className="welcome-item">
-              <Star width="14" height="14" /> Customisation rapide
-            </span>
+            </Link>
           </div>
         </div>
       )}

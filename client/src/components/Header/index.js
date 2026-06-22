@@ -212,8 +212,20 @@ export default function Header() {
 
   const handleTabClick = (tabKey) => {
     setActiveSearchTab(tabKey);
-    const queryParam = searchVal.trim() ? `q=${encodeURIComponent(searchVal.trim())}&` : '';
-    router.push(`/boutique?${queryParam}filter=${tabKey}`);
+    if (tabKey === 'ai') {
+      router.push('/ai-mode');
+    } else if (tabKey === 'sellers') {
+      router.push('/vendeurs');
+    } else if (tabKey === 'products') {
+      if (pathname === '/') {
+        window.location.reload(); // Refresh the homepage to default
+      } else {
+        router.push('/');
+      }
+    } else {
+      const queryParam = searchVal.trim() ? `q=${encodeURIComponent(searchVal.trim())}&` : '';
+      router.push(`/boutique?${queryParam}filter=${tabKey}`);
+    }
   };
 
   // PWA Prompt
