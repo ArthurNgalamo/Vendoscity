@@ -192,6 +192,8 @@ async function runMigrations() {
                     ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_status VARCHAR(50) DEFAULT 'none';
                     ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_application_data JSONB DEFAULT '{}'::jsonb;
                     ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false;
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS wallet_failed_attempts INTEGER DEFAULT 0;
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS wallet_locked_until TIMESTAMP WITH TIME ZONE;
                 END IF;
 
                 -- Update orders table

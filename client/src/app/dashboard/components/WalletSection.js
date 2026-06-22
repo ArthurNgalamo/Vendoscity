@@ -28,6 +28,17 @@ export default function WalletSection({ authFetch, showToast }) {
   const [verifying, setVerifying] = useState(false);
   const [showPin, setShowPin] = useState(false);
 
+  // Lockout states
+  const [lockedUntil, setLockedUntil] = useState(null);
+  const [failedAttempts, setFailedAttempts] = useState(0);
+  const [lockoutCountdown, setLockoutCountdown] = useState(0);
+
+  // Passcode reset states
+  const [resetStep, setResetStep] = useState('none'); // 'none', 'request', 'verify'
+  const [resetOtp, setResetOtp] = useState('');
+  const [newResetPasscode, setNewResetPasscode] = useState('');
+  const [simulatedOtpDisplay, setSimulatedOtpDisplay] = useState('');
+
   // Form states
   const [actionTab, setActionTab] = useState('withdraw'); // 'withdraw' or 'deposit'
   const [amount, setAmount] = useState('');
@@ -44,6 +55,13 @@ export default function WalletSection({ authFetch, showToast }) {
         setWalletInfo(data);
         if (data.walletPhone && !phone) {
           setPhone(data.walletPhone);
+        }
+        // Update lockout states
+        setFailedAttempts(data.walletFailedAttempts || 0);
+        if (data.walletLockedUntil) {
+          setLockedUntil(data.walletLockedUntil);
+        } else {
+          setLockedUntil(null);
         }
       }
     } catch (e) {
@@ -72,6 +90,81 @@ export default function WalletSection({ authFetch, showToast }) {
   useEffect(() => {
     loadAll();
   }, []);
+
+  // Countdown timer for lockout
+  useEffect(() => {
+    if (!lockedUntil) {
+      setLockoutCountdown(0);
+      return;
+    }
+
+    const checkLockout = () => {
+      const remainingMs = new Date(lockedUntil) - new Date();
+      if (remainingMs > 0) {
+        setLockoutCountdown(Math.ceil(remainingMs / 1000));
+      } else {
+        setLockoutCountdown(0);
+        setLockedUntil(null);
+      }
+    };
+
+    checkLockout();
+    const interval = setInterval(checkLockout, 1000);
+    return () => clearInterval(interval);
+  }, [lockedUntil]);
+
+  const autoVerifyPin = async (pinToVerify) => {
+    setVerifying(true);
+    try {
+      const res = await authFetch('/api/wallet/verify-passcode', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ passcode: pinToVerify })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        setIsUnlocked(true);
+        setPasscodePin('');
+        setFailedAttempts(0);
+        setLockedUntil(null);
+        showToast("Portefeuille déverrouillé !");
+      } else {
+        if (res.status === 423 || data.lockedUntil) {
+          setLockedUntil(data.lockedUntil);
+          setFailedAttempts(data.attempts || 0);
+          showToast(data.error || "Portefeuille verrouillé.");
+        } else {
+          setFailedAttempts(data.attempts || 0);
+          setLockedUntil(data.lockedUntil || null);
+          alert(data.error || "Code PIN de sécurité incorrect.");
+        }
+        setPasscodePin(''); // Reset input on failure
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur lors de la vérification.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  // Auto-verify when 6 digits are typed
+  useEffect(() => {
+    if (
+      passcodePin.length === 6 && 
+      !verifying && 
+      lockoutCountdown === 0 && 
+      walletInfo?.hasPasscode && 
+      !isUnlocked && 
+      resetStep === 'none'
+    ) {
+      autoVerifyPin(passcodePin);
+    }
+  }, [passcodePin, verifying, lockoutCountdown, walletInfo, isUnlocked, resetStep]);
 
   // Passcode setup handler
   const handleSetupPasscode = async (e) => {
@@ -113,38 +206,80 @@ export default function WalletSection({ authFetch, showToast }) {
     }
   };
 
-  // Passcode unlock handler
+  // Passcode unlock handler (for manual submit fallback)
   const handleUnlockWallet = async (e) => {
-    e.preventDefault();
+    if (e) e.preventDefault();
+    if (lockoutCountdown > 0) {
+      alert("Votre portefeuille est temporairement verrouillé.");
+      return;
+    }
     if (passcodePin.length !== 6) {
       alert("Saisissez votre code PIN à 6 chiffres.");
+      return;
+    }
+    await autoVerifyPin(passcodePin);
+  };
+
+  const handleForgotPasscode = async () => {
+    setVerifying(true);
+    try {
+      const res = await authFetch('/api/wallet/forgot-passcode', {
+        method: 'POST'
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setSimulatedOtpDisplay(data.otp || '');
+        setResetStep('verify');
+        showToast("Code OTP généré (simulé) !");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Impossible de générer le code de réinitialisation.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Erreur réseau.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResetPasscodeSubmit = async (e) => {
+    e.preventDefault();
+    if (!resetOtp || newResetPasscode.length !== 6 || isNaN(newResetPasscode)) {
+      alert("Veuillez saisir le code OTP et un nouveau code PIN à 6 chiffres.");
       return;
     }
 
     setVerifying(true);
     try {
-      const res = await authFetch('/api/wallet/verify-passcode', {
+      const res = await authFetch('/api/wallet/reset-passcode', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ passcode: passcodePin })
+        body: JSON.stringify({
+          otp: resetOtp,
+          newPasscode: newResetPasscode
+        })
       });
 
       if (res.ok) {
-        const data = await res.json();
-        if (data.success) {
-          setIsUnlocked(true);
-          setPasscodePin('');
-          showToast("Portefeuille déverrouillé !");
-        } else {
-          alert("Code PIN de sécurité incorrect.");
-        }
+        showToast("Votre code PIN a été réinitialisé avec succès !");
+        setResetStep('none');
+        setResetOtp('');
+        setNewResetPasscode('');
+        setSimulatedOtpDisplay('');
+        setPasscodePin('');
+        setFailedAttempts(0);
+        setLockedUntil(null);
       } else {
-        alert("Erreur lors de la vérification.");
+        const data = await res.json();
+        alert(data.error || "La réinitialisation a échoué.");
       }
     } catch (e) {
       console.error(e);
+      alert("Erreur réseau.");
     } finally {
       setVerifying(false);
     }
@@ -436,41 +571,223 @@ export default function WalletSection({ authFetch, showToast }) {
     );
   }
 
-  // SCREEN B: Verify PIN to unlock
+  // SCREEN B: Verify PIN or reset passcode to unlock
   if (!isUnlocked) {
+    const cardStyle = { 
+      maxWidth: '400px', 
+      margin: '40px auto', 
+      padding: '36px 30px', 
+      textAlign: 'center',
+      background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
+      borderRadius: '24px',
+      color: '#fff',
+      boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(59, 130, 246, 0.1)',
+      border: '1px solid rgba(255, 255, 255, 0.08)',
+      fontFamily: '"Inter", sans-serif'
+    };
+
+    const iconWrapperStyle = { 
+      width: '64px', 
+      height: '64px', 
+      borderRadius: '20px', 
+      background: 'rgba(59, 130, 246, 0.12)', 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center', 
+      margin: '0 auto 20px auto',
+      border: '1px solid rgba(59, 130, 246, 0.25)',
+      boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)'
+    };
+
+    if (resetStep === 'request') {
+      return (
+        <div style={cardStyle}>
+          <div style={iconWrapperStyle}>
+            <Lock width="28" height="28" style={{ color: '#ff6a00' }} />
+          </div>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+            Code secret oublié ?
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '28px', padding: '0 10px' }}>
+            Vous pouvez réinitialiser votre code PIN en générant un code de validation OTP à 6 chiffres (simulé).
+          </p>
+
+          <button 
+            type="button" 
+            onClick={handleForgotPasscode}
+            disabled={verifying}
+            style={{ 
+              width: '100%',
+              padding: '14px',
+              borderRadius: '12px',
+              border: 'none',
+              background: 'linear-gradient(135deg, #ff6a00 0%, #ee5a00 100%)',
+              color: '#fff',
+              fontWeight: '700',
+              fontSize: '0.95rem',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              marginBottom: '20px',
+              boxShadow: '0 8px 16px -4px rgba(255, 106, 0, 0.3)',
+              transition: 'all 0.2s ease'
+            }}
+          >
+            {verifying ? <RefreshCw className="animate-spin" width="16" height="16" /> : <Clock width="16" height="16" />}
+            <span>Générer le code de réinitialisation</span>
+          </button>
+
+          <button 
+            type="button" 
+            onClick={() => setResetStep('none')}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: '0.85rem', textDecoration: 'underline' }}
+          >
+            Retour au déverrouillage
+          </button>
+        </div>
+      );
+    }
+
+    if (resetStep === 'verify') {
+      return (
+        <div style={cardStyle}>
+          <div style={iconWrapperStyle}>
+            <Unlock width="28" height="28" style={{ color: '#10b981' }} />
+          </div>
+          <h3 style={{ margin: '0 0 10px 0', fontSize: '1.4rem', fontWeight: 800, color: '#fff' }}>
+            Réinitialiser le code PIN
+          </h3>
+          <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '20px', padding: '0 10px' }}>
+            Saisissez le code OTP reçu et configurez votre nouveau code secret à 6 chiffres.
+          </p>
+
+          {simulatedOtpDisplay && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.1)', border: '1px dashed #10b981', padding: '12px', borderRadius: '10px', fontSize: '0.8rem', color: '#10b981', marginBottom: '20px', fontWeight: 'bold' }}>
+              🔑 Code OTP de test simulé : {simulatedOtpDisplay}
+            </div>
+          )}
+
+          <form onSubmit={handleResetPasscodeSubmit}>
+            <div style={{ marginBottom: '16px', textAlign: 'left' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+                Code OTP de validation
+              </label>
+              <input 
+                type="text" 
+                maxLength={6}
+                value={resetOtp}
+                onChange={(e) => setResetOtp(e.target.value.replace(/\D/g, ''))}
+                placeholder="Ex: 582910"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: '#fff',
+                  fontSize: '0.95rem',
+                  fontFamily: 'inherit',
+                  textAlign: 'center',
+                  letterSpacing: '4px'
+                }}
+                required
+              />
+            </div>
+
+            <div style={{ marginBottom: '24px', textAlign: 'left' }}>
+              <label style={{ fontSize: '0.75rem', fontWeight: '700', textTransform: 'uppercase', color: '#94a3b8', display: 'block', marginBottom: '6px' }}>
+                Nouveau Code PIN (6 chiffres)
+              </label>
+              <input 
+                type="password" 
+                maxLength={6}
+                value={newResetPasscode}
+                onChange={(e) => setNewResetPasscode(e.target.value.replace(/\D/g, ''))}
+                placeholder="••••••"
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  color: '#fff',
+                  fontSize: '0.95rem',
+                  fontFamily: 'inherit',
+                  textAlign: 'center',
+                  letterSpacing: '4px'
+                }}
+                required
+              />
+            </div>
+
+            <button 
+              type="submit" 
+              disabled={verifying}
+              style={{ 
+                width: '100%',
+                padding: '14px',
+                borderRadius: '12px',
+                border: 'none',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#fff',
+                fontWeight: '700',
+                fontSize: '0.95rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                cursor: 'pointer',
+                marginBottom: '20px',
+                boxShadow: '0 8px 16px -4px rgba(16, 185, 129, 0.3)',
+                transition: 'all 0.2s ease'
+              }}
+            >
+              {verifying ? <RefreshCw className="animate-spin" width="16" height="16" /> : <Unlock width="16" height="16" />}
+              <span>Réinitialiser mon code secret</span>
+            </button>
+          </form>
+
+          <button 
+            type="button" 
+            onClick={() => { setResetStep('none'); setSimulatedOtpDisplay(''); setResetOtp(''); setNewResetPasscode(''); }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: '0.85rem', textDecoration: 'underline' }}
+          >
+            Annuler
+          </button>
+        </div>
+      );
+    }
+
     return (
-      <div style={{ 
-        maxWidth: '400px', 
-        margin: '40px auto', 
-        padding: '36px 30px', 
-        textAlign: 'center',
-        background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)',
-        borderRadius: '24px',
-        color: '#fff',
-        boxShadow: '0 25px 50px -12px rgba(0,0,0,0.5), 0 0 40px rgba(59, 130, 246, 0.1)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-        fontFamily: '"Inter", sans-serif'
-      }}>
-        <div style={{ 
-          width: '64px', 
-          height: '64px', 
-          borderRadius: '20px', 
-          background: 'rgba(59, 130, 246, 0.12)', 
-          display: 'flex', 
-          alignItems: 'center', 
-          justifyContent: 'center', 
-          margin: '0 auto 20px auto',
-          border: '1px solid rgba(59, 130, 246, 0.25)',
-          boxShadow: '0 0 20px rgba(59, 130, 246, 0.1)'
-        }}>
-          <Lock width="28" height="28" style={{ color: '#3b82f6' }} />
+      <div style={cardStyle}>
+        <div style={iconWrapperStyle}>
+          <Lock width="28" height="28" style={{ color: lockoutCountdown > 0 ? '#ef4444' : '#3b82f6' }} />
         </div>
         <h3 style={{ margin: '0 0 10px 0', fontSize: '1.4rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#fff' }}>
           Portefeuille Sécurisé
         </h3>
-        <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '28px', padding: '0 10px' }}>
-          Entrez votre code secret PIN à 6 chiffres pour accéder à votre portefeuille d'entreprise.
-        </p>
+        
+        {lockoutCountdown > 0 ? (
+          <div style={{ 
+            background: 'rgba(239, 68, 68, 0.12)', 
+            border: '1px solid rgba(239, 68, 68, 0.25)', 
+            borderRadius: '12px', 
+            padding: '12px 15px', 
+            color: '#fca5a5', 
+            fontSize: '0.8rem', 
+            lineHeight: 1.5,
+            marginBottom: '24px'
+          }}>
+            Trop de tentatives erronées. Portefeuille verrouillé pour des raisons de sécurité.<br/>
+            <strong>Veuillez patienter : {Math.floor(lockoutCountdown / 60)}m {lockoutCountdown % 60}s</strong>
+          </div>
+        ) : (
+          <p style={{ fontSize: '0.85rem', color: '#94a3b8', lineHeight: 1.5, marginBottom: '28px', padding: '0 10px' }}>
+            Entrez votre code secret PIN à 6 chiffres pour accéder à votre portefeuille d'entreprise.
+          </p>
+        )}
 
         <form onSubmit={handleUnlockWallet}>
           <div style={{ marginBottom: '28px', textAlign: 'left' }}>
@@ -480,15 +797,16 @@ export default function WalletSection({ authFetch, showToast }) {
               </label>
               <button 
                 type="button" 
+                disabled={lockoutCountdown > 0}
                 onClick={() => setShowPin(!showPin)}
-                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: 0 }}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', display: 'flex', alignItems: 'center', padding: 0, opacity: lockoutCountdown > 0 ? 0.5 : 1 }}
               >
                 {showPin ? <EyeOff width="14" height="14" /> : <Eye width="14" height="14" />}
               </button>
             </div>
             <div style={{ position: 'relative', width: '100%', height: '48px' }}>
               {/* Visual circles */}
-              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%' }}>
+              <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', width: '100%', opacity: lockoutCountdown > 0 ? 0.35 : 1 }}>
                 {[0, 1, 2, 3, 4, 5].map((index) => {
                   const isFilled = passcodePin.length > index;
                   return (
@@ -522,47 +840,52 @@ export default function WalletSection({ authFetch, showToast }) {
                 })}
               </div>
               {/* Transparent input */}
-              <input 
-                type="text"
-                pattern="\d*"
-                inputMode="numeric"
-                value={passcodePin}
-                onChange={(e) => setPasscodePin(e.target.value.replace(/\D/g, '').slice(0,6))}
-                maxLength={6}
-                autoFocus
-                style={{
-                  position: 'absolute',
-                  opacity: 0,
-                  width: '100%',
-                  height: '100%',
-                  left: 0,
-                  top: 0,
-                  cursor: 'pointer',
-                  zIndex: 2
-                }}
-                required
-              />
+              {lockoutCountdown === 0 && (
+                <input 
+                  type="text"
+                  pattern="\d*"
+                  inputMode="numeric"
+                  value={passcodePin}
+                  onChange={(e) => setPasscodePin(e.target.value.replace(/\D/g, '').slice(0,6))}
+                  maxLength={6}
+                  autoFocus
+                  style={{
+                    position: 'absolute',
+                    opacity: 0,
+                    width: '100%',
+                    height: '100%',
+                    left: 0,
+                    top: 0,
+                    cursor: 'pointer',
+                    zIndex: 2
+                  }}
+                  required
+                />
+              )}
             </div>
           </div>
 
           <button 
             type="submit" 
-            disabled={verifying} 
+            disabled={verifying || lockoutCountdown > 0} 
             style={{ 
               width: '100%',
               padding: '14px',
               borderRadius: '12px',
               border: 'none',
-              background: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
-              color: '#fff',
+              background: lockoutCountdown > 0 
+                ? 'rgba(255,255,255,0.08)' 
+                : 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)',
+              color: lockoutCountdown > 0 ? '#64748b' : '#fff',
               fontWeight: '700',
               fontSize: '0.95rem',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               gap: '8px',
-              cursor: 'pointer',
-              boxShadow: '0 8px 16px -4px rgba(37, 99, 235, 0.3)',
+              cursor: lockoutCountdown > 0 ? 'not-allowed' : 'pointer',
+              marginBottom: '20px',
+              boxShadow: lockoutCountdown > 0 ? 'none' : '0 8px 16px -4px rgba(37, 99, 235, 0.3)',
               transition: 'all 0.2s ease'
             }}
           >
@@ -570,6 +893,14 @@ export default function WalletSection({ authFetch, showToast }) {
             <span>Déverrouiller le portefeuille</span>
           </button>
         </form>
+
+        <button 
+          type="button" 
+          onClick={() => setResetStep('request')}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#94a3b8', fontSize: '0.85rem', textDecoration: 'underline' }}
+        >
+          Code PIN secret oublié ?
+        </button>
       </div>
     );
   }

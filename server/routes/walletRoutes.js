@@ -9,6 +9,77 @@ function hashPasscode(passcode) {
     return crypto.createHash('sha256').update(passcode.toString()).digest('hex');
 }
 
+// Helper to verify passcode and handle lockout attempts
+async function verifyPasscodeAndLockout(userId, passcode) {
+    const { data: profile, error } = await db
+        .from('profiles')
+        .select('wallet_passcode, wallet_failed_attempts, wallet_locked_until')
+        .eq('id', userId)
+        .single();
+
+    if (error || !profile) {
+        return { valid: false, error: 'Profil introuvable.', status: 404 };
+    }
+
+    if (!profile.wallet_passcode) {
+        return { valid: false, error: 'Aucun code secret configuré.', status: 400, setupRequired: true };
+    }
+
+    // Check if locked
+    if (profile.wallet_locked_until) {
+        const lockedUntilDate = new Date(profile.wallet_locked_until);
+        const now = new Date();
+        if (lockedUntilDate > now) {
+            const remainingMs = lockedUntilDate - now;
+            const remainingMinutes = Math.ceil(remainingMs / 60000);
+            return {
+                valid: false,
+                error: `Trop de tentatives erronées. Portefeuille verrouillé. Veuillez réessayer dans ${remainingMinutes} minute(s).`,
+                status: 423,
+                lockedUntil: profile.wallet_locked_until,
+                attempts: profile.wallet_failed_attempts
+            };
+        }
+    }
+
+    const matches = profile.wallet_passcode === hashPasscode(passcode);
+
+    if (matches) {
+        // Reset attempts on success
+        await db
+            .from('profiles')
+            .update({ wallet_failed_attempts: 0, wallet_locked_until: null })
+            .eq('id', userId);
+
+        return { valid: true };
+    } else {
+        const newAttempts = (profile.wallet_failed_attempts || 0) + 1;
+        let lockedUntil = null;
+
+        if (newAttempts >= 7) {
+            lockedUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+        } else if (newAttempts >= 5) {
+            lockedUntil = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+        }
+
+        await db
+            .from('profiles')
+            .update({ 
+                wallet_failed_attempts: newAttempts, 
+                wallet_locked_until: lockedUntil 
+            })
+            .eq('id', userId);
+
+        return {
+            valid: false,
+            error: 'Code PIN de sécurité incorrect.',
+            status: 401,
+            attempts: newAttempts,
+            lockedUntil: lockedUntil
+        };
+    }
+}
+
 /**
  * POST /api/wallet/setup-passcode
  * Configure le code PIN de securite (premiere utilisation)
@@ -47,22 +118,16 @@ router.post('/verify-passcode', authenticate, async (req, res) => {
     }
 
     try {
-        const { data: profile, error } = await db
-            .from('profiles')
-            .select('wallet_passcode')
-            .eq('id', req.user.id)
-            .single();
-
-        if (error || !profile) {
-            return res.status(404).json({ error: 'Profile not found' });
+        const check = await verifyPasscodeAndLockout(req.user.id, passcode);
+        if (!check.valid) {
+            return res.status(check.status).json({
+                error: check.error,
+                attempts: check.attempts,
+                lockedUntil: check.lockedUntil,
+                setupRequired: check.setupRequired
+            });
         }
-
-        if (!profile.wallet_passcode) {
-            return res.status(400).json({ error: 'No passcode configured yet', setupRequired: true });
-        }
-
-        const matches = profile.wallet_passcode === hashPasscode(passcode);
-        res.json({ success: matches });
+        res.json({ success: true });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -77,7 +142,7 @@ router.get('/balance', authenticate, async (req, res) => {
         // 1. Recupere le solde disponible depuis le profil
         const { data: profile, error: profileErr } = await db
             .from('profiles')
-            .select('wallet_balance, wallet_phone, wallet_passcode')
+            .select('wallet_balance, wallet_phone, wallet_passcode, wallet_failed_attempts, wallet_locked_until')
             .eq('id', req.user.id)
             .single();
 
@@ -93,8 +158,6 @@ router.get('/balance', authenticate, async (req, res) => {
 
         if (ordersErr) throw ordersErr;
 
-        const pendingBalance = pendingOrders.reduce((acc, curr) => acc + parseFloat(curr.total_amount), 0);
-
         // 3. Calculer les ventes totales (historiques des payouts complets)
         const { data: totalSalesTx, error: txErr } = await db
             .from('wallet_transactions')
@@ -105,6 +168,7 @@ router.get('/balance', authenticate, async (req, res) => {
 
         if (txErr) throw txErr;
 
+        const pendingBalance = pendingOrders.reduce((acc, curr) => acc + parseFloat(curr.total_amount), 0);
         const totalSales = totalSalesTx.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
 
         res.json({
@@ -112,7 +176,9 @@ router.get('/balance', authenticate, async (req, res) => {
             pendingBalance,
             totalSales,
             walletPhone: profile.wallet_phone || '',
-            hasPasscode: !!profile.wallet_passcode
+            hasPasscode: !!profile.wallet_passcode,
+            walletFailedAttempts: profile.wallet_failed_attempts || 0,
+            walletLockedUntil: profile.wallet_locked_until || null
         });
 
     } catch (error) {
@@ -182,21 +248,18 @@ router.post('/withdraw', authenticate, async (req, res) => {
 
     try {
         // 1. Verifier le PIN secret
+        const check = await verifyPasscodeAndLockout(req.user.id, passcode);
+        if (!check.valid) {
+            return res.status(check.status).json({ error: check.error });
+        }
+
         const { data: profile, error: profileErr } = await db
             .from('profiles')
-            .select('wallet_passcode, wallet_balance')
+            .select('wallet_balance')
             .eq('id', req.user.id)
             .single();
 
         if (profileErr) throw profileErr;
-
-        if (!profile.wallet_passcode) {
-            return res.status(400).json({ error: 'No passcode configured yet' });
-        }
-
-        if (profile.wallet_passcode !== hashPasscode(passcode)) {
-            return res.status(401).json({ error: 'Incorrect passcode PIN' });
-        }
 
         const balance = parseFloat(profile.wallet_balance || 0);
         const withdrawAmount = parseFloat(amount);
@@ -323,6 +386,109 @@ router.post('/deposit', authenticate, async (req, res) => {
 
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+/**
+ * POST /api/wallet/forgot-passcode
+ * Demande un OTP de réinitialisation du code secret
+ */
+router.post('/forgot-passcode', authenticate, async (req, res) => {
+    try {
+        const { data: profile, error } = await db
+            .from('profiles')
+            .select('seller_application_data, email, phone')
+            .eq('id', req.user.id)
+            .single();
+
+        if (error || !profile) {
+            return res.status(404).json({ error: 'Profil introuvable.' });
+        }
+
+        // Générer un OTP à 6 chiffres
+        const resetOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        // Expire dans 10 minutes
+        const expires = new Date(Date.now() + 10 * 60 * 1000).toISOString();
+
+        const appData = profile.seller_application_data || {};
+        appData.passcode_reset_otp = resetOtp;
+        appData.passcode_reset_expires = expires;
+
+        const { error: updateErr } = await db
+            .from('profiles')
+            .update({ seller_application_data: appData })
+            .eq('id', req.user.id);
+
+        if (updateErr) throw updateErr;
+
+        // Simulation de messagerie (lorsqu'un service SMS ou Email sera branché)
+        console.log(`✉️ [OTP WALLET SIMULATION] Code de réinitialisation pour ${profile.email || 'l\'utilisateur'}: ${resetOtp}`);
+
+        res.json({
+            success: true,
+            message: 'Un code de réinitialisation (OTP) de 6 chiffres a été simulé avec succès.',
+            otp: resetOtp // Renvoyé pour faciliter les tests/la démonstration en local
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+/**
+ * POST /api/wallet/reset-passcode
+ * Réinitialise le code secret avec l'OTP valide
+ */
+router.post('/reset-passcode', authenticate, async (req, res) => {
+    const { otp, newPasscode } = req.body;
+
+    if (!otp || !newPasscode || newPasscode.toString().length !== 6 || isNaN(newPasscode)) {
+        return res.status(400).json({ error: 'Le code OTP et le nouveau code secret (6 chiffres) sont requis.' });
+    }
+
+    try {
+        const { data: profile, error } = await db
+            .from('profiles')
+            .select('seller_application_data')
+            .eq('id', req.user.id)
+            .single();
+
+        if (error || !profile) {
+            return res.status(404).json({ error: 'Profil introuvable.' });
+        }
+
+        const appData = profile.seller_application_data || {};
+        
+        if (!appData.passcode_reset_otp || appData.passcode_reset_otp !== otp.toString().trim()) {
+            return res.status(400).json({ error: 'Code OTP de réinitialisation incorrect.' });
+        }
+
+        const expires = new Date(appData.passcode_reset_expires);
+        if (expires < new Date()) {
+            return res.status(400).json({ error: 'Le code OTP de réinitialisation a expiré.' });
+        }
+
+        // Réinitialiser le code PIN
+        const hashed = hashPasscode(newPasscode);
+        
+        // Supprimer l'OTP de la DB
+        delete appData.passcode_reset_otp;
+        delete appData.passcode_reset_expires;
+
+        const { error: updateErr } = await db
+            .from('profiles')
+            .update({ 
+                wallet_passcode: hashed,
+                wallet_failed_attempts: 0,
+                wallet_locked_until: null,
+                seller_application_data: appData
+            })
+            .eq('id', req.user.id);
+
+        if (updateErr) throw updateErr;
+
+        res.json({ success: true, message: 'Votre code secret a été mis à jour avec succès.' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
 });
 
