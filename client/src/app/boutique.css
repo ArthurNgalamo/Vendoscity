@@ -1325,6 +1325,13 @@ body.vc-page-seller {
     display: none !important;
 }
 
+/* Hide cart FAB on mobile/tablet since it's already in the bottom taskbar */
+@media (max-width: 1023px) {
+    .cart-fab {
+        display: none !important;
+    }
+}
+
 /* ============================================================
  * PRODUCT DETAIL - WhatsApp CTA (mobile-first)
  * ============================================================ */
