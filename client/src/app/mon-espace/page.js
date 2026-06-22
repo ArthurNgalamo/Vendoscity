@@ -24,7 +24,8 @@ import {
   TrendingUp,
   Truck,
   Wallet,
-  QrCode
+  QrCode,
+  ShieldCheck
 } from 'lucide-react';
 import { getApiBaseUrl, fetchWithTimeout, getUserAvatarUrl, compressImage } from '../../core/api';
 
@@ -263,7 +264,14 @@ export default function MonEspacePage() {
                   }}
                 />
                 <div>
-                  <h2 style={{ margin: '0 0 4px 0', fontSize: '1.3rem', fontWeight: '700', letterSpacing: '-0.02em' }}>{profile?.shop_name || user?.shop_name || 'Mon Profil'}</h2>
+                  <h2 style={{ margin: '0 0 4px 0', fontSize: '1.3rem', fontWeight: '700', letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {profile?.shop_name || user?.shop_name || 'Mon Profil'}
+                    {profile?.is_verified && (
+                      <span title="Vendeur Certifié et Vérifié" style={{ display: 'inline-flex', alignItems: 'center', color: '#3b82f6' }}>
+                        <ShieldCheck width="18" height="18" fill="#3b82f6" color="#ffffff" />
+                      </span>
+                    )}
+                  </h2>
                   <span style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{profile?.email || user?.email}</span>
                 </div>
               </div>

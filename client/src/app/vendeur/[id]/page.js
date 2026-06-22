@@ -235,9 +235,11 @@ export default function SellerPublicPage({ params }) {
           <div>
             <div className="seller-title-wrapper">
               <h1 className="seller-title" id="seller-name">{shopName}</h1>
-              <span className="seller-badge-verified" title="Vendeur Vérifié">
-                <ShieldCheck width="14" height="14" fill="white" color="#007aff" />
-              </span>
+              {seller.is_verified && (
+                <span className="seller-badge-verified" title="Vendeur Vérifié">
+                  <ShieldCheck width="14" height="14" fill="white" color="#007aff" />
+                </span>
+              )}
             </div>
             <p className="seller-subtitle">
               Vitrine professionnelle certifiée. Contact direct sans commission intermédiaire.
@@ -286,7 +288,9 @@ export default function SellerPublicPage({ params }) {
             </div>
             <div className="seller-profile-header-text">
               <h2 className="seller-sidebar-title">{shopName}</h2>
-              <p className="seller-sidebar-subtitle">Boutique Vérifiée</p>
+              <p className="seller-sidebar-subtitle">
+                {seller.is_verified ? 'Boutique Vérifiée' : 'Boutique Pro'}
+              </p>
             </div>
           </div>
 

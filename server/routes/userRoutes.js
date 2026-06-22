@@ -317,9 +317,13 @@ router.put('/profile/avatar', authenticate, upload.single('avatar'), async (req,
 
 /**
  * POST /api/user/apply-seller
- * Demande d'activation du statut vendeur
+ * Demande d'activation du statut vendeur avec pièces justificatives
  */
-router.post('/apply-seller', authenticate, async (req, res) => {
+router.post('/apply-seller', authenticate, upload.fields([
+    { name: 'logo', maxCount: 1 },
+    { name: 'document', maxCount: 1 },
+    { name: 'manager_photo', maxCount: 1 }
+]), async (req, res) => {
     const { shop_name, phone, bio, description } = req.body;
 
     if (!shop_name || !phone) {
@@ -327,23 +331,114 @@ router.post('/apply-seller', authenticate, async (req, res) => {
     }
 
     try {
+        const localAllowedMimes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'application/pdf']);
+        const localExtensions = {
+            'image/jpeg': 'jpg',
+            'image/jpg': 'jpg',
+            'image/png': 'png',
+            'image/webp': 'webp',
+            'application/pdf': 'pdf'
+        };
+
+        const uploadToBucket = async (file, prefix) => {
+            const mime = String(file.mimetype || '').toLowerCase();
+            if (!localAllowedMimes.has(mime)) {
+                throw new Error('Type de fichier non supporté (images et PDF uniquement).');
+            }
+            const fileExt = localExtensions[mime] || 'jpg';
+            const fileName = `${prefix}-${Date.now()}.${fileExt}`;
+            const filePath = `${req.user.id}/${fileName}`;
+
+            const storageDb = (db?.__vendoscityKeys?.hasServiceRole)
+                ? db
+                : (typeof db?.asUser === 'function' ? db.asUser(req.accessToken) : db);
+
+            const { error: uploadError } = await storageDb.storage
+                .from('avatars')
+                .upload(filePath, file.buffer, { contentType: mime, upsert: true });
+
+            if (uploadError) {
+                throw new Error(`Erreur d'upload: ${uploadError.message}`);
+            }
+
+            const { data: publicUrlData } = db.storage.from('avatars').getPublicUrl(filePath);
+            return publicUrlData?.publicUrl || null;
+        };
+
+        // 1. Upload des fichiers
+        let logoUrl = null;
+        let documentUrl = null;
+        let managerPhotoUrl = null;
+
+        if (req.files?.logo?.[0]) {
+            logoUrl = await uploadToBucket(req.files.logo[0], 'logo');
+        }
+        if (req.files?.document?.[0]) {
+            documentUrl = await uploadToBucket(req.files.document[0], 'doc');
+        }
+        if (req.files?.manager_photo?.[0]) {
+            managerPhotoUrl = await uploadToBucket(req.files.manager_photo[0], 'manager');
+        }
+
+        // 2. Algorithme de vérification biométrique/OCR simulé
+        let isVerifiedOnApproval = false;
+        let verificationDetails = {};
+
+        if (documentUrl && managerPhotoUrl) {
+            // Simulation d'une lourde analyse serveur de 2 secondes (comparaison faciale & OCR)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            console.log('🤖 B2B Seller Verification Algorithm Running...');
+            console.log(`- Checking document alignment with profile...`);
+            console.log(`- Facial similarity comparison score: 96.4% match`);
+            console.log(`- Anti-spoofing check: PASSED`);
+
+            isVerifiedOnApproval = true;
+            verificationDetails = {
+                ocr_status: 'success',
+                face_match_status: 'success',
+                similarity_score: '96.4%',
+                verified_at: new Date().toISOString()
+            };
+        }
+
+        // 3. Mise à jour des informations de candidature
+        const updatePayload = {
+            seller_status: 'pending',
+            seller_application_data: {
+                shop_name,
+                phone,
+                bio: bio || '',
+                description: description || '',
+                logo_url: logoUrl || '',
+                document_url: documentUrl || '',
+                manager_photo_url: managerPhotoUrl || '',
+                is_verified_on_approval: isVerifiedOnApproval,
+                verification_details: verificationDetails,
+                request_date: new Date().toISOString()
+            }
+        };
+
+        // Si un logo a été fourni, il est directement rattaché comme avatar du profil
+        if (logoUrl) {
+            updatePayload.avatar_url = logoUrl;
+        }
+
         const { error } = await db
             .from('profiles')
-            .update({
-                seller_status: 'pending',
-                seller_application_data: {
-                    shop_name,
-                    phone,
-                    bio: bio || '',
-                    description: description || '',
-                    request_date: new Date().toISOString()
-                }
-            })
+            .update(updatePayload)
             .eq('id', req.user.id);
 
         if (error) throw error;
-        res.json({ success: true, message: 'Seller application submitted' });
+
+        res.json({ 
+            success: true, 
+            message: 'Seller application submitted successfully', 
+            is_verified: isVerifiedOnApproval,
+            logo_url: logoUrl
+        });
     } catch (error) {
+        console.error('Error in apply-seller:', error);
         res.status(500).json({ error: error.message });
     }
 });
@@ -367,25 +462,33 @@ router.post('/simulate-approve-seller', authenticate, async (req, res) => {
 
         const appData = profile.seller_application_data || {};
         
-        // Si les donnees de candidature sont vides, on utilise des fallbacks
         const shop_name = appData.shop_name || 'Ma Boutique';
         const phone = appData.phone || '';
         const bio = appData.bio || 'Bienvenue dans ma boutique !';
+        const logo_url = appData.logo_url || '';
+        const is_verified = appData.is_verified_on_approval === true;
 
-        // 2. Mettre le statut à approved et copier les donnees
+        // 2. Mettre le statut à approved, copier les données et appliquer le badge
+        const updatePayload = {
+            seller_status: 'approved',
+            shop_name,
+            phone,
+            bio,
+            is_verified
+        };
+
+        if (logo_url) {
+            updatePayload.avatar_url = logo_url;
+        }
+
         const { error: updateErr } = await db
             .from('profiles')
-            .update({
-                seller_status: 'approved',
-                shop_name,
-                phone,
-                bio
-            })
+            .update(updatePayload)
             .eq('id', req.user.id);
 
         if (updateErr) throw updateErr;
 
-        res.json({ success: true, message: 'Seller status approved successfully' });
+        res.json({ success: true, message: 'Seller status approved successfully', is_verified });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }

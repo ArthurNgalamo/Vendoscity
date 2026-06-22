@@ -155,7 +155,8 @@ function DashboardContent() {
         login_streak: profile.login_streak || 0,
         avg_response_time: profile.avg_response_time || null,
         response_count: profile.response_count || 0,
-        last_login_at: profile.last_login_at || null
+        last_login_at: profile.last_login_at || null,
+        is_verified: profile.is_verified || false
       });
       const parsedPhone = parsePhoneNumber(profile.phone || '');
       setSelectedCountry(parsedPhone.country);
@@ -238,7 +239,8 @@ function DashboardContent() {
         setProfileData(prev => ({ 
           ...prev, 
           phone: finalPhone,
-          avatar_url: updated.avatar_url || prev.avatar_url
+          avatar_url: updated.avatar_url || prev.avatar_url,
+          is_verified: updated.is_verified || prev.is_verified
         }));
         setProfile(updated);
         // Update user session metadata if needed

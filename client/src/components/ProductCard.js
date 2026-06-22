@@ -9,7 +9,7 @@ import { useFavorites } from '../context/FavoritesContext';
 import { useToast } from '../context/ToastContext';
 import { normalizeSupabaseImageUrl, formatCurrency, getApiBaseUrl } from '../core/api';
 import { shareLink } from '../core/share';
-import { Store, Share2, Star, Heart } from 'lucide-react';
+import { Store, Share2, Star, Heart, ShieldCheck } from 'lucide-react';
 
 function ProductCard({ product }) {
   const { addToCart, setCartOpen } = useCart();
@@ -205,14 +205,25 @@ function ProductCard({ product }) {
             <Link
               href={`/vendeur/${sellerId}`}
               className="product-shop-link"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}
             >
               <Store width="11" height="11" />
               <span>{sellerName}</span>
+              {product.seller?.is_verified && (
+                <span title="Vendeur Certifié" style={{ display: 'inline-flex', alignItems: 'center', color: '#3b82f6' }}>
+                  <ShieldCheck width="12" height="12" fill="#3b82f6" color="#ffffff" />
+                </span>
+              )}
             </Link>
           ) : (
-            <span className="product-shop-link fallback">
+            <span className="product-shop-link fallback" style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
               <Store width="11" height="11" />
               <span>{sellerName}</span>
+              {product.seller?.is_verified && (
+                <span title="Vendeur Certifié" style={{ display: 'inline-flex', alignItems: 'center', color: '#3b82f6' }}>
+                  <ShieldCheck width="12" height="12" fill="#3b82f6" color="#ffffff" />
+                </span>
+              )}
             </span>
           )}
           

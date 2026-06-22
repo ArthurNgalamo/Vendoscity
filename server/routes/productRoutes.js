@@ -595,13 +595,13 @@ async function attachSellerProfilesToProducts(products) {
         const orFilter = ids.map(id => `id.eq.${id}`).join(',');
         let { data: sellers, error } = await db
             .from('profiles')
-            .select('id,shop_name,first_name,last_name,phone,bio,last_login_at,login_streak,avg_response_time')
+            .select('id,shop_name,first_name,last_name,phone,bio,last_login_at,login_streak,avg_response_time,is_verified')
             .or(orFilter);
 
         if (error && isMissingColumn(error, 'shop_name')) {
             const retry = await db
                 .from('profiles')
-                .select('id,first_name,last_name,bio,last_login_at,login_streak,avg_response_time')
+                .select('id,first_name,last_name,bio,last_login_at,login_streak,avg_response_time,is_verified')
                 .or(orFilter);
             sellers = retry.data;
             error = retry.error;
@@ -611,14 +611,14 @@ async function attachSellerProfilesToProducts(products) {
             // Older schema without activity fields.
             const retry = await db
                 .from('profiles')
-                .select('id,shop_name,first_name,last_name,phone,bio')
+                .select('id,shop_name,first_name,last_name,phone,bio,is_verified')
                 .or(orFilter);
             sellers = retry.data;
             error = retry.error;
             if (error && isMissingColumn(error, 'shop_name')) {
                 const retry2 = await db
                     .from('profiles')
-                    .select('id,first_name,last_name,bio')
+                    .select('id,first_name,last_name,bio,is_verified')
                     .or(orFilter);
                 sellers = retry2.data;
                 error = retry2.error;

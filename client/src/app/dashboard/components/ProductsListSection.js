@@ -1,6 +1,5 @@
-// client/src/app/dashboard/components/ProductsListSection.js
 import React from 'react';
-import { Store, Share2, LogOut, Archive, Loader, Pencil, Trash2, AlertCircle, Plus } from 'lucide-react';
+import { Store, Share2, LogOut, Archive, Loader, Pencil, Trash2, AlertCircle, Plus, ShieldCheck } from 'lucide-react';
 
 export default function ProductsListSection({
   profileData,
@@ -20,8 +19,13 @@ export default function ProductsListSection({
       {/* Profile connection header */}
       <div className="dashboard-alert" style={{ background: '#d1e7dd', color: '#0f5132', borderLeftColor: '#0f5132', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
         <Store width="20" height="20" />
-        <span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
           Connecté en tant que Vendeur : <strong>{profileData.shopName || user?.shop_name || 'Boutique'}</strong>
+          {profileData.is_verified && (
+            <span title="Boutique Vérifiée (Badge de Confiance)" style={{ display: 'inline-flex', alignItems: 'center', color: '#3b82f6' }}>
+              <ShieldCheck width="18" height="18" fill="#3b82f6" color="#ffffff" />
+            </span>
+          )}
         </span>
         <button
           type="button"
@@ -77,13 +81,14 @@ export default function ProductsListSection({
 
         {/* Card 2: Shop Status */}
         <div style={{ background: '#fff', border: '1px solid #e5e7eb', borderRadius: '12px', padding: '20px', display: 'flex', alignItems: 'center', gap: '15px', boxShadow: '0 2px 8px rgba(0,0,0,0.02)' }}>
-          <div style={{ background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderRadius: '10px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <div style={{ background: profileData.is_verified ? 'rgba(59, 130, 246, 0.1)' : 'rgba(16, 185, 129, 0.1)', color: profileData.is_verified ? '#3b82f6' : '#10b981', borderRadius: '10px', width: '48px', height: '48px', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
              <Store width="22" height="22" />
           </div>
           <div>
             <div style={{ fontSize: '0.85rem', color: '#666', fontWeight: '600' }}>Statut Boutique</div>
-            <div style={{ fontSize: '1.05rem', fontWeight: '800', color: '#10b981', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }}></span> Active (Vérifiée)
+            <div style={{ fontSize: '1.05rem', fontWeight: '800', color: profileData.is_verified ? '#3b82f6' : '#10b981', marginTop: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: profileData.is_verified ? '#3b82f6' : '#10b981', display: 'inline-block' }}></span> 
+               {profileData.is_verified ? 'Active & Vérifiée' : 'Active (Standard)'}
             </div>
           </div>
         </div>

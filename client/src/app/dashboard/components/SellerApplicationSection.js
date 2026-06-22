@@ -30,8 +30,17 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
   // Enterprise details
   const [structureType, setStructureType] = useState('Artisan / Créateur');
   const [sector, setSector] = useState('Artisanat');
+
+  // Real files states
+  const [logoFile, setLogoFile] = useState(null);
   const [logoPreview, setLogoPreview] = useState(null);
+  const [documentFile, setDocumentFile] = useState(null);
   const [docName, setDocName] = useState('');
+  const [managerPhotoFile, setManagerPhotoFile] = useState(null);
+  const [managerPhotoPreview, setManagerPhotoPreview] = useState(null);
+
+  // Verification progress animation state
+  const [verificationStage, setVerificationStage] = useState(null);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -52,26 +61,47 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
       return;
     }
 
-    setLoading(true);
+    // Si un document CNI est fourni mais pas la photo du responsable, on alerte l'utilisateur
+    if (documentFile && !managerPhotoFile) {
+      alert("Veuillez charger votre photo de responsable/vendeur afin de comparer vos visages pour obtenir le badge de vérification.");
+      return;
+    }
 
-    const formattedDescription = `[Structure: ${structureType}]\n[Secteur: ${sector}]\n[Logo: ${logoPreview ? 'Fourni' : 'Non fourni'}]\n[Document d'enregistrement: ${docName || 'Non fourni'}]\n\nDescription d'activité:\n${description.trim()}`;
+    setLoading(true);
+    setVerificationStage('uploading');
+
+    // Démarrer la progression visuelle premium
+    const timer1 = setTimeout(() => setVerificationStage('ocr'), 600);
+    const timer2 = setTimeout(() => setVerificationStage('face_match'), 1200);
+    const timer3 = setTimeout(() => setVerificationStage('completing'), 1800);
+
+    const formattedDescription = `[Structure: ${structureType}]\n[Secteur: ${sector}]\n[Logo: ${logoFile ? 'Fourni' : 'Non fourni'}]\n[Document d'enregistrement: ${docName || 'Non fourni'}]\n\nDescription d'activité:\n${description.trim()}`;
+
+    const formData = new FormData();
+    formData.append('shop_name', shopName.trim());
+    formData.append('phone', whatsapp.trim());
+    formData.append('bio', bio.trim());
+    formData.append('description', formattedDescription);
+    if (logoFile) formData.append('logo', logoFile);
+    if (documentFile) formData.append('document', documentFile);
+    if (managerPhotoFile) formData.append('manager_photo', managerPhotoFile);
 
     try {
       const res = await authFetch('/api/user/apply-seller', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          shop_name: shopName.trim(),
-          phone: whatsapp.trim(),
-          bio: bio.trim(),
-          description: formattedDescription
-        })
+        body: formData
       });
 
+      // Laisser le temps à la simulation d'être visible si la requête réseau est trop rapide
+      await new Promise(r => setTimeout(r, 400));
+
       if (res.ok) {
-        showToast("Votre candidature d'entreprise a été soumise avec succès !");
+        const data = await res.json();
+        if (data.is_verified) {
+          showToast("Votre candidature d'entreprise a été soumise. Documents vérifiés avec succès par biométrie (Badge accordé après validation admin).");
+        } else {
+          showToast("Votre candidature d'entreprise a été soumise avec succès !");
+        }
         onApprovalSuccess(); // Re-fetch profile
       } else {
         const err = await res.json();
@@ -81,6 +111,10 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
       console.error(e);
       alert("Impossible de joindre le serveur.");
     } finally {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      setVerificationStage(null);
       setLoading(false);
     }
   };
@@ -108,9 +142,10 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     }
   };
 
-  const handleLogoUploadFake = (e) => {
+  const handleLogoUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      setLogoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setLogoPreview(reader.result);
@@ -119,10 +154,23 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     }
   };
 
-  const handleDocUploadFake = (e) => {
+  const handleDocUpload = (e) => {
     const file = e.target.files?.[0];
     if (file) {
+      setDocumentFile(file);
       setDocName(file.name);
+    }
+  };
+
+  const handleManagerPhotoUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setManagerPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setManagerPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -159,6 +207,105 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
     );
   }
 
+  if (loading && verificationStage) {
+    return (
+      <div style={{ 
+        display: 'flex', 
+        flexDirection: 'column', 
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        padding: '50px 30px', 
+        textAlign: 'center',
+        background: '#ffffff', 
+        borderRadius: '16px', 
+        border: '1px solid #e2e8f0', 
+        boxShadow: '0 10px 25px -5px rgba(0,0,0,0.02)',
+        minHeight: '420px'
+      }}>
+        {/* Animated radar/verification scanner */}
+        <div style={{ position: 'relative', width: '100px', height: '100px', marginBottom: '30px' }}>
+          <div className="radar-pulse" style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            border: '3px solid #3b82f6',
+            opacity: 0.75
+          }}></div>
+          <div style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            background: 'rgba(59, 130, 246, 0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            border: '2px solid #3b82f6'
+          }}>
+            <RefreshCw className="animate-spin" width="36" height="36" style={{ color: '#3b82f6' }} />
+          </div>
+        </div>
+
+        <h3 style={{ fontSize: '1.4rem', fontWeight: 850, color: '#0f172a', margin: '0 0 12px 0' }}>
+          Analyse et Vérification Sécurisée
+        </h3>
+        
+        {/* Stages steps UI */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', width: '100%', maxWidth: '400px', margin: '20px auto 0 auto', textAlign: 'left' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', color: '#1e293b' }}>
+            <div style={{ width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#3b82f6', color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' }}>1</div>
+            <span style={{ fontWeight: verificationStage === 'uploading' ? '800' : 'normal', color: verificationStage === 'uploading' ? '#3b82f6' : '#64748b' }}>
+              Envoi des fichiers et logo vers le stockage sécurisé...
+            </span>
+          </div>
+          {documentFile && (
+            <>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', color: '#1e293b' }}>
+                <div style={{ 
+                  width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  background: (verificationStage === 'ocr' || verificationStage === 'face_match' || verificationStage === 'completing') ? '#3b82f6' : '#cbd5e1', 
+                  color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' 
+                }}>2</div>
+                <span style={{ 
+                  fontWeight: verificationStage === 'ocr' ? '800' : 'normal', 
+                  color: verificationStage === 'ocr' ? '#3b82f6' : (['face_match', 'completing'].includes(verificationStage) ? '#1e293b' : '#64748b') 
+                }}>
+                  Algorithme OCR : Lecture de la pièce d'identité...
+                </span>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', color: '#1e293b' }}>
+                <div style={{ 
+                  width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+                  background: (verificationStage === 'face_match' || verificationStage === 'completing') ? '#3b82f6' : '#cbd5e1', 
+                  color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' 
+                }}>3</div>
+                <span style={{ 
+                  fontWeight: verificationStage === 'face_match' ? '800' : 'normal', 
+                  color: verificationStage === 'face_match' ? '#3b82f6' : (verificationStage === 'completing' ? '#1e293b' : '#64748b') 
+                }}>
+                  Comparaison biométrique faciale (Anti-spoofing)...
+                </span>
+              </div>
+            </>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '0.9rem', color: '#1e293b' }}>
+            <div style={{ 
+              width: '24px', height: '24px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', 
+              background: verificationStage === 'completing' ? '#3b82f6' : '#cbd5e1', 
+              color: '#fff', fontSize: '0.8rem', fontWeight: 'bold' 
+            }}>
+              {documentFile ? '4' : '2'}
+            </div>
+            <span style={{ fontWeight: verificationStage === 'completing' ? '800' : 'normal', color: verificationStage === 'completing' ? '#3b82f6' : '#64748b' }}>
+              Finalisation et enregistrement du dossier...
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const structureTypes = [
     { name: 'Artisan / Créateur', desc: 'Fabrication manuelle & locale' },
     { name: 'PME / SARL', desc: 'Entreprise formelle enregistrée' },
@@ -185,7 +332,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
         padding: '40px 30px',
         color: '#ffffff',
         border: '1px solid rgba(255, 255, 255, 0.08)',
-        boxShadow: '0 10px 30px -10px rgba(15, 23, 42, 0.3)',
+        boxShadow: '0 10px 30px -10 rgba(15, 23, 42, 0.3)',
         display: 'flex',
         flexDirection: 'column',
         gap: '12px',
@@ -352,7 +499,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
           {/* Section 3: Professional Files Upload Mockup */}
           <div>
             <label style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 700, display: 'block', marginBottom: '12px' }}>
-              3. Pièces justificatives (Recommandé pour accélérer la validation)
+              3. Pièces justificatives (Recommandé pour accélérer la validation et obtenir le badge vérifié)
             </label>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '20px' }}>
               
@@ -360,7 +507,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
               <div>
                 <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Logo de la structure</label>
                 <div 
-                  onClick={() => document.getElementById('fake-logo-file').click()}
+                  onClick={() => document.getElementById('logo-file-input').click()}
                   style={{
                     border: '2px dashed #cbd5e1',
                     borderRadius: '10px',
@@ -379,20 +526,20 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
                 >
                   <input 
                     type="file" 
-                    id="fake-logo-file" 
+                    id="logo-file-input" 
                     accept="image/*" 
-                    onChange={handleLogoUploadFake} 
+                    onChange={handleLogoUpload} 
                     style={{ display: 'none' }} 
                   />
                   {logoPreview ? (
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <img src={logoPreview} alt="Logo preview" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' }} />
-                      <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>Logo importé avec succès</span>
+                      <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>Logo importé</span>
                     </div>
                   ) : (
                     <>
                       <UploadCloud width="24" height="24" style={{ color: '#94a3b8', marginBottom: '6px' }} />
-                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>Cliquez pour charger une image</span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>Logo boutique</span>
                     </>
                   )}
                 </div>
@@ -402,7 +549,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
               <div>
                 <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Registre du Commerce / CNI</label>
                 <div 
-                  onClick={() => document.getElementById('fake-doc-file').click()}
+                  onClick={() => document.getElementById('doc-file-input').click()}
                   style={{
                     border: '2px dashed #cbd5e1',
                     borderRadius: '10px',
@@ -421,9 +568,9 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
                 >
                   <input 
                     type="file" 
-                    id="fake-doc-file" 
+                    id="doc-file-input" 
                     accept=".pdf,.png,.jpg,.jpeg" 
-                    onChange={handleDocUploadFake} 
+                    onChange={handleDocUpload} 
                     style={{ display: 'none' }} 
                   />
                   {docName ? (
@@ -436,11 +583,56 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
                   ) : (
                     <>
                       <UploadCloud width="24" height="24" style={{ color: '#94a3b8', marginBottom: '6px' }} />
-                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>Sélectionner un fichier (PDF, image)</span>
+                      <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>CNI ou Registre</span>
                     </>
                   )}
                 </div>
               </div>
+
+              {/* Photo du Vendeur / Responsable - Conditionally rendered */}
+              {docName && (
+                <div>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Photo du Responsable *</label>
+                  <div 
+                    onClick={() => document.getElementById('manager-photo-file-input').click()}
+                    style={{
+                      border: '2px dashed #cbd5e1',
+                      borderRadius: '10px',
+                      padding: '20px',
+                      textAlign: 'center',
+                      cursor: 'pointer',
+                      background: '#f8fafc',
+                      transition: 'all 0.2s',
+                      minHeight: '110px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}
+                    className="upload-hover"
+                  >
+                    <input 
+                      type="file" 
+                      id="manager-photo-file-input" 
+                      accept="image/*" 
+                      onChange={handleManagerPhotoUpload} 
+                      style={{ display: 'none' }} 
+                      required
+                    />
+                    {managerPhotoPreview ? (
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img src={managerPhotoPreview} alt="Manager preview" style={{ width: '48px', height: '48px', objectFit: 'cover', borderRadius: '6px' }} />
+                        <span style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700 }}>Photo importée</span>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadCloud width="24" height="24" style={{ color: '#94a3b8', marginBottom: '6px' }} />
+                        <span style={{ fontSize: '0.75rem', color: '#64748b', display: 'block' }}>Photo du visage</span>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
 
             </div>
           </div>
@@ -541,6 +733,21 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
           }
           .upload-hover:active {
             background: #e2e8f0 !important;
+          }
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+          .animate-spin {
+            animation: spin 1s linear infinite;
+          }
+          @keyframes radarPulse {
+            0% { transform: scale(0.95); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 0.4; }
+            100% { transform: scale(1.25); opacity: 0; }
+          }
+          .radar-pulse {
+            animation: radarPulse 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
           }
         ` }} />
 

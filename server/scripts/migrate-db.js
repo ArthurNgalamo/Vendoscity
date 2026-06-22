@@ -191,6 +191,7 @@ async function runMigrations() {
                     ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS wallet_phone TEXT;
                     ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_status VARCHAR(50) DEFAULT 'none';
                     ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_application_data JSONB DEFAULT '{}'::jsonb;
+                    ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT false;
                 END IF;
 
                 -- Update orders table

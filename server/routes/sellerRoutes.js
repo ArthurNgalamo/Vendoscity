@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
     try {
         const { data: sellers, error: sellerError } = await db
             .from('profiles')
-            .select('id, shop_name, first_name, last_name, bio, created_at, last_login_at, avatar_url, avg_response_time')
+            .select('id, shop_name, first_name, last_name, bio, created_at, last_login_at, avatar_url, avg_response_time, is_verified')
             .not('shop_name', 'is', null)
             .neq('shop_name', '')
             .order('shop_name', { ascending: true });
@@ -48,14 +48,14 @@ router.get('/:id', async (req, res) => {
 
     let { data, error } = await db
         .from('profiles')
-        .select('id,shop_name,first_name,last_name,bio,created_at,last_login_at,avatar_url')
+        .select('id,shop_name,first_name,last_name,bio,created_at,last_login_at,avatar_url,is_verified')
         .eq('id', id)
         .single();
 
     if (error && (error.code === '42703' || String(error.message || '').includes('shop_name'))) {
         const retry = await db
             .from('profiles')
-            .select('id,first_name,last_name,bio,created_at,last_login_at,avatar_url')
+            .select('id,first_name,last_name,bio,created_at,last_login_at,avatar_url,is_verified')
             .eq('id', id)
             .single();
         data = retry.data;
