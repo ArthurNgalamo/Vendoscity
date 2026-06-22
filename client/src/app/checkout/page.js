@@ -78,27 +78,14 @@ export default function CheckoutPage() {
     }
   };
 
-  if (!hasMounted) {
-    return (
-      <div style={{ textAlign: 'center', padding: '100px 0', color: '#64748b' }}>
-        <p>Chargement de la commande...</p>
-      </div>
-    );
-  }
-
-  if (!checkoutData) {
-    return (
-      <div style={{ maxWidth: '800px', margin: '80px auto', padding: '0 20px', textAlign: 'center' }}>
-        <h2>Votre panier est vide</h2>
-        <p>Veuillez d'abord ajouter des articles au panier avant de procéder au paiement.</p>
-        <Link href="/panier" className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '20px', textDecoration: 'none', color: '#ff6a00', fontWeight: 'bold' }}>
-          <ArrowLeft width="16" height="16" /> Retour au panier
-        </Link>
-      </div>
-    );
-  }
-
-  const { items, sellerName, sellerWhatsApp, sellerId, deliveryLocation, appliedPromo } = checkoutData;
+  const { 
+    items = [], 
+    sellerName = '', 
+    sellerWhatsApp = '', 
+    sellerId = '', 
+    deliveryLocation = '', 
+    appliedPromo = null 
+  } = checkoutData || {};
 
   const isGroupBuy = items && items.some(it => it.is_group_buy);
 
@@ -346,6 +333,26 @@ export default function CheckoutPage() {
   };
 
   const apiBaseUrl = getApiBaseUrl();
+
+  if (!hasMounted) {
+    return (
+      <div style={{ textAlign: 'center', padding: '100px 0', color: '#64748b' }}>
+        <p>Chargement de la commande...</p>
+      </div>
+    );
+  }
+
+  if (!checkoutData) {
+    return (
+      <div style={{ maxWidth: '800px', margin: '80px auto', padding: '0 20px', textAlign: 'center' }}>
+        <h2>Votre panier est vide</h2>
+        <p>Veuillez d'abord ajouter des articles au panier avant de procéder au paiement.</p>
+        <Link href="/panier" className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '20px', textDecoration: 'none', color: '#ff6a00', fontWeight: 'bold' }}>
+          <ArrowLeft width="16" height="16" /> Retour au panier
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <main style={{ backgroundColor: '#fafafb', minHeight: '100vh', paddingBottom: '60px' }}>
