@@ -1523,59 +1523,109 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
                 Aucune opération de crédit ou débit enregistrée.
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid #f1f5f9', color: '#64748b', fontWeight: '700' }}>
-                      <th style={{ padding: '10px 8px' }}>Date & Heure</th>
-                      <th style={{ padding: '10px 8px' }}>Opération</th>
-                      <th style={{ padding: '10px 8px' }}>Détails</th>
-                      <th style={{ padding: '10px 8px' }}>Montant</th>
-                      <th style={{ padding: '10px 8px', textAlign: 'right' }}>Statut</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.slice(0, 5).map((tx, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #f8fafc', color: '#1e293b' }} className="tx-row">
-                        <td style={{ padding: '12px 8px', color: '#64748b', fontSize: '0.72rem' }}>
-                          {new Date(tx.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                        </td>
-                        <td style={{ padding: '12px 8px', fontWeight: 'bold' }}>
-                          {tx.type === 'deposit' && <span style={{ color: '#047857', background: '#ecfdf5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Crédit / Dépôt</span>}
-                          {tx.type === 'payout' && <span style={{ color: '#1d4ed8', background: '#eff6ff', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Revenu Vente</span>}
-                          {tx.type === 'withdrawal' && <span style={{ color: '#b91c1c', background: '#fef2f2', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Débit / Retrait</span>}
-                          {tx.type === 'refund' && <span style={{ color: '#d97706', background: '#fffbeb', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Remboursement</span>}
-                        </td>
-                        <td style={{ padding: '12px 8px', fontSize: '0.75rem', color: '#475569' }}>
-                          {tx.details || (tx.order_id ? `Vente commande #${tx.order_id.substring(0,8)}` : 'Ajustement portefeuille')}
-                        </td>
-                        <td style={{ padding: '12px 8px', fontWeight: '800' }}>
-                          {tx.type === 'withdrawal' ? (
-                            <span style={{ color: '#ef4444' }}>-{tx.amount.toLocaleString('fr-FR')} F</span>
-                          ) : (
-                            <span style={{ color: '#10b981' }}>+{tx.amount.toLocaleString('fr-FR')} F</span>
-                          )}
-                        </td>
-                        <td style={{ padding: '12px 8px', textAlign: 'right' }}>
-                          {tx.status === 'completed' || tx.status === 'approved' ? (
-                            <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                              <CheckCircle width="11" height="11" /> Validé
-                            </span>
-                          ) : tx.status === 'pending' ? (
-                            <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                              <Clock width="11" height="11" /> En cours
-                            </span>
-                          ) : (
-                            <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                              <XCircle width="11" height="11" /> Échoué
-                            </span>
-                          )}
-                        </td>
+              <>
+                <div className="desktop-tx-table" style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8rem', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid #f1f5f9', color: '#64748b', fontWeight: '700' }}>
+                        <th style={{ padding: '10px 8px' }}>Date & Heure</th>
+                        <th style={{ padding: '10px 8px' }}>Opération</th>
+                        <th style={{ padding: '10px 8px' }}>Détails</th>
+                        <th style={{ padding: '10px 8px' }}>Montant</th>
+                        <th style={{ padding: '10px 8px', textAlign: 'right' }}>Statut</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {transactions.slice(0, 5).map((tx, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #f8fafc', color: '#1e293b' }} className="tx-row">
+                          <td style={{ padding: '12px 8px', color: '#64748b', fontSize: '0.72rem' }}>
+                            {new Date(tx.date).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontWeight: 'bold' }}>
+                            {tx.type === 'deposit' && <span style={{ color: '#047857', background: '#ecfdf5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Crédit / Dépôt</span>}
+                            {tx.type === 'payout' && <span style={{ color: '#1d4ed8', background: '#eff6ff', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Revenu Vente</span>}
+                            {tx.type === 'withdrawal' && <span style={{ color: '#b91c1c', background: '#fef2f2', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Débit / Retrait</span>}
+                            {tx.type === 'refund' && <span style={{ color: '#d97706', background: '#fffbeb', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Remboursement</span>}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontSize: '0.75rem', color: '#475569' }}>
+                            {tx.details || (tx.order_id ? `Vente commande #${tx.order_id.substring(0,8)}` : 'Ajustement portefeuille')}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontWeight: '800' }}>
+                            {tx.type === 'withdrawal' ? (
+                              <span style={{ color: '#ef4444' }}>-{tx.amount.toLocaleString('fr-FR')} F</span>
+                            ) : (
+                              <span style={{ color: '#10b981' }}>+{tx.amount.toLocaleString('fr-FR')} F</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px 8px', textAlign: 'right' }}>
+                            {tx.status === 'completed' || tx.status === 'approved' ? (
+                              <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
+                                <CheckCircle width="11" height="11" /> Validé
+                              </span>
+                            ) : tx.status === 'pending' ? (
+                              <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
+                                <Clock width="11" height="11" /> En cours
+                              </span>
+                            ) : (
+                              <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
+                                <XCircle width="11" height="11" /> Échoué
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mobile-tx-list" style={{ display: 'none' }}>
+                  {transactions.slice(0, 5).map((tx, idx) => (
+                    <div key={idx} style={{ 
+                      background: '#f8fafc', 
+                      borderRadius: '12px', 
+                      padding: '14px', 
+                      border: '1px solid #e2e8f0', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '8px',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
+                          {new Date(tx.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {tx.status === 'completed' || tx.status === 'approved' ? (
+                          <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.68rem' }}>
+                            <CheckCircle width="10" height="10" /> Validé
+                          </span>
+                        ) : tx.status === 'pending' ? (
+                          <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.68rem' }}>
+                            <Clock width="10" height="10" /> En cours
+                          </span>
+                        ) : (
+                          <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.68rem' }}>
+                            <XCircle width="10" height="10" /> Échoué
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.78rem', color: '#1e293b', fontWeight: 700 }}>
+                          {tx.details || (tx.order_id ? `Vente #${tx.order_id.substring(0,8)}` : 'Ajustement')}
+                        </span>
+                        <span style={{ fontWeight: '900', fontSize: '0.85rem', color: tx.type === 'withdrawal' ? '#ef4444' : '#10b981' }}>
+                          {tx.type === 'withdrawal' ? '-' : '+'}{tx.amount.toLocaleString('fr-FR')} F
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {tx.type === 'deposit' && <span style={{ color: '#047857', background: '#ecfdf5', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Dépôt</span>}
+                        {tx.type === 'payout' && <span style={{ color: '#1d4ed8', background: '#eff6ff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Vente</span>}
+                        {tx.type === 'withdrawal' && <span style={{ color: '#b91c1c', background: '#fef2f2', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Retrait</span>}
+                        {tx.type === 'refund' && <span style={{ color: '#d97706', background: '#fffbeb', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Remboursement</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -1948,59 +1998,109 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
                 Aucune transaction ne correspond à vos critères de recherche.
               </div>
             ) : (
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontWeight: '700' }}>
-                      <th style={{ padding: '12px 8px' }}>Horodatage complet</th>
-                      <th style={{ padding: '12px 8px' }}>Type d'opération</th>
-                      <th style={{ padding: '12px 8px' }}>Détails / Réf</th>
-                      <th style={{ padding: '12px 8px' }}>Flux financier</th>
-                      <th style={{ padding: '12px 8px', textAlign: 'right' }}>Statut final</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredTransactions.map((tx, idx) => (
-                      <tr key={idx} style={{ borderBottom: '1px solid #f8fafc', color: '#1e293b' }} className="tx-row">
-                        <td style={{ padding: '12px 8px', color: '#64748b', fontSize: '0.75rem' }}>
-                          {new Date(tx.date).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                        </td>
-                        <td style={{ padding: '12px 8px', fontWeight: 'bold' }}>
-                          {tx.type === 'deposit' && <span style={{ color: '#047857', background: '#ecfdf5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Crédit / Dépôt</span>}
-                          {tx.type === 'payout' && <span style={{ color: '#1d4ed8', background: '#eff6ff', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Revenu Vente</span>}
-                          {tx.type === 'withdrawal' && <span style={{ color: '#b91c1c', background: '#fef2f2', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Débit / Retrait</span>}
-                          {tx.type === 'refund' && <span style={{ color: '#d97706', background: '#fffbeb', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Remboursement</span>}
-                        </td>
-                        <td style={{ padding: '12px 8px', fontSize: '0.78rem', color: '#475569' }}>
-                          {tx.details || (tx.order_id ? `Vente commande #${tx.order_id.substring(0,8)}` : 'Ajustement de caisse')}
-                        </td>
-                        <td style={{ padding: '12px 8px', fontWeight: '800' }}>
-                          {tx.type === 'withdrawal' ? (
-                            <span style={{ color: '#ef4444' }}>-{tx.amount.toLocaleString('fr-FR')} F</span>
-                          ) : (
-                            <span style={{ color: '#10b981' }}>+{tx.amount.toLocaleString('fr-FR')} F</span>
-                          )}
-                        </td>
-                        <td style={{ padding: '12px 8px', textAlign: 'right' }}>
-                          {tx.status === 'completed' || tx.status === 'approved' ? (
-                            <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                              <CheckCircle width="11" height="11" /> Validé
-                            </span>
-                          ) : tx.status === 'pending' ? (
-                            <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                              <Clock width="11" height="11" /> En cours
-                            </span>
-                          ) : (
-                            <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
-                              <XCircle width="11" height="11" /> Échoué
-                            </span>
-                          )}
-                        </td>
+              <>
+                <div className="desktop-tx-table" style={{ overflowX: 'auto' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.82rem', textAlign: 'left' }}>
+                    <thead>
+                      <tr style={{ borderBottom: '2px solid #f1f5f9', color: '#64748b', fontWeight: '700' }}>
+                        <th style={{ padding: '12px 8px' }}>Horodatage complet</th>
+                        <th style={{ padding: '12px 8px' }}>Type d'opération</th>
+                        <th style={{ padding: '12px 8px' }}>Détails / Réf</th>
+                        <th style={{ padding: '12px 8px' }}>Flux financier</th>
+                        <th style={{ padding: '12px 8px', textAlign: 'right' }}>Statut final</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {filteredTransactions.map((tx, idx) => (
+                        <tr key={idx} style={{ borderBottom: '1px solid #f8fafc', color: '#1e293b' }} className="tx-row">
+                          <td style={{ padding: '12px 8px', color: '#64748b', fontSize: '0.75rem' }}>
+                            {new Date(tx.date).toLocaleString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontWeight: 'bold' }}>
+                            {tx.type === 'deposit' && <span style={{ color: '#047857', background: '#ecfdf5', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Crédit / Dépôt</span>}
+                            {tx.type === 'payout' && <span style={{ color: '#1d4ed8', background: '#eff6ff', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Revenu Vente</span>}
+                            {tx.type === 'withdrawal' && <span style={{ color: '#b91c1c', background: '#fef2f2', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Débit / Retrait</span>}
+                            {tx.type === 'refund' && <span style={{ color: '#d97706', background: '#fffbeb', padding: '3px 8px', borderRadius: '6px', fontSize: '0.7rem' }}>Remboursement</span>}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontSize: '0.78rem', color: '#475569' }}>
+                            {tx.details || (tx.order_id ? `Vente commande #${tx.order_id.substring(0,8)}` : 'Ajustement de caisse')}
+                          </td>
+                          <td style={{ padding: '12px 8px', fontWeight: '800' }}>
+                            {tx.type === 'withdrawal' ? (
+                              <span style={{ color: '#ef4444' }}>-{tx.amount.toLocaleString('fr-FR')} F</span>
+                            ) : (
+                              <span style={{ color: '#10b981' }}>+{tx.amount.toLocaleString('fr-FR')} F</span>
+                            )}
+                          </td>
+                          <td style={{ padding: '12px 8px', textAlign: 'right' }}>
+                            {tx.status === 'completed' || tx.status === 'approved' ? (
+                              <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
+                                <CheckCircle width="11" height="11" /> Validé
+                              </span>
+                            ) : tx.status === 'pending' ? (
+                              <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
+                                <Clock width="11" height="11" /> En cours
+                              </span>
+                            ) : (
+                              <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.7rem' }}>
+                                <XCircle width="11" height="11" /> Échoué
+                              </span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mobile-tx-list" style={{ display: 'none' }}>
+                  {filteredTransactions.map((tx, idx) => (
+                    <div key={idx} style={{ 
+                      background: '#f8fafc', 
+                      borderRadius: '12px', 
+                      padding: '14px', 
+                      border: '1px solid #e2e8f0', 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      gap: '8px',
+                      marginBottom: '8px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.7rem', color: '#64748b', fontWeight: 600 }}>
+                          {new Date(tx.date).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        {tx.status === 'completed' || tx.status === 'approved' ? (
+                          <span style={{ color: '#059669', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.68rem' }}>
+                            <CheckCircle width="10" height="10" /> Validé
+                          </span>
+                        ) : tx.status === 'pending' ? (
+                          <span style={{ color: '#d97706', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.68rem' }}>
+                            <Clock width="10" height="10" /> En cours
+                          </span>
+                        ) : (
+                          <span style={{ color: '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '3px', fontWeight: 'bold', fontSize: '0.68rem' }}>
+                            <XCircle width="10" height="10" /> Échoué
+                          </span>
+                        )}
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <span style={{ fontSize: '0.78rem', color: '#1e293b', fontWeight: 700 }}>
+                          {tx.details || (tx.order_id ? `Vente #${tx.order_id.substring(0,8)}` : 'Ajustement')}
+                        </span>
+                        <span style={{ fontWeight: '900', fontSize: '0.85rem', color: tx.type === 'withdrawal' ? '#ef4444' : '#10b981' }}>
+                          {tx.type === 'withdrawal' ? '-' : '+'}{tx.amount.toLocaleString('fr-FR')} F
+                        </span>
+                      </div>
+                      <div style={{ display: 'flex', gap: '6px' }}>
+                        {tx.type === 'deposit' && <span style={{ color: '#047857', background: '#ecfdf5', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Dépôt</span>}
+                        {tx.type === 'payout' && <span style={{ color: '#1d4ed8', background: '#eff6ff', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Vente</span>}
+                        {tx.type === 'withdrawal' && <span style={{ color: '#b91c1c', background: '#fef2f2', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Retrait</span>}
+                        {tx.type === 'refund' && <span style={{ color: '#d97706', background: '#fffbeb', padding: '2px 6px', borderRadius: '4px', fontSize: '0.65rem', fontWeight: 'bold' }}>Remboursement</span>}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
             )}
           </div>
         </div>
@@ -2134,10 +2234,51 @@ export default function WalletSection({ authFetch, showToast, isUnlocked, setIsU
           fill: #3b82f6;
           stroke: #ffffff;
         }
+        
+        .desktop-tx-table {
+          display: block;
+        }
+        .mobile-tx-list {
+          display: none;
+        }
+
         @media (max-width: 768px) {
           .wallet-corporate-cols {
             grid-template-columns: 1fr !important;
             gap: 20px !important;
+          }
+          .desktop-tx-table {
+            display: none !important;
+          }
+          .mobile-tx-list {
+            display: flex !important;
+            flex-direction: column;
+            gap: 12px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          /* target metrics cards */
+          div[style*="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))"] > div {
+            padding: 16px !important;
+            border-radius: 12px !important;
+          }
+          /* target card values */
+          div[style*="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr))"] span[style*="font-size: 1.9rem"] {
+            font-size: 1.45rem !important;
+            margin: 8px 0 4px 0 !important;
+          }
+        }
+
+        @media (max-width: 360px) {
+          /* scale down PIN circles */
+          div[style*="gap: 10px"][style*="justify-content: center"] {
+            gap: 6px !important;
+          }
+          div[style*="gap: 10px"][style*="justify-content: center"] > div {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 1rem !important;
           }
         }
       ` }} />

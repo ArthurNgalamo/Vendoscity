@@ -543,7 +543,7 @@ function DashboardContent() {
     <div style={{ background: '#f4f7f6', minHeight: '80vh', paddingTop: '20px' }}>
 
       {/* Main dashboard body */}
-      <div className="dashboard-container" style={{ gridTemplateColumns: (activeSection === 'wallet' && isWalletUnlocked) ? '1fr' : '250px 1fr' }}>
+      <div className={`dashboard-container ${(activeSection === 'wallet' && isWalletUnlocked) ? 'wallet-unlocked' : ''}`}>
         
         {/* Sidebar menu */}
         {!(activeSection === 'wallet' && isWalletUnlocked) && (

@@ -25,6 +25,9 @@
     gap: 30px;
     min-height: 80vh;
 }
+.dashboard-container.wallet-unlocked {
+    grid-template-columns: 1fr;
+}
 .dashboard-sidebar {
     background: white;
     border-radius: 12px;
