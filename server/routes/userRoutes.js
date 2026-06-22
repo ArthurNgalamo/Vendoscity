@@ -402,9 +402,13 @@ router.post('/apply-seller', authenticate, upload.fields([
             };
         }
 
-        // 3. Mise à jour des informations de candidature
+        // 3. Mise à jour automatique et approbation immédiate
         const updatePayload = {
-            seller_status: 'pending',
+            seller_status: 'approved',
+            shop_name,
+            phone,
+            bio: bio || '',
+            is_verified: isVerifiedOnApproval,
             seller_application_data: {
                 shop_name,
                 phone,

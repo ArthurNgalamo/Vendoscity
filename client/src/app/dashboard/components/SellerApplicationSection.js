@@ -98,9 +98,9 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
       if (res.ok) {
         const data = await res.json();
         if (data.is_verified) {
-          showToast("Votre candidature d'entreprise a été soumise. Documents vérifiés avec succès par biométrie (Badge accordé après validation admin).");
+          showToast("Félicitations ! Votre compte vendeur est validé et certifié avec le badge vérifié.");
         } else {
-          showToast("Votre candidature d'entreprise a été soumise avec succès !");
+          showToast("Félicitations ! Votre compte vendeur est désormais validé.");
         }
         onApprovalSuccess(); // Re-fetch profile
       } else {
