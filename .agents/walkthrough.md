@@ -88,6 +88,7 @@ Ce document résume l'ensemble des corrections, refactorings et optimisations de
 ### 3. Portefeuille Virtuel Vendeur (Wallet)
 *   **Sécurisation par code PIN** : L'accès au solde et aux retraits est verrouillé par un code PIN à 6 chiffres configuré par le vendeur.
 *   **Opérations financières** : Support des dépôts et demandes de retraits (sur numéro MoMo/Orange configuré) avec historique de transactions complet.
+*   **Refonte Premium de l'interface PIN** : Remplacement des formulaires de configuration et de déverrouillage PIN par un design sombre premium à base de dégradés Slate, de lueurs néon (orange MoMo / bleu sécurité) et de 6 cases de saisie visuelle dynamique (avec masquage optionnel via bouton œil) pour une ergonomie optimale.
 
 ### 4. Demande de Statut Vendeur et Bypass
 *   **Formulaire d'adhésion** : Les utilisateurs demandent à être vendeurs via un formulaire professionnel (Nom, Tél, Bio).
