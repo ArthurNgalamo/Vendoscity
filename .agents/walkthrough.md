@@ -97,6 +97,7 @@ Ce document résume l'ensemble des corrections, refactorings et optimisations de
 ### 5. Aplatissement des Menus de Navigation
 *   **Liens directs** : Remplacement du lien unique "Tableau de Bord" dans les en-têtes desktop et mobile par les sections directes : *Espace Vendeur*, *Commandes Reçues*, *Mon Portefeuille*, *Statistiques & Métriques*, *Mon Profil*.
 *   **Navigation sans rechargement** : Le dashboard écoute dynamiquement la query `tab` de l'URL via `useSearchParams()` et bascule réactivement d'onglet. La page `/dashboard` a été enveloppée dans une zone `<Suspense>` pour se conformer au rendu statique de Next.js.
+*   **Masquage du menu secondaire sur mobile** : Le menu de la page Dashboard (`.dashboard-sidebar`) a été masqué via CSS (`display: none`) sur les appareils mobiles (max-width: 768px) car il faisait doublon avec le menu principal, aérant ainsi l'interface.
 
 ---
 
