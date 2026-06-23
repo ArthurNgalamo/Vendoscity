@@ -26,7 +26,7 @@ const DISTRIBUTION_HUBS = [
 export default function CheckoutPage() {
   const showToast = useToast();
   const { authFetch } = useAuth();
-  const { removeFromCart } = useCart();
+  const { removeFromCart, clearCart } = useCart();
   const [checkoutData, setCheckoutData] = useState(null);
   const [paymentMethod, setPaymentMethod] = useState(''); // direct transition mode or 'escrow'
   const [operator, setOperator] = useState('mtn'); // 'mtn' or 'orange'
@@ -80,6 +80,8 @@ export default function CheckoutPage() {
 
   const { 
     items = [], 
+    sellers = [],
+    isMultiSeller = false,
     sellerName = '', 
     sellerWhatsApp = '', 
     sellerId = '', 
@@ -87,6 +89,8 @@ export default function CheckoutPage() {
     appliedPromo = null 
   } = checkoutData || {};
 
+  // For multi-seller, flatten all items
+  const allSellers = isMultiSeller && sellers.length > 0 ? sellers : [{ sellerId, sellerName, sellerWhatsApp, items }];
   const isGroupBuy = items && items.some(it => it.is_group_buy);
 
   // Force distribution point as standard delivery method for group buy
@@ -122,82 +126,84 @@ export default function CheckoutPage() {
     const selectedHub = DISTRIBUTION_HUBS.find(h => h.id === selectedHubId);
 
     try {
-      const orderItems = items.map(it => ({
-        product_id: it.id,
-        quantity: it.quantity,
-        price: it.price
+      // Create one order per seller in parallel
+      await Promise.all(allSellers.map(async (sellerEntry, idx) => {
+        const entryItems = sellerEntry.items || [];
+        const entrySubtotal = entryItems.reduce((s, it) => s + it.price * it.quantity, 0);
+        // Apply shipping only on first seller's order to avoid double-charging
+        const entryShipping = idx === 0 ? actualShippingCost : 0;
+        // Apply discount only on first order
+        const entryDiscount = idx === 0 ? discount : 0;
+        const entryTotal = Math.max(0, entrySubtotal + entryShipping - entryDiscount);
+
+        const orderItems = entryItems.map(it => ({
+          product_id: it.id,
+          quantity: it.quantity,
+          price: it.price
+        }));
+
+        await authFetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            seller_id: sellerEntry.sellerId,
+            total_amount: entryTotal,
+            payment_method: 'direct_whatsapp',
+            items: orderItems,
+            is_group_buy: false,
+            is_distribution: isDistribution,
+            distribution_point_id: isDistribution ? selectedHubId : null,
+            distribution_point_name: isDistribution ? selectedHub?.name : null,
+            promo_code: idx === 0 && appliedPromo ? appliedPromo.code : null
+          })
+        });
+
+        // Open WhatsApp for each seller
+        const lines = [
+          `*📦 COMMANDE VENDOSCITY*`,
+          `Référence : *${orderId}*`,
+          `Boutique : *${sellerEntry.sellerName}*`,
+          `=========================`,
+        ];
+        entryItems.forEach(item => {
+          lines.push(`• *${item.title}* x${item.quantity} (${item.price.toLocaleString('fr-FR')} FCFA)`);
+        });
+        lines.push(`=========================`);
+        lines.push(`Sous-total boutique : ${entrySubtotal.toLocaleString('fr-FR')} FCFA`);
+        if (idx === 0 && discount > 0) {
+          lines.push(`Remise promo : -${discount.toLocaleString('fr-FR')} FCFA`);
+        }
+        lines.push(`*TOTAL BOUTIQUE : ${entryTotal.toLocaleString('fr-FR')} FCFA*`);
+        lines.push(`=========================`);
+        lines.push(`Acheteur sur Vendoscity.com`);
+
+        if (sellerEntry.sellerWhatsApp) {
+          const waUrl = `https://wa.me/${sellerEntry.sellerWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(lines.join('\n'))}`;
+          window.open(waUrl, '_blank');
+        }
       }));
 
-      // Create order in DB first. The payment_method value is kept for backend compatibility.
-      await authFetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          seller_id: sellerId,
-          total_amount: totalAmount,
-          payment_method: 'direct_whatsapp',
-          items: orderItems,
-          is_group_buy: isGroupBuy,
-          is_distribution: isDistribution,
-          distribution_point_id: isDistribution ? selectedHubId : null,
-          distribution_point_name: isDistribution ? selectedHub?.name : null
-        })
-      });
-
-      const lines = [
-        `*📦 COMMANDE VENDOSCITY*`,
-        `Référence : *${orderId}*`,
-        `Boutique : *${sellerName}*`,
-        `=========================`,
-      ];
-      
-      items.forEach(item => {
-        lines.push(`• *${item.title}* x${item.quantity} (${item.price.toLocaleString('fr-FR')} FCFA)${item.is_group_buy ? ' [Achat Groupé]' : ''}`);
-      });
-      
-      lines.push(`=========================`);
-      lines.push(`Sous-total : ${subtotal.toLocaleString('fr-FR')} FCFA`);
-      if (isDistribution) {
-        lines.push(`Livraison : Point de distribution (${selectedHub?.name}) (+500 FCFA)`);
-      } else {
-        lines.push(`Livraison : ${getShippingLabel(deliveryLocation)}`);
-      }
-      if (discount > 0) {
-        lines.push(`Remise : -${discount.toLocaleString('fr-FR')} FCFA`);
-      }
-      lines.push(`*TOTAL À PAYER : ${totalAmount.toLocaleString('fr-FR')} FCFA*`);
-      lines.push(`=========================`);
-      lines.push(`Méthode de paiement : Commande directe assistée`);
-      lines.push(`Acheteur sur Vendoscity.com`);
-   
-      const waUrl = `https://wa.me/${sellerWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(lines.join('\n'))}`;
-      window.open(waUrl, '_blank');
-
       // Clean Cart
-      items.forEach(item => {
-        removeFromCart(item.id);
-      });
+      clearCart();
       localStorage.removeItem('checkout_data');
 
-      showToast("Commande créée. Ouverture du contact vendeur...");
+      showToast('Commande(s) créée(s). Ouverture du contact vendeur...');
       setTimeout(() => {
         window.location.href = '/commandes';
       }, 1000);
     } catch (err) {
       console.error(err);
-      alert("Erreur lors de la préparation de la commande.");
+      alert('Erreur lors de la préparation de la commande.');
     } finally {
       setLoading(false);
     }
   };
 
-  // Secure Escrow Order Creation
+  // Secure Escrow Order Creation (multi-seller aware)
   const handleCreateEscrowOrder = async (e) => {
     e.preventDefault();
     if (!buyerPhone || buyerPhone.trim().length < 9) {
-      alert("Veuillez saisir un numéro de téléphone valide à 9 chiffres.");
+      alert('Veuillez saisir un numéro de téléphone valide à 9 chiffres.');
       return;
     }
 
@@ -205,40 +211,49 @@ export default function CheckoutPage() {
     const selectedHub = DISTRIBUTION_HUBS.find(h => h.id === selectedHubId);
 
     try {
-      const orderItems = items.map(it => ({
-        product_id: it.id,
-        quantity: it.quantity,
-        price: it.price
+      // Create one escrow order per seller in parallel
+      const createdOrders = await Promise.all(allSellers.map(async (sellerEntry, idx) => {
+        const entryItems = sellerEntry.items || [];
+        const entrySubtotal = entryItems.reduce((s, it) => s + it.price * it.quantity, 0);
+        const entryShipping = idx === 0 ? actualShippingCost : 0;
+        const entryDiscount = idx === 0 ? discount : 0;
+        const entryTotal = Math.max(0, entrySubtotal + entryShipping - entryDiscount);
+
+        const orderItems = entryItems.map(it => ({
+          product_id: it.id,
+          quantity: it.quantity,
+          price: it.price
+        }));
+
+        const res = await authFetch('/api/orders', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            seller_id: sellerEntry.sellerId,
+            total_amount: entryTotal,
+            payment_method: `escrow_${operator}`,
+            buyer_phone_payeur: buyerPhone.trim(),
+            items: orderItems,
+            is_group_buy: false,
+            is_distribution: isDistribution,
+            distribution_point_id: isDistribution ? selectedHubId : null,
+            distribution_point_name: isDistribution ? selectedHub?.name : null,
+            promo_code: idx === 0 && appliedPromo ? appliedPromo.code : null
+          })
+        });
+
+        if (!res.ok) {
+          const err = await res.json();
+          throw new Error(err.error || 'Impossible de créer la commande.');
+        }
+        return await res.json();
       }));
 
-      const res = await authFetch('/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          seller_id: sellerId,
-          total_amount: totalAmount,
-          payment_method: `escrow_${operator}`,
-          buyer_phone_payeur: buyerPhone.trim(),
-          items: orderItems,
-          is_group_buy: isGroupBuy,
-          is_distribution: isDistribution,
-          distribution_point_id: isDistribution ? selectedHubId : null,
-          distribution_point_name: isDistribution ? selectedHub?.name : null
-        })
-      });
-
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.error || "Impossible de créer la commande.");
-      }
-
-      const order = await res.json();
-      setCreatedOrder(order);
+      // Track the first created order for polling
+      setCreatedOrder(createdOrders[0]);
       setPaymentStatus('pending_sms');
       setPollingActive(true);
-      showToast("Commande en séquestre initiée !");
+      showToast('Commande(s) en séquestre initiée(s) !');
     } catch (err) {
       alert(err.message);
     } finally {
@@ -261,12 +276,10 @@ export default function CheckoutPage() {
             if (target.escrow_status === 'held') {
               setPaymentStatus('success');
               setPollingActive(false);
-              showToast("Paiement sécurisé validé !");
+              showToast('Paiement sécurisé validé !');
               
               // Clean Cart
-              items.forEach(item => {
-                removeFromCart(item.id);
-              });
+              clearCart();
               localStorage.removeItem('checkout_data');
             } else if (parseFloat(target.amount_paid) > 0) {
               setPaymentStatus('partial');
@@ -363,7 +376,9 @@ export default function CheckoutPage() {
           </Link>
           <div>
             <h1 style={{ margin: 0, fontSize: '1.6rem', fontWeight: 800 }}>Validation de votre commande</h1>
-            <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', opacity: 0.85 }}>Boutique : {sellerName}</p>
+            <p style={{ margin: '4px 0 0 0', fontSize: '0.9rem', opacity: 0.85 }}>
+              {isMultiSeller ? `Commande multi-boutiques (${allSellers.length} vendeurs)` : `Boutique : ${sellerName}`}
+            </p>
           </div>
         </div>
       </div>

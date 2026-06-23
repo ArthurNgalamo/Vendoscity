@@ -20,7 +20,9 @@ import {
   MoreVertical,
   Trash2,
   Edit3,
-  X
+  X,
+  Search,
+  Bell
 } from 'lucide-react';
 import './messagerie.css';
 
@@ -133,6 +135,8 @@ function ChatContent() {
   const [activeMenuId, setActiveMenuId] = useState(null);
   const [editingMessage, setEditingMessage] = useState(null);
   const [sessionFirstUnreadId, setSessionFirstUnreadId] = useState(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeTab, setActiveTab] = useState('discussions'); // 'discussions' | 'notifications'
   const prevPartnerIdRef = useRef(null);
 
   // States and refs for dynamic discussion header scrolling
@@ -755,15 +759,117 @@ function ChatContent() {
           </button>
         </div>
 
+        {/* Search bar */}
+        <div style={{ padding: '10px 14px 0 14px' }}>
+          <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+            <Search width="15" height="15" style={{ position: 'absolute', left: '10px', color: '#94a3b8', pointerEvents: 'none' }} />
+            <input
+              type="text"
+              placeholder="Rechercher une discussion..."
+              value={searchQuery}
+              onChange={e => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                padding: '8px 10px 8px 32px',
+                borderRadius: '8px',
+                border: '1.5px solid #e2e8f0',
+                fontSize: '0.83rem',
+                outline: 'none',
+                background: '#f8fafc',
+                fontFamily: 'inherit',
+                boxSizing: 'border-box'
+              }}
+              onFocus={e => e.target.style.borderColor = 'var(--primary-blue)'}
+              onBlur={e => e.target.style.borderColor = '#e2e8f0'}
+            />
+          </div>
+        </div>
+
+        {/* Tabs: Discussions vs Notifications */}
+        <div style={{ display: 'flex', gap: '4px', padding: '10px 14px 0 14px' }}>
+          <button
+            onClick={() => setActiveTab('discussions')}
+            style={{
+              flex: 1,
+              padding: '7px 8px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '700',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              background: activeTab === 'discussions' ? 'var(--primary-blue)' : '#f1f5f9',
+              color: activeTab === 'discussions' ? '#fff' : '#64748b',
+              transition: 'all 0.15s'
+            }}
+          >
+            <MessageSquare width="13" height="13" /> Discussions
+          </button>
+          <button
+            onClick={() => setActiveTab('notifications')}
+            style={{
+              flex: 1,
+              padding: '7px 8px',
+              borderRadius: '8px',
+              border: 'none',
+              fontWeight: '700',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '5px',
+              background: activeTab === 'notifications' ? '#4f46e5' : '#f1f5f9',
+              color: activeTab === 'notifications' ? '#fff' : '#64748b',
+              transition: 'all 0.15s'
+            }}
+          >
+            <Bell width="13" height="13" /> Notifications
+          </button>
+        </div>
+
         <div className="conversations-scroll-area">
-          {conversations.length === 0 ? (
-            <div className="empty-conversations">
-              <MessageSquare width="32" height="32" style={{ color: '#d1d5db', marginBottom: '10px' }} />
-              <p>Aucune conversation en cours.</p>
-              <p style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Consultez un article pour chater avec le vendeur.</p>
-            </div>
-          ) : (
-            conversations.map((conv) => {
+          {(() => {
+            // Filter conversations by tab and search
+            const isNotifTab = activeTab === 'notifications';
+            let filtered = conversations.filter(conv => {
+              // Determine if this conv is a notification (has subject in messages)
+              const convMessages = messages.filter(
+                m => (m.sender_id === currentUserId && m.receiver_id === conv.partnerId) ||
+                     (m.sender_id === conv.partnerId && m.receiver_id === currentUserId)
+              );
+              const hasSubject = convMessages.some(m => m.subject);
+              if (isNotifTab) return hasSubject;
+              return !hasSubject;
+            });
+
+            // Apply search filter
+            if (searchQuery.trim()) {
+              const q = searchQuery.toLowerCase();
+              filtered = filtered.filter(conv => {
+                const partner = partnerProfiles[conv.partnerId] || {};
+                const name = (partner.shop_name || partner.first_name || '').toLowerCase();
+                const lastText = (conv.lastMessage?.content || '').toLowerCase();
+                return name.includes(q) || lastText.includes(q);
+              });
+            }
+
+            if (filtered.length === 0) {
+              return (
+                <div className="empty-conversations">
+                  {isNotifTab
+                    ? <Bell width="32" height="32" style={{ color: '#d1d5db', marginBottom: '10px' }} />
+                    : <MessageSquare width="32" height="32" style={{ color: '#d1d5db', marginBottom: '10px' }} />}
+                  <p>{isNotifTab ? 'Aucune notification système.' : searchQuery ? 'Aucune discussion trouvée.' : 'Aucune conversation en cours.'}</p>
+                  {!isNotifTab && !searchQuery && <p style={{ fontSize: '0.75rem', color: '#9ca3af' }}>Consultez un article pour chater avec le vendeur.</p>}
+                </div>
+              );
+            }
+
+            return filtered.map((conv) => {
               const partner = partnerProfiles[conv.partnerId] || { shop_name: 'Chargement...', first_name: 'Vendeur' };
               const isActive = conv.partnerId === activePartnerId;
               const parsed = parseProductPreview(conv.lastMessage?.content || '');
@@ -771,6 +877,10 @@ function ChatContent() {
               const lastMsgTime = conv.lastMessage?.created_at 
                 ? new Date(conv.lastMessage.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
                 : '';
+              const hasSubjectMsg = messages.some(
+                m => ((m.sender_id === conv.partnerId && m.receiver_id === currentUserId) ||
+                       (m.sender_id === currentUserId && m.receiver_id === conv.partnerId)) && m.subject
+              );
 
               return (
                 <div
@@ -778,18 +888,18 @@ function ChatContent() {
                   className={`conversation-item ${isActive ? 'active' : ''}`}
                   onClick={() => {
                     setActivePartnerId(conv.partnerId);
-                    // Clear query params to prevent resetting the state
-                    if (searchParams.get('seller')) {
-                      router.replace('/messagerie');
-                    }
+                    if (searchParams.get('seller')) router.replace('/messagerie');
                   }}
                 >
-                  <div className="conversation-avatar" style={{ overflow: 'hidden', padding: 0 }}>
-                    <img 
-                      src={getUserAvatarUrl(partner.avatar_url, partner.shop_name || partner.first_name || 'V')} 
-                      alt="" 
-                      style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
-                    />
+                  <div className="conversation-avatar" style={{ overflow: 'hidden', padding: 0, background: hasSubjectMsg ? 'linear-gradient(135deg, #4f46e5, #7c3aed)' : undefined }}>
+                    {hasSubjectMsg
+                      ? <Bell width="20" height="20" style={{ color: '#fff', margin: 'auto' }} />
+                      : <img 
+                          src={getUserAvatarUrl(partner.avatar_url, partner.shop_name || partner.first_name || 'V')} 
+                          alt="" 
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }} 
+                        />
+                    }
                   </div>
                   <div className="conversation-details">
                     <div className="conversation-row">
@@ -816,8 +926,8 @@ function ChatContent() {
                   </div>
                 </div>
               );
-            })
-          )}
+            });
+          })()}
         </div>
       </div>
 

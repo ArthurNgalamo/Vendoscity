@@ -16,54 +16,115 @@ export default function ProductsListSection({
 }) {
   return (
     <div className="dashboard-section active">
-      {/* Profile connection header */}
-      <div className="dashboard-alert" style={{ background: '#d1e7dd', color: '#0f5132', borderLeftColor: '#0f5132', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '12px' }}>
-        <Store width="20" height="20" />
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
-          Connecté en tant que Vendeur : <strong>{profileData.shopName || user?.shop_name || 'Boutique'}</strong>
-          {profileData.is_verified && (
-            <span title="Boutique Vérifiée (Badge de Confiance)" style={{ display: 'inline-flex', alignItems: 'center', color: '#3b82f6' }}>
-              <ShieldCheck width="18" height="18" fill="#3b82f6" color="#ffffff" />
+      {/* Premium SaaS Seller Profile Header */}
+      <div style={{
+        background: 'linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)',
+        borderRadius: '16px',
+        padding: '24px 28px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '20px',
+        flexWrap: 'wrap',
+        marginBottom: '4px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.25)',
+        position: 'relative',
+        overflow: 'hidden'
+      }}>
+        {/* Decorative glow */}
+        <div style={{ position: 'absolute', top: '-40px', right: '-40px', width: '160px', height: '160px', borderRadius: '50%', background: 'rgba(255,255,255,0.03)', pointerEvents: 'none' }} />
+        <div style={{ position: 'absolute', bottom: '-30px', left: '60px', width: '120px', height: '120px', borderRadius: '50%', background: 'rgba(99,102,241,0.08)', pointerEvents: 'none' }} />
+
+        {/* Store avatar */}
+        <div style={{
+          width: '56px',
+          height: '56px',
+          borderRadius: '14px',
+          background: 'linear-gradient(135deg, #667eea, #764ba2)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexShrink: 0,
+          boxShadow: '0 4px 16px rgba(102,126,234,0.4)'
+        }}>
+          <Store width="26" height="26" color="#fff" />
+        </div>
+
+        {/* Store info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '1.2rem', fontWeight: '800', color: '#fff', letterSpacing: '-0.02em' }}>
+              {profileData.shopName || user?.shop_name || 'Ma Boutique'}
             </span>
-          )}
-        </span>
-        <button
-          type="button"
-          onClick={handleShareShop}
-          style={{
-            marginLeft: 'auto',
-            padding: '6px 14px',
-            cursor: 'pointer',
-            borderRadius: '6px',
-            border: 'none',
-            background: 'var(--primary-blue)',
-            fontWeight: 'bold',
-            color: 'white',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px'
-          }}
-        >
-          <Share2 width="14" height="14" /> Partager
-        </button>
-        <button
-          type="button"
-          onClick={logout}
-          style={{
-            padding: '6px 14px',
-            cursor: 'pointer',
-            borderRadius: '6px',
-            border: 'none',
-            background: 'white',
-            fontWeight: 'bold',
-            color: '#0f5132',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px'
-          }}
-        >
-          <LogOut width="14" height="14" /> Déconnexion
-        </button>
+            {profileData.is_verified && (
+              <span title="Boutique Vérifiée" style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '4px',
+                background: 'rgba(59,130,246,0.2)',
+                border: '1px solid rgba(59,130,246,0.4)',
+                color: '#93c5fd',
+                padding: '2px 8px',
+                borderRadius: '99px',
+                fontSize: '0.72rem',
+                fontWeight: '700'
+              }}>
+                <ShieldCheck width="11" height="11" /> Vérifiée
+              </span>
+            )}
+          </div>
+          <p style={{ margin: '4px 0 0 0', fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '0.02em' }}>
+            Espace Vendeur Vendoscity
+          </p>
+        </div>
+
+        {/* Action buttons */}
+        <div style={{ display: 'flex', gap: '8px', flexShrink: 0 }}>
+          <button
+            type="button"
+            onClick={handleShareShop}
+            style={{
+              padding: '8px 16px',
+              cursor: 'pointer',
+              borderRadius: '8px',
+              border: '1px solid rgba(255,255,255,0.15)',
+              background: 'rgba(255,255,255,0.08)',
+              backdropFilter: 'blur(10px)',
+              fontWeight: '700',
+              color: '#fff',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.85rem',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.08)'}
+          >
+            <Share2 width="14" height="14" /> Partager
+          </button>
+          <button
+            type="button"
+            onClick={logout}
+            style={{
+              padding: '8px 16px',
+              cursor: 'pointer',
+              borderRadius: '8px',
+              border: '1px solid rgba(239,68,68,0.3)',
+              background: 'rgba(239,68,68,0.1)',
+              fontWeight: '700',
+              color: '#fca5a5',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '0.85rem',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={e => e.currentTarget.style.background = 'rgba(239,68,68,0.2)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'rgba(239,68,68,0.1)'}
+          >
+            <LogOut width="14" height="14" /> Déconnexion
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards Row */}

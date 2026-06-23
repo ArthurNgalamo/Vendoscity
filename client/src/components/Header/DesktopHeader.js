@@ -124,7 +124,7 @@ export default function DesktopHeader({
           <div className="tool-dropdown-trigger delivery-address-tool">
             <span className="tool-label">Adresse de livraison :</span>
             <span className="tool-value">
-              <span className="flag-icon">{deliveryCountry.flag}</span> {deliveryCountry.code} <ChevronDown width="10" height="10" className="chevron-icon" />
+              <span className="flag-icon">{deliveryCountry.flag}</span> {deliveryCountry.name && deliveryCountry.name.length > 20 ? deliveryCountry.name.substring(0, 18) + '...' : (deliveryCountry.name || deliveryCountry.code)} <ChevronDown width="10" height="10" className="chevron-icon" />
             </span>
             <div className="tool-dropdown-menu" style={{
               minWidth: '220px',
@@ -186,6 +186,9 @@ export default function DesktopHeader({
               <div className="menu-item active">Franc CFA (XAF)</div>
             </div>
           </div>
+
+          {/* Google Translate Widget container */}
+          <div id="google_translate_element" style={{ display: 'inline-block', verticalAlign: 'middle', marginLeft: '10px' }}></div>
 
           {/* Favorites Icon */}
           <Link href="/favorites" className="tool-link-favorites" title="Voir mes favoris">

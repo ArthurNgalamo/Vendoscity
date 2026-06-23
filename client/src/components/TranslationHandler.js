@@ -59,9 +59,22 @@ export default function TranslationHandler() {
               window.location.reload();
             }
           });
-        }).catch((err) => {
-          console.error('Erreur désenregistrement service worker:', err);
         });
+      }
+
+      // Google Translate widget loader for non-French browsers
+      const userLang = navigator.language || navigator.userLanguage || '';
+      if (userLang && !userLang.startsWith('fr') && !window.googleTranslateElementInit) {
+        window.googleTranslateElementInit = () => {
+          new window.google.translate.TranslateElement(
+            { pageLanguage: 'fr', layout: window.google.translate.TranslateElement.InlineLayout.SIMPLE },
+            'google_translate_element'
+          );
+        };
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = '//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+        document.body.appendChild(script);
       }
     }
   }, []);

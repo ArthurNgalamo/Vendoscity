@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useCart } from '../../../context/CartContext';
 import { useFavorites } from '../../../context/FavoritesContext';
 import { useToast } from '../../../context/ToastContext';
+import { useAuth } from '../../../context/AuthContext';
 import { getApiBaseUrl, fetchWithTimeout, normalizeSupabaseImageUrl, formatCurrency, logAnalyticsEvent } from '../../../core/api';
 import { shareLink } from '../../../core/share';
 
@@ -22,6 +23,7 @@ export default function ProductDetailPage({ params }) {
   const { addToCart, setCartOpen } = useCart();
   const { isFavorite, addFavorite, removeFavorite } = useFavorites();
   const showToast = useToast();
+  const { user, authFetch } = useAuth();
 
   const [product, setProduct] = useState(null);
   const [reviews, setReviews] = useState([]);
@@ -74,7 +76,8 @@ export default function ProductDetailPage({ params }) {
         const revRes = await fetchWithTimeout(`${base}/api/products/${productId}/reviews`, {}, 15000);
         if (revRes.ok) {
           const revData = await revRes.json();
-          setReviews(revData.reviews || []);
+          // API returns an array directly, not a wrapper object
+          setReviews(Array.isArray(revData) ? revData : (revData?.reviews || []));
         }
       } catch (e) {
         console.error('Error fetching product data:', e);
@@ -114,28 +117,32 @@ export default function ProductDetailPage({ params }) {
 
   const handleAddReview = async (e) => {
     e.preventDefault();
-    if (!reviewName.trim() || !reviewComment.trim()) {
-      showToast('Veuillez remplir tous les champs du formulaire.');
+    if (!user) {
+      showToast('Veuillez vous connecter pour publier un avis.');
+      return;
+    }
+    if (!reviewComment.trim()) {
+      showToast('Veuillez rédiger un commentaire.');
       return;
     }
     setSubmittingReview(true);
     const base = getApiBaseUrl();
 
     try {
-      const res = await fetchWithTimeout(`${base}/api/products/${productId}/reviews`, {
+      const res = await authFetch(`/api/products/${productId}/reviews`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: reviewName,
           rating: Number(reviewRating),
           comment: reviewComment
         })
-      }, 15000);
+      });
 
       if (res.ok) {
         const data = await res.json();
-        setReviews((prev) => [data.review, ...prev]);
-        setReviewName('');
+        // data may be the review directly or wrapped
+        const newReview = data?.review || data;
+        setReviews((prev) => [newReview, ...prev]);
         setReviewComment('');
         setReviewRating(5);
         showToast('Votre avis a été publié !');
@@ -296,8 +303,7 @@ export default function ProductDetailPage({ params }) {
         <ProductReviews
           reviews={reviews}
           handleAddReview={handleAddReview}
-          reviewName={reviewName}
-          setReviewName={setReviewName}
+          user={user}
           reviewRating={reviewRating}
           setReviewRating={setReviewRating}
           reviewComment={reviewComment}

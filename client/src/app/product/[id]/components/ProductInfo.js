@@ -23,13 +23,7 @@ export default function ProductInfo({
   sellerWhatsApp,
   specsList
 }) {
-  const [purchaseMode, setPurchaseMode] = React.useState('individual'); // 'individual' or 'group'
-
-  const groupPrice = product.group_price && Number(product.group_price) > 0 
-    ? Number(product.group_price) 
-    : Math.round(price * 0.85);
-
-  const displayPrice = purchaseMode === 'group' ? groupPrice : price;
+  const displayPrice = price;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -93,65 +87,7 @@ export default function ProductInfo({
         </div>
       )}
 
-      {/* Option d'achat */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '20px' }}>
-        <span style={{ fontSize: '0.85rem', fontWeight: '800', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-          Option d&apos;achat :
-        </span>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-          <div 
-            onClick={() => {
-              setPurchaseMode('individual');
-              setQuantity(1);
-            }}
-            style={{
-              border: `2px solid ${purchaseMode === 'individual' ? 'var(--primary-blue)' : '#cbd5e1'}`,
-              background: purchaseMode === 'individual' ? '#f0f4ff' : '#ffffff',
-              borderRadius: '10px',
-              padding: '12px 16px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}
-          >
-            <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#0f172a' }}>Achat Individuel</span>
-            <span style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--primary-blue)' }}>{formatCurrency(price)}</span>
-          </div>
 
-          <div 
-            onClick={() => {
-              setPurchaseMode('group');
-              setQuantity(product.group_min_participants || 3);
-            }}
-            style={{
-              border: `2px solid ${purchaseMode === 'group' ? 'var(--primary-blue)' : '#cbd5e1'}`,
-              background: purchaseMode === 'group' ? '#f0f4ff' : '#ffffff',
-              borderRadius: '10px',
-              padding: '12px 16px',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px'
-            }}
-          >
-            <span style={{ fontSize: '0.88rem', fontWeight: '800', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '6px' }}>
-              Achat Groupé 
-              <span style={{ background: '#22c55e', color: 'white', fontSize: '0.65rem', padding: '1px 5px', borderRadius: '4px', fontWeight: 'bold' }}>
-                -{product.group_price && Number(product.group_price) > 0 ? Math.round((1 - Number(product.group_price)/price) * 100) : 15}%
-              </span>
-            </span>
-            <span style={{ fontSize: '1.1rem', fontWeight: '800', color: 'var(--primary-blue)' }}>
-              {formatCurrency(groupPrice)}
-            </span>
-            <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
-              Min. {product.group_min_participants || 3} participants
-            </span>
-          </div>
-        </div>
-      </div>
 
       <hr style={{ border: 0, borderTop: '1px solid #eee', margin: '0 0 20px 0' }} />
 
@@ -175,11 +111,10 @@ export default function ProductInfo({
 
         <button
           onClick={() => {
-            const isGroup = purchaseMode === 'group';
             addToCart({
               ...product,
-              price: isGroup ? groupPrice : price,
-              is_group_buy: isGroup
+              price: price,
+              is_group_buy: false
             }, quantity);
             setCartOpen(true);
           }}

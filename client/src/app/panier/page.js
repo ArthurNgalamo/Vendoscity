@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { useCart } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { useToast } from '../../context/ToastContext';
+import { useAuth } from '../../context/AuthContext';
 import { 
   ShoppingCart, 
   Trash2, 
@@ -17,9 +18,9 @@ import {
   Truck, 
   ShieldCheck, 
   ArrowLeft,
-  ArrowRight
+  ArrowRight,
+  CreditCard
 } from 'lucide-react';
-import Sparkles from '../../components/Sparkles';
 import { formatCurrency, normalizeSupabaseImageUrl } from '../../core/api';
 import './panier.css';
 
@@ -27,6 +28,7 @@ export default function PanierPage() {
   const { cart, updateQuantity, removeFromCart } = useCart();
   const { addFavorite, isFavorite } = useFavorites();
   const showToast = useToast();
+  const { user, authFetch } = useAuth();
 
   const [deliveryLocation, setDeliveryLocation] = useState('standard-yde'); // 'pickup', 'standard-yde', 'standard-dla', 'express'
   const [promoInput, setPromoInput] = useState('');
@@ -81,27 +83,50 @@ export default function PanierPage() {
   const discount = getDiscount(appliedPromo, subtotal, shippingCost);
   const total = Math.max(0, subtotal + shippingCost - discount);
 
-  // Apply promo handler
-  const handleApplyPromo = (e) => {
+  // Apply promo handler with minimum amount and unique-usage restrictions
+  const handleApplyPromo = async (e) => {
     e.preventDefault();
     const code = String(promoInput || '').trim().toUpperCase();
     if (!code) return;
 
+    // Enforce minimum order amount
+    if (subtotal < 50000) {
+      showToast('Les codes promo sont disponibles uniquement pour les commandes ≥ 50 000 FCFA.');
+      return;
+    }
+
+    const validCodes = ['VENDOS10', 'WELCOME500', 'MARCHE237'];
+    if (!validCodes.includes(code)) {
+      showToast('Code promotionnel invalide ou expiré.');
+      return;
+    }
+
+    // Check if user already used this promo code
+    if (user) {
+      try {
+        const res = await authFetch('/api/orders');
+        if (res.ok) {
+          const orders = await res.json();
+          const alreadyUsed = orders.some(o => o.promo_code === code);
+          if (alreadyUsed) {
+            showToast('Vous avez déjà utilisé ce code promo. Chaque code est limité à 1 utilisation par compte.');
+            return;
+          }
+        }
+      } catch (_) { /* ignore network errors, allow promo */ }
+    }
+
     if (code === 'VENDOS10') {
       setAppliedPromo({ code: 'VENDOS10', label: '10% de réduction sur vos articles' });
       showToast('Code promo VENDOS10 appliqué ! (-10%)');
-      setPromoInput('');
     } else if (code === 'WELCOME500') {
       setAppliedPromo({ code: 'WELCOME500', label: '500 FCFA offerts sur votre commande' });
       showToast('Code promo WELCOME500 appliqué ! (-500 FCFA)');
-      setPromoInput('');
     } else if (code === 'MARCHE237') {
       setAppliedPromo({ code: 'MARCHE237', label: 'Livraison standard gratuite' });
       showToast('Code promo MARCHE237 appliqué ! (Livraison gratuite)');
-      setPromoInput('');
-    } else {
-      showToast('Code promotionnel invalide ou expiré.');
     }
+    setPromoInput('');
   };
 
   const handleRemovePromo = () => {
@@ -116,27 +141,30 @@ export default function PanierPage() {
     showToast(`${item.title} sauvegardé pour plus tard !`);
   };
 
-  // Per-seller checkout redirecting to unified checkout page
-  const handleCheckoutSeller = (sellerName, items) => {
-    const sellerId = items[0]?.seller_id || '';
-    const sellerWhatsApp = items[0]?.whatsapp || '';
-    if (!sellerWhatsApp) {
-      alert("Ce vendeur n'a pas encore renseigné de contact de commande.");
-      return;
-    }
+  // Global multi-seller checkout
+  const handleCheckoutAll = () => {
+    if (cart.length === 0) return;
 
-    // Save order data to localStorage to pass to the checkout page
-    const checkoutData = {
-      sellerId,
+    // Build sellers groups
+    const sellerGroups = Object.entries(groupedItems).map(([sellerName, items]) => ({
+      sellerId: items[0]?.seller_id || '',
       sellerName,
-      sellerWhatsApp,
-      items,
+      sellerWhatsApp: items[0]?.whatsapp || '',
+      items
+    }));
+
+    const checkoutData = {
+      isMultiSeller: sellerGroups.length > 1,
+      sellers: sellerGroups,
+      // For backward compat with single-seller checkout page
+      sellerId: sellerGroups[0]?.sellerId || '',
+      sellerName: sellerGroups.length === 1 ? sellerGroups[0].sellerName : `${sellerGroups.length} boutiques`,
+      sellerWhatsApp: sellerGroups[0]?.sellerWhatsApp || '',
+      items: cart,
       deliveryLocation,
       appliedPromo
     };
     localStorage.setItem('checkout_data', JSON.stringify(checkoutData));
-    
-    // Redirect to the checkout page
     window.location.href = '/checkout';
   };
 
@@ -203,13 +231,8 @@ export default function PanierPage() {
 
                         {/* Details */}
                         <div className="cart-item-info">
-                          <h4 className="cart-item-title" style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <h4 className="cart-item-title">
                             <span>{item.title}</span>
-                            {item.is_group_buy && (
-                              <span style={{ fontSize: '0.65rem', background: '#e0f2fe', color: '#0369a1', padding: '2px 6px', borderRadius: '4px', fontWeight: 'bold' }}>
-                                Achat Groupé
-                              </span>
-                            )}
                           </h4>
                           <span className="cart-item-category">{item.category}</span>
                           <div className="cart-item-price-unit">{formatCurrency(item.price)} / unité</div>
@@ -221,7 +244,7 @@ export default function PanierPage() {
                           <div className="cart-quantity-selector">
                             <button 
                               type="button" 
-                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1), item.is_group_buy)}
+                              onClick={() => updateQuantity(item.id, Math.max(1, item.quantity - 1))}
                               className="qty-btn"
                               aria-label="Diminuer quantité"
                             >
@@ -230,7 +253,7 @@ export default function PanierPage() {
                             <span className="qty-value">{item.quantity}</span>
                             <button 
                               type="button" 
-                              onClick={() => updateQuantity(item.id, item.quantity + 1, item.is_group_buy)}
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
                               className="qty-btn"
                               aria-label="Augmenter quantité"
                             >
@@ -248,7 +271,7 @@ export default function PanierPage() {
                               <Heart width="14" height="14" /> <span>Mettre de côté</span>
                             </button>
                             <button 
-                              onClick={() => removeFromCart(item.id, item.is_group_buy)}
+                              onClick={() => removeFromCart(item.id)}
                               className="item-action-btn delete"
                               title="Retirer du panier"
                             >
@@ -266,25 +289,18 @@ export default function PanierPage() {
                     ))}
                   </div>
 
-                  {/* Checkout CTA per seller */}
+                  {/* Per-seller chat link only */}
                   <div className="seller-group-footer-checkout">
                     <div className="seller-checkout-text">
-                      Prêt à commander auprès de <strong>{sellerName}</strong> ?
+                      Vendeur : <strong>{sellerName}</strong>
                     </div>
                     <div className="seller-checkout-actions">
                       <Link 
                         href={`/messagerie?seller=${items[0]?.seller_id || ''}&product=${items[0]?.id || ''}&title=${encodeURIComponent(items[0]?.title || '')}&price=${items[0]?.price || ''}&image=${encodeURIComponent(items[0]?.images?.[0] || items[0]?.image_url || items[0]?.image || '')}`}
                         className="seller-chat-btn"
                       >
-                        <MessageSquare width="16" height="16" /> Chat
+                        <MessageSquare width="16" height="16" /> Contacter le vendeur
                       </Link>
-                      <button 
-                        onClick={() => handleCheckoutSeller(sellerName, items)}
-                        className="seller-whatsapp-btn"
-                        style={{ background: 'var(--brand-accent)' }}
-                      >
-                        <Sparkles width="16" height="16" /> Passer la commande
-                      </button>
                     </div>
                   </div>
 
@@ -389,9 +405,8 @@ export default function PanierPage() {
                 
                 {/* Promo hints */}
                 <div style={{ marginTop: '10px', fontSize: '0.78rem', color: '#94a3b8', display: 'flex', flexDirection: 'column', gap: '3px' }}>
-                  <span>💡 Essayez <strong>VENDOS10</strong> (-10% sur articles)</span>
-                  <span>💡 Essayez <strong>WELCOME500</strong> (-500 FCFA)</span>
-                  <span>💡 Essayez <strong>MARCHE237</strong> (Livraison standard offerte)</span>
+                  <span>💡 Codes disponibles pour commandes ≥ 50 000 FCFA</span>
+                  <span>💡 Essayez <strong>VENDOS10</strong> (-10%) • <strong>WELCOME500</strong> (-500 F) • <strong>MARCHE237</strong> (livraison gratuite)</span>
                 </div>
               </div>
 
@@ -433,6 +448,36 @@ export default function PanierPage() {
                     <p>Vendoscity évolue vers des paiements gérés sur la plateforme. Les vendeurs en transition peuvent encore proposer un règlement local.</p>
                   </div>
                 </div>
+
+                {/* Global checkout button */}
+                <button
+                  id="btn-checkout-global"
+                  onClick={handleCheckoutAll}
+                  className="global-checkout-btn"
+                  style={{
+                    marginTop: '18px',
+                    width: '100%',
+                    padding: '14px',
+                    background: 'linear-gradient(135deg, var(--primary-blue), #4f46e5)',
+                    color: '#fff',
+                    border: 'none',
+                    borderRadius: '10px',
+                    fontWeight: '800',
+                    fontSize: '1rem',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxShadow: '0 4px 16px rgba(18,18,147,0.25)',
+                    transition: 'transform 0.15s, box-shadow 0.15s'
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform='translateY(-2px)'; e.currentTarget.style.boxShadow='0 8px 24px rgba(18,18,147,0.35)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform='translateY(0)'; e.currentTarget.style.boxShadow='0 4px 16px rgba(18,18,147,0.25)'; }}
+                >
+                  <CreditCard width="18" height="18" />
+                  Passer la commande globale · {formatCurrency(total)}
+                </button>
               </div>
 
             </div>

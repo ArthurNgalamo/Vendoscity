@@ -6,7 +6,6 @@ import { FavoritesProvider } from '../context/FavoritesContext';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import CartSidebar from '../components/CartSidebar';
-import CartFab from '../components/CartFab';
 import TranslationHandler from '../components/TranslationHandler';
 import PwaInstallPrompt from '../components/PwaInstallPrompt';
 
@@ -66,7 +65,6 @@ export default function RootLayout({ children }) {
               <FavoritesProvider>
                 <Header />
                 <CartSidebar />
-                <CartFab />
                 <main style={{ flexGrow: 1 }}>{children}</main>
                 <Footer />
               </FavoritesProvider>

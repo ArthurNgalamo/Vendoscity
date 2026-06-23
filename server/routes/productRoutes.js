@@ -992,6 +992,21 @@ router.post('/:id/reviews', authenticate, async (req, res) => {
         return res.status(400).json({ error: 'Note invalide. Choisissez une note entre 1 et 5.' });
     }
 
+    // Fetch the reviewer's profile to use their real name
+    let reviewerName = 'Anonyme';
+    try {
+        const { data: profileData } = await db
+            .from('profiles')
+            .select('first_name, last_name, shop_name')
+            .eq('id', userAuth.user.id)
+            .single();
+        if (profileData) {
+            reviewerName = profileData.shop_name ||
+                [profileData.first_name, profileData.last_name].filter(Boolean).join(' ') ||
+                'Utilisateur Vendoscity';
+        }
+    } catch (_) { /* ignore */ }
+
     const writeDb = (db?.__vendoscityKeys?.hasServiceRole)
         ? db
         : (typeof db?.asUser === 'function' ? db.asUser(token) : db);
@@ -1002,13 +1017,18 @@ router.post('/:id/reviews', authenticate, async (req, res) => {
             {
                 product_id: id,
                 user_id: userAuth.user.id,
+                name: reviewerName,
                 rating: ratingInt,
                 comment: comment
             }
-        ]);
+        ])
+        .select()
+        .single();
 
     if (error) return res.status(400).json({ error: error.message });
-    res.status(201).json(data);
+    // Return enriched review
+    const enriched = data ? { ...data, reviewer_name: reviewerName } : data;
+    res.status(201).json(enriched);
 });
 
 // Supprimer son avis (l'utilisateur ne peut supprimer que ses propres avis)

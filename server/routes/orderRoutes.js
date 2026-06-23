@@ -61,7 +61,8 @@ router.post('/', authenticate, async (req, res) => {
         group_buy_min_participants,
         is_distribution,
         distribution_point_id,
-        distribution_point_name
+        distribution_point_name,
+        promo_code
     } = req.body;
 
     if (!seller_id || !total_amount || !items || !items.length) {
@@ -103,6 +104,7 @@ router.post('/', authenticate, async (req, res) => {
             amount_paid: 0.0,
             buyer_phone_payeur: isEscrow ? buyer_phone_payeur : null,
             escrow_qr_code: isEscrow ? escrowCode : null,
+            promo_code: promo_code || null,
             
             // Group buy fields
             is_group_buy: !!is_group_buy,

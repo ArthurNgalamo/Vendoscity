@@ -140,7 +140,7 @@ export default function Header() {
     }, 1800);
   };
 
-  // Detect country location by IP with localStorage caching
+  // Detect country/city location by Geolocation or IP fallback
   useEffect(() => {
     try {
       const cached = localStorage.getItem('vc_delivery_country');
@@ -150,7 +150,7 @@ export default function Header() {
       }
     } catch (_) {}
 
-    const detectCountry = async () => {
+    const fallbackIpDetect = async () => {
       try {
         const base = getApiBaseUrl();
         const res = await fetchWithTimeout(`${base}/api/geolocation`, {}, 5000);
@@ -158,7 +158,6 @@ export default function Header() {
           const data = await res.json();
           if (data.code) {
             const code = data.code.toUpperCase();
-            // Retrouver si possible les informations du pays dans la liste COUNTRIES
             const matched = COUNTRIES.find(c => c.code === code);
             const countryInfo = matched 
               ? { code: matched.code, name: matched.name, flag: matched.flag }
@@ -168,7 +167,6 @@ export default function Header() {
             try {
               localStorage.setItem('vc_delivery_country', JSON.stringify(countryInfo));
             } catch (_) {}
-            return;
           }
         }
       } catch (err) {
@@ -176,7 +174,46 @@ export default function Header() {
       }
     };
 
-    detectCountry();
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          try {
+            const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10`);
+            if (res.ok) {
+              const data = await res.json();
+              const address = data.address || {};
+              const city = address.city || address.town || address.village || address.county || '';
+              const country = address.country || 'Cameroun';
+              const countryCode = (address.country_code || 'cm').toUpperCase();
+              const flag = getFlagEmoji(countryCode);
+              
+              const detected = {
+                code: countryCode,
+                name: city ? `${city}, ${country}` : country,
+                flag
+              };
+              setDeliveryCountry(detected);
+              try {
+                localStorage.setItem('vc_delivery_country', JSON.stringify(detected));
+              } catch (_) {}
+            } else {
+              await fallbackIpDetect();
+            }
+          } catch (e) {
+            console.error("Reverse geocoding failed, falling back to IP:", e);
+            await fallbackIpDetect();
+          }
+        },
+        async (err) => {
+          console.warn("Geolocation permission denied or failed, falling back to IP:", err);
+          await fallbackIpDetect();
+        },
+        { timeout: 5000 }
+      );
+    } else {
+      fallbackIpDetect();
+    }
   }, []);
 
   const handleCountryChange = (countryInfo) => {
