@@ -103,6 +103,7 @@ const shareRoutes = require('./routes/shareRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
 const walletRoutes = require('./routes/walletRoutes');
+const importRoutes = require('./routes/importRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
@@ -116,6 +117,7 @@ app.use('/api/sellers', sellerRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/wallet', walletRoutes);
+app.use('/api/imports', importRoutes);
 
 // Endpoint de géolocalisation par IP avec fallbacks (évite CORS et blocages pub/privacy)
 app.get('/api/geolocation', async (req, res) => {

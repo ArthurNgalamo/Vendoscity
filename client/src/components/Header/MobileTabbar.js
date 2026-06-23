@@ -1,7 +1,7 @@
 // client/src/components/Header/MobileTabbar.js
 import React from 'react';
 import Link from 'next/link';
-import { ShoppingCart, User, Home } from 'lucide-react';
+import { ShoppingCart, User, Home, Video } from 'lucide-react';
 import { VendoscityLogoMini, GridIcon, MessageIcon } from './HeaderIcons';
 import { getUserAvatarUrl } from '../../core/api';
 
@@ -26,11 +26,11 @@ export default function MobileTabbar({
         <span>Accueil</span>
       </Link>
 
-      <Link href="/categories" className={`tabbar-item ${pathname === '/categories' ? 'active' : ''}`}>
+      <Link href="/videos" className={`tabbar-item ${pathname === '/videos' ? 'active' : ''}`}>
         <div className="tabbar-icon-wrap">
-          <GridIcon />
+          <Video width="20" height="20" />
         </div>
-        <span>Catégories</span>
+        <span>Vidéos</span>
       </Link>
 
       <Link href="/messagerie" className={`tabbar-item ${pathname === '/messagerie' ? 'active' : ''}`}>

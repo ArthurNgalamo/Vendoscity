@@ -35,7 +35,8 @@ import {
   MessageSquare,
   QrCode,
   Wallet,
-  TrendingUp
+  TrendingUp,
+  Video
 } from 'lucide-react';
 import { CATEGORIES } from './constants';
 import Sparkles from '../Sparkles';
@@ -344,6 +345,9 @@ export default function DesktopHeader({
                 {unreadCount}
               </span>
             )}
+          </Link>
+          <Link href="/videos" className={`nav-sub-link ${pathname === '/videos' ? 'active' : ''}`} style={{ fontWeight: 'bold', color: pathname === '/videos' ? 'var(--primary-blue)' : '#8b5cf6', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+            Vidéos
           </Link>
           <Link href="/apropos" className="nav-sub-link">À propos</Link>
           <Link href="/contacts" className="nav-sub-link">Contacts</Link>

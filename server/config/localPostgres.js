@@ -252,6 +252,38 @@ class LocalPostgresClient {
                 }
                 const data = this.isSingle ? results[0] : results;
                 return onSuccess({ data, error: null });
+            } else if (this.operation === 'UPSERT') {
+                const results = [];
+                for (const row of this.dataToInsert) {
+                    const keys = Object.keys(row);
+                    const rowValues = Object.values(row);
+                    const placeholders = keys.map((_, i) => `$${i + 1}`).join(', ');
+                    let insertSql = `INSERT INTO ${schema}.${this.tableName} (${keys.map(k => `"${k}"`).join(', ')}) VALUES (${placeholders})`;
+                    
+                    let conflictTarget = '';
+                    if (this.tableName === 'imported_pool') {
+                        conflictTarget = '"source", "original_id"';
+                    } else if (this.tableName === 'seller_imported_catalog') {
+                        conflictTarget = '"seller_id", "pool_product_id"';
+                    } else if (this.tableName === 'seller_social_credentials') {
+                        conflictTarget = '"seller_id", "platform"';
+                    } else if (this.tableName === 'temporary_cache') {
+                        conflictTarget = '"key"';
+                    }
+                    
+                    if (conflictTarget) {
+                        const updateSet = keys.map(k => `"${k}" = EXCLUDED."${k}"`).join(', ');
+                        insertSql += ` ON CONFLICT (${conflictTarget}) DO UPDATE SET ${updateSet}`;
+                    } else {
+                        insertSql += ` ON CONFLICT DO NOTHING`;
+                    }
+                    
+                    insertSql += ` RETURNING *`;
+                    const { rows } = await pool.query(insertSql, rowValues);
+                    results.push(rows[0]);
+                }
+                const data = this.isSingle ? results[0] : results;
+                return onSuccess({ data, error: null });
             } else if (this.operation === 'UPDATE') {
                 const keys = Object.keys(this.dataToUpdate);
                 const updateValues = Object.values(this.dataToUpdate);

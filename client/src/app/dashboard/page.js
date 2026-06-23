@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 import { getApiBaseUrl, fetchWithTimeout, normalizeSupabaseImageUrl, formatCurrency, compressImage } from '../../core/api';
 import { shareLink } from '../../core/share';
-import { LayoutDashboard, Store, User, TrendingUp, QrCode, Wallet, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, Store, User, TrendingUp, QrCode, Wallet, ShieldCheck, Globe } from 'lucide-react';
 
 import { POPULAR_NEIGHBORHOODS, parsePhoneNumber } from './constants';
 import ProfileSection from './components/ProfileSection';
@@ -18,6 +18,7 @@ import StatsSection from './components/StatsSection';
 import SellerApplicationSection from './components/SellerApplicationSection';
 import OrdersSection from './components/OrdersSection';
 import WalletSection from './components/WalletSection';
+import ImportSection from './components/ImportSection';
 import './dashboard.css';
 
 function DashboardContent() {
@@ -72,7 +73,7 @@ function DashboardContent() {
     if (loading || !user) return;
 
     const validTabs = isSellerApproved
-      ? ['profile', 'stats', 'seller-area', 'orders', 'wallet', ...(!profile?.is_verified ? ['seller-application'] : [])]
+      ? ['profile', 'stats', 'seller-area', 'orders', 'wallet', 'import', ...(!profile?.is_verified ? ['seller-application'] : [])]
       : ['profile', 'seller-application'];
 
     let target = tab;
@@ -589,6 +590,15 @@ function DashboardContent() {
                       <ShieldCheck width="18" height="18" style={{ color: '#3b82f6' }} /> Certifier ma boutique
                     </button>
                   )}
+                  {isSellerApproved && profile?.is_verified && (
+                    <button
+                      onClick={() => setActiveSection('import')}
+                      className={`dashboard-menu-item ${activeSection === 'import' ? 'active' : ''}`}
+                      style={{ background: 'none', border: 'none', textAlign: 'left', width: '100%', fontFamily: 'inherit' }}
+                    >
+                      <Globe width="18" height="18" style={{ color: '#8b5cf6' }} /> Importer des Articles
+                    </button>
+                  )}
                 </>
               ) : (
                 <button
@@ -685,6 +695,16 @@ function DashboardContent() {
                   showToast={showToast}
                   isUnlocked={isWalletUnlocked}
                   setIsUnlocked={setIsWalletUnlocked}
+                />
+              )}
+
+              {/* Section: Import Catalogue */}
+              {activeSection === 'import' && (
+                <ImportSection
+                  profile={profile}
+                  authFetch={authFetch}
+                  showToast={showToast}
+                  formatCurrency={formatCurrency}
                 />
               )}
 

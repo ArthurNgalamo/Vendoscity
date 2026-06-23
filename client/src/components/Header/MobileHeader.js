@@ -14,7 +14,8 @@ import {
   QrCode,
   Wallet,
   TrendingUp,
-  ShieldCheck
+  ShieldCheck,
+  Video
 } from 'lucide-react';
 import { GridIcon } from './HeaderIcons';
 import { useTypingPlaceholder, getPersonalizedPhrases } from '../../hooks/useTypingPlaceholder';
@@ -129,11 +130,11 @@ export default function MobileHeader({
 
           {/* ROW 3: Navigation shortcuts */}
           <div className="mobile-shortcuts-row">
-            <Link href="/categories" className="mobile-shortcut-card">
+            <Link href="/videos" className="mobile-shortcut-card">
               <div className="mobile-shortcut-icon">
-                <GridIcon />
+                <Video width="20" height="20" style={{ color: '#8b5cf6' }} />
               </div>
-              <span className="mobile-shortcut-text">Explorer par<br/>catégories</span>
+              <span className="mobile-shortcut-text">Flux<br/>vidéos</span>
             </Link>
             <Link href="/ai-mode?message=Je%20souhaite%20demander%20un%20devis%20pour%20les%20produits%20suivants%20%3A%20" className="mobile-shortcut-card">
               <div className="mobile-shortcut-icon">

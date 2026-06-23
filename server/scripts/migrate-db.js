@@ -286,6 +286,129 @@ async function runMigrations() {
             CREATE POLICY "Les utilisateurs peuvent inserer leurs propres retraits" ON public.wallet_withdrawals FOR INSERT WITH CHECK (auth.uid() = seller_id);
         `);
 
+        // 11. Caching and Indexing Migrations
+        console.log('⚡ Creating imports, social, gamification, caching, indexing, and cost logging tables & fields...');
+        await pool.query(`
+            -- Create imported_pool first if not exists
+            CREATE TABLE IF NOT EXISTS public.imported_pool (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                source VARCHAR(50) NOT NULL,
+                original_id VARCHAR(100) NOT NULL,
+                original_currency VARCHAR(10) NOT NULL DEFAULT 'USD',
+                price_original NUMERIC(12,2) NOT NULL,
+                price_fcfa NUMERIC(12,2) NOT NULL,
+                price_final NUMERIC(12,2) NOT NULL,
+                category VARCHAR(100),
+                title_fr VARCHAR(500) NOT NULL,
+                description_fr TEXT,
+                image_urls TEXT[] DEFAULT '{}',
+                video_url TEXT,
+                cached_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+                UNIQUE(source, original_id)
+            );
+
+            -- RLS for imported_pool
+            ALTER TABLE public.imported_pool ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "imported_pool_public_read" ON public.imported_pool;
+            DROP POLICY IF EXISTS "imported_pool_service_write" ON public.imported_pool;
+            CREATE POLICY "imported_pool_public_read" ON public.imported_pool FOR SELECT USING (true);
+            CREATE POLICY "imported_pool_service_write" ON public.imported_pool FOR ALL USING (true);
+
+            -- Create seller_imported_catalog if not exists
+            CREATE TABLE IF NOT EXISTS public.seller_imported_catalog (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                seller_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+                pool_product_id UUID NOT NULL REFERENCES public.imported_pool(id) ON DELETE CASCADE,
+                custom_title VARCHAR(500),
+                custom_description TEXT,
+                is_active BOOLEAN DEFAULT true,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+                UNIQUE(seller_id, pool_product_id)
+            );
+
+            ALTER TABLE public.seller_imported_catalog ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "sic_owner_all" ON public.seller_imported_catalog;
+            DROP POLICY IF EXISTS "sic_public_read" ON public.seller_imported_catalog;
+            CREATE POLICY "sic_owner_all" ON public.seller_imported_catalog FOR ALL USING (auth.uid() = seller_id);
+            CREATE POLICY "sic_public_read" ON public.seller_imported_catalog FOR SELECT USING (true);
+
+            -- Create seller_social_credentials if not exists
+            CREATE TABLE IF NOT EXISTS public.seller_social_credentials (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                seller_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+                platform VARCHAR(50) NOT NULL,
+                access_token TEXT,
+                refresh_token TEXT,
+                page_id VARCHAR(100),
+                expires_at TIMESTAMP WITH TIME ZONE,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now()),
+                UNIQUE(seller_id, platform)
+            );
+
+            ALTER TABLE public.seller_social_credentials ENABLE ROW LEVEL SECURITY;
+            DROP POLICY IF EXISTS "ssc_owner_all" ON public.seller_social_credentials;
+            CREATE POLICY "ssc_owner_all" ON public.seller_social_credentials FOR ALL USING (auth.uid() = seller_id);
+
+            -- Add gamification columns to profiles
+            ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS seller_level VARCHAR(20) DEFAULT 'bronze';
+            ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS referral_code VARCHAR(20) UNIQUE;
+            ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS referred_by UUID REFERENCES public.profiles(id);
+            ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_sales_count INTEGER DEFAULT 0;
+            ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS total_revenue_fcfa NUMERIC(12,2) DEFAULT 0;
+
+            -- Alter imported_pool for caching policy fields
+            DO $$
+            BEGIN
+                IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema='public' AND table_name='imported_pool') THEN
+                    ALTER TABLE public.imported_pool ADD COLUMN IF NOT EXISTS stock INTEGER DEFAULT 1;
+                    ALTER TABLE public.imported_pool ADD COLUMN IF NOT EXISTS price_cached_at TIMESTAMP WITH TIME ZONE DEFAULT now();
+                    ALTER TABLE public.imported_pool ADD COLUMN IF NOT EXISTS details_cached_at TIMESTAMP WITH TIME ZONE DEFAULT now();
+                    ALTER TABLE public.imported_pool ADD COLUMN IF NOT EXISTS views INTEGER DEFAULT 0;
+                    ALTER TABLE public.imported_pool ADD COLUMN IF NOT EXISTS price_comparison JSONB DEFAULT '{}'::jsonb;
+                END IF;
+            END $$;
+
+            -- Create temporary_cache table
+            CREATE TABLE IF NOT EXISTS public.temporary_cache (
+                key VARCHAR(255) PRIMARY KEY,
+                value TEXT NOT NULL,
+                expires_at TIMESTAMP WITH TIME ZONE NOT NULL
+            );
+
+            -- Create api_call_logs table
+            CREATE TABLE IF NOT EXISTS public.api_call_logs (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                api_name VARCHAR(100) NOT NULL,
+                endpoint VARCHAR(255) NOT NULL,
+                cost_credits NUMERIC(10,4) NOT NULL DEFAULT 1.0,
+                timestamp TIMESTAMP WITH TIME ZONE DEFAULT now()
+            );
+
+            -- Create api_alerts table
+            CREATE TABLE IF NOT EXISTS public.api_alerts (
+                id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                alert_type VARCHAR(50) NOT NULL,
+                message TEXT NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+            );
+
+            -- Indexes for search
+            CREATE INDEX IF NOT EXISTS idx_imported_pool_search_title ON public.imported_pool (title_fr);
+            CREATE INDEX IF NOT EXISTS idx_imported_pool_price_final ON public.imported_pool (price_final);
+            CREATE INDEX IF NOT EXISTS idx_imported_pool_views ON public.imported_pool (views DESC);
+            CREATE INDEX IF NOT EXISTS idx_imported_pool_source ON public.imported_pool (source);
+            CREATE INDEX IF NOT EXISTS idx_imported_pool_category ON public.imported_pool (category);
+        `);
+
+        try {
+            console.log('⚙️ Enabling pg_trgm extension for faster text search...');
+            await pool.query('CREATE EXTENSION IF NOT EXISTS pg_trgm;');
+            await pool.query('CREATE INDEX IF NOT EXISTS idx_imported_pool_title_trgm ON public.imported_pool USING gin (title_fr gin_trgm_ops);');
+            console.log('✅ pg_trgm search index created successfully!');
+        } catch (trgmErr) {
+            console.warn('⚠️ Could not enable pg_trgm index (this is optional, search will fall back to standard index):', trgmErr.message);
+        }
+
         console.log('🎉 Database migration completed successfully!');
         await pool.end();
         process.exit(0);
