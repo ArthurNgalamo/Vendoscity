@@ -226,38 +226,9 @@ export default function ProductInfo({
         </button>
       </div>
 
-      {/* Direct Contact Buttons */}
-      {sellerWhatsApp && (
+      {/* Contact buttons */}
+      {(sellerId || sellerWhatsApp) && (
         <div style={{ display: 'flex', gap: '10px', marginTop: '10px', flexWrap: 'wrap' }}>
-          <a
-            href={`https://wa.me/${sellerWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(
-              `Bonjour, je suis intéressé par votre article : "${product.title}" (${typeof window !== 'undefined' ? window.location.href : ''})`
-            )}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="pressable"
-            onClick={() => logAnalyticsEvent('whatsapp_click', sellerId, product.id)}
-            style={{
-              flex: 1,
-              background: '#25D366',
-              color: '#fff',
-              border: 'none',
-              borderRadius: '8px',
-              padding: '12px',
-              fontWeight: '800',
-              textAlign: 'center',
-              textDecoration: 'none',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              fontSize: '0.95rem',
-              minWidth: '140px'
-            }}
-          >
-            <MessageSquare width="18" height="18" fill="white" /> WhatsApp
-          </a>
-
           {sellerId && (
             <Link
               href={`/messagerie?seller=${sellerId}&product=${product.id}&title=${encodeURIComponent(product.title)}&price=${price}&image=${encodeURIComponent(product.images?.[0] || product.image_url || product.image || '')}`}
@@ -265,8 +236,8 @@ export default function ProductInfo({
               onClick={() => logAnalyticsEvent('chat_click', sellerId, product.id)}
               style={{
                 flex: 1,
-                background: '#fff',
-                color: 'var(--primary-blue)',
+                background: 'var(--primary-blue)',
+                color: '#fff',
                 border: '1px solid var(--primary-blue)',
                 borderRadius: '8px',
                 padding: '12px',
@@ -281,31 +252,33 @@ export default function ProductInfo({
                 minWidth: '140px'
               }}
             >
-              <MessageSquare width="18" height="18" /> Chat en Direct
+              <MessageSquare width="18" height="18" /> Écrire au vendeur
             </Link>
           )}
 
-          <a
-            href={`tel:${sellerWhatsApp.replace(/\D/g, '')}`}
-            className="pressable"
-            onClick={() => logAnalyticsEvent('phone_click', sellerId, product.id)}
-            style={{
-              background: '#f3f4f6',
-              color: '#1f2937',
-              border: '1px solid #e5e7eb',
-              borderRadius: '8px',
-              width: '48px',
-              height: '48px',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              textDecoration: 'none',
-              cursor: 'pointer'
-            }}
-            title="Appeler le vendeur"
-          >
-            <Phone width="18" height="18" />
-          </a>
+          {sellerWhatsApp && (
+            <a
+              href={`tel:${sellerWhatsApp.replace(/\D/g, '')}`}
+              className="pressable"
+              onClick={() => logAnalyticsEvent('phone_click', sellerId, product.id)}
+              style={{
+                background: '#f3f4f6',
+                color: '#1f2937',
+                border: '1px solid #e5e7eb',
+                borderRadius: '8px',
+                width: '48px',
+                height: '48px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                textDecoration: 'none',
+                cursor: 'pointer'
+              }}
+              title="Appeler le vendeur"
+            >
+              <Phone width="18" height="18" />
+            </a>
+          )}
         </div>
       )}
 

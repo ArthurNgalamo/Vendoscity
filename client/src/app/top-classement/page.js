@@ -221,7 +221,7 @@ export default function TopClassementPage() {
                             {seller.shop_name}
                           </h4>
                           <span style={{ fontSize: '0.72rem', color: '#64748b', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                            <CheckCircle width="10" height="10" style={{ color: '#3b82f6' }} /> Verified Vendor
+                            <CheckCircle width="10" height="10" style={{ color: '#3b82f6' }} /> Vendeur certifié
                           </span>
                         </div>
                       </div>

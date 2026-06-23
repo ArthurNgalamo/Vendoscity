@@ -13,7 +13,6 @@ import {
   Plus, 
   Minus, 
   MessageSquare, 
-  Phone, 
   Tag, 
   Truck, 
   ShieldCheck, 
@@ -122,7 +121,7 @@ export default function PanierPage() {
     const sellerId = items[0]?.seller_id || '';
     const sellerWhatsApp = items[0]?.whatsapp || '';
     if (!sellerWhatsApp) {
-      alert("Ce vendeur n'a pas renseigné son numéro WhatsApp.");
+      alert("Ce vendeur n'a pas encore renseigné de contact de commande.");
       return;
     }
 
@@ -267,7 +266,7 @@ export default function PanierPage() {
                     ))}
                   </div>
 
-                  {/* Checkout CTA per seller (Direct order WhatsApp link) */}
+                  {/* Checkout CTA per seller */}
                   <div className="seller-group-footer-checkout">
                     <div className="seller-checkout-text">
                       Prêt à commander auprès de <strong>{sellerName}</strong> ?
@@ -430,8 +429,8 @@ export default function PanierPage() {
                 <div className="cart-security-badge">
                   <ShieldCheck width="18" height="18" style={{ color: '#16a34a', flexShrink: 0 }} />
                   <div>
-                    <strong>Paiement de gré à gré à la livraison</strong>
-                    <p>Aucun paiement n&apos;est fait sur le site. Vous inspectez l&apos;article et payez le vendeur MOMO/Cash.</p>
+                    <strong>Paiement sécurisé en cours de déploiement</strong>
+                    <p>Vendoscity évolue vers des paiements gérés sur la plateforme. Les vendeurs en transition peuvent encore proposer un règlement local.</p>
                   </div>
                 </div>
               </div>

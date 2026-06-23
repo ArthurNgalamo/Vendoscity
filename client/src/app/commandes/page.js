@@ -121,7 +121,7 @@ export default function CommandesPage() {
             <div class="header">
               <div>
                 <div class="logo">VENDOSCITY</div>
-                <div style="font-size: 12px; color: #64748b;">Mise en relation direct & Séquestre</div>
+                <div style="font-size: 12px; color: #64748b;">Commande suivie & paiement sécurisé</div>
               </div>
               <div class="title">
                 <h2 style="margin: 0; color: #0f172a;">FACTURE</h2>
@@ -135,7 +135,7 @@ export default function CommandesPage() {
                 <strong>Vendeur :</strong>
                 <div>${seller?.shop_name || 'Boutique Partenaire'}</div>
                 <div>Propriétaire : ${seller?.first_name || ''} ${seller?.last_name || ''}</div>
-                <div>Tél/WhatsApp : ${seller?.phone || ''}</div>
+                <div>Téléphone : ${seller?.phone || ''}</div>
               </div>
               <div class="details-block">
                 <strong>Acheteur :</strong>
@@ -174,7 +174,7 @@ export default function CommandesPage() {
             </div>
 
             <div class="footer">
-              <p>Arthur Romi Ngalamo Kekenou - Gestionnaire de Séquestre Officiel de Vendoscity</p>
+              <p>Vendoscity - Service de paiement sécurisé</p>
               <p>Ce document atteste de la libération conforme des fonds en séquestre après livraison physique de l'article.</p>
             </div>
             <script>

@@ -90,7 +90,7 @@ export default function ProductDetailPage({ params }) {
     if (!product) return;
     const res = await shareLink({
       title: product.title,
-      text: `Découvrez ${product.title} sur Vendoscity ! Commande directe WhatsApp.`,
+      text: `Découvrez ${product.title} sur Vendoscity.`,
       url: window.location.href
     });
 

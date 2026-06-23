@@ -499,7 +499,7 @@ function DashboardContent() {
 
     const wa = profileData.phone || user?.phone || '';
     if (!wa) {
-      alert('Veuillez d\'abord renseigner votre numéro WhatsApp dans la section "Mon Profil".');
+      alert('Veuillez d\'abord renseigner votre numéro de téléphone dans la section "Mon Profil".');
       setSubmittingProduct(false);
       return;
     }

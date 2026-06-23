@@ -60,7 +60,7 @@ export default function ContactsPage() {
                 <Phone width="18" height="18" />
               </div>
               <div>
-                <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', fontWeight: '800' }}>Téléphone / WhatsApp</h4>
+                <h4 style={{ margin: '0 0 4px 0', fontSize: '0.95rem', fontWeight: '800' }}>Téléphone</h4>
                 <a href="tel:+237681570075" style={{ color: '#444', textDecoration: 'none', fontSize: '0.9rem' }}>
                   +237 681 570 075
                 </a>
@@ -128,7 +128,7 @@ export default function ContactsPage() {
                 <option value="">-- Sélectionnez un sujet --</option>
                 <option value="account">Problème de compte</option>
                 <option value="order">Question sur une commande</option>
-                <option value="payment">Paiement (entre acheteur et vendeur)</option>
+                <option value="payment">Paiement sécurisé</option>
                 <option value="product">Question sur un produit</option>
                 <option value="seller">Question vendeur</option>
                 <option value="general">Autre</option>
@@ -179,28 +179,28 @@ export default function ContactsPage() {
           <div>
             <h4 style={{ color: 'var(--primary-blue)', margin: '0 0 8px 0', fontWeight: '800' }}>Quel est le délai de livraison ?</h4>
             <p style={{ margin: 0, color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Les délais varient selon le vendeur. Après commande, vous contactez directement le vendeur pour convenir de la remise en main propre ou d&apos;une livraison.
+              Les délais varient selon le vendeur. Après commande, utilisez la messagerie et le suivi Vendoscity pour convenir de la remise en main propre ou d&apos;une livraison.
             </p>
           </div>
 
           <div>
             <h4 style={{ color: 'var(--primary-blue)', margin: '0 0 8px 0', fontWeight: '800' }}>Puis-je retourner un article ?</h4>
             <p style={{ margin: 0, color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Les retours se discutent directement avec le vendeur (conditions et délais). Vendoscity est une plateforme de mise en relation et ne gère pas les litiges ou remboursements.
+              Les retours se discutent avec le vendeur depuis l'historique de commande. Les commandes avec paiement sécurisé peuvent bénéficier d'un suivi plus clair en cas de problème.
             </p>
           </div>
 
           <div>
             <h4 style={{ color: 'var(--primary-blue)', margin: '0 0 8px 0', fontWeight: '800' }}>Quelles sont les méthodes de paiement ?</h4>
             <p style={{ margin: 0, color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              La commande se fait sur Vendoscity. Le paiement se fait ensuite hors plateforme directement entre acheteur et vendeur selon le mode de votre choix (Orange Money, Mobile Money, Cash...).
+              Vendoscity évolue vers le paiement sécurisé sur la plateforme. Certains vendeurs peuvent encore proposer un règlement local pendant la transition.
             </p>
           </div>
 
           <div>
             <h4 style={{ color: 'var(--primary-blue)', margin: '0 0 8px 0', fontWeight: '800' }}>Comment créer un compte vendeur ?</h4>
             <p style={{ margin: 0, color: '#555', fontSize: '0.9rem', lineHeight: '1.5' }}>
-              Rendez-vous sur la page d&apos;inscription vendeur. Créez un compte avec vos informations WhatsApp, et vous pourrez immédiatement publier vos produits.
+              Rendez-vous sur la page d&apos;inscription vendeur. Créez un compte avec vos informations professionnelles, puis publiez vos produits depuis votre tableau de bord.
             </p>
           </div>
         </div>

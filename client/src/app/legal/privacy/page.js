@@ -73,8 +73,8 @@ export default function PrivacyPage() {
           <h3>2.1 Données fournies volontairement</h3>
           <p>Dans le cadre de l'utilisation du Site, vous pouvez être amené à nous transmettre directement certaines données personnelles, notamment :</p>
           <ul>
-            <li>Lors de l'inscription vendeur : Nom de boutique, prénom, nom, adresse email, mot de passe, numéro WhatsApp et quartier.</li>
-            <li>Lors du passage d'une commande par un client : Numéro WhatsApp.</li>
+            <li>Lors de l'inscription vendeur : Nom de boutique, prénom, nom, adresse email, mot de passe, téléphone professionnel et quartier.</li>
+            <li>Lors du passage d'une commande par un client : coordonnées de contact, articles commandés, informations de livraison et moyen de paiement choisi.</li>
             <li>Lors de la publication d'avis ou de messages de contact : Contenu de l'avis, nom d'utilisateur, email.</li>
           </ul>
 
@@ -86,12 +86,13 @@ export default function PrivacyPage() {
           <ul>
             <li>Assurer le fonctionnement technique et la sécurité de la plateforme.</li>
             <li>Permettre aux vendeurs de gérer leur profil et leurs catalogues de produits.</li>
-            <li>Générer et formater le récapitulatif de commande WhatsApp destiné à être envoyé au vendeur.</li>
+            <li>Créer, suivre et sécuriser les commandes passées sur la plateforme.</li>
+            <li>Préparer l'import de catalogues, images et vidéos depuis des fournisseurs partenaires lorsque cette fonctionnalité sera activée.</li>
             <li>Améliorer l'expérience utilisateur et réaliser des analyses de trafic anonymes.</li>
           </ul>
 
           <h2>4. Partage des Données</h2>
-          <p>Vendoscity ne vend pas, ne loue pas et ne cède pas vos données personnelles à des tiers. Les données de commande (les articles et votre numéro WhatsApp) sont partagées uniquement avec le vendeur concerné lorsque vous initiez la discussion WhatsApp.</p>
+          <p>Vendoscity ne vend pas, ne loue pas et ne cède pas vos données personnelles à des tiers. Les données de commande sont partagées uniquement avec les vendeurs, prestataires de paiement, livraison ou fournisseurs techniques nécessaires au traitement de la commande.</p>
 
           <h2>5. Stockage et Sécurité</h2>
           <p>Vos données de session vendeur (jeton d'authentification) et vos paniers sont stockés localement sur votre appareil (via le stockage local du navigateur) pour optimiser les performances et limiter les requêtes réseau superflues. Les données serveurs sont stockées sur des serveurs sécurisés équipés de protocoles de chiffrement standard.</p>

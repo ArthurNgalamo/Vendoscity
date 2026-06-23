@@ -63,7 +63,7 @@ function AiChatContent() {
       return "Je recherche pour vous dans notre catalogue. Nous répertorions de nombreux articles :\n• **Électronique & Téléphonie** (Yaoundé / Douala)\n• **Mode & Créations sur mesure**\n• **Services de Proximité**\n\nIndiquez-moi le produit et le quartier ciblé pour affiner la recherche.";
     }
     if (inputLower.includes('vendeur') || inputLower.includes('fournisseur') || inputLower.includes('boutique')) {
-      return "Vous pouvez consulter la liste de nos partenaires sur la page dédiée aux **Vendeurs**. Tous disposent de profils vérifiés avec un lien direct WhatsApp pour faciliter vos échanges professionnels et la négociation des tarifs.";
+      return "Vous pouvez consulter la liste de nos partenaires sur la page dédiée aux **Vendeurs**. Les profils certifiés, la messagerie Vendoscity et les commandes suivies facilitent vos échanges professionnels.";
     }
     
     return "J'ai bien noté votre demande. Le service de devis automatique par IA est en cours d'intégration. Vos retours nous aident à améliorer cet outil d'approvisionnement B2B pour le marché camerounais.";
@@ -418,7 +418,7 @@ function AiChatContent() {
             Assistant d&apos;Approvisionnement Vendoscity
             <Sparkles width="16" height="16" style={{ color: 'var(--brand-accent)' }} />
           </h1>
-          <p>Recherche intelligente de produits, devis professionnels et mise en relation directe.</p>
+          <p>Recherche intelligente de produits, devis professionnels et préparation des imports fournisseurs.</p>
         </div>
       </div>
 
@@ -447,8 +447,8 @@ function AiChatContent() {
           <div className="ai-guide-item">
             <CheckCircle width="16" height="16" className="ai-guide-icon" />
             <div>
-              <strong>Relation directe WhatsApp</strong>
-              <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Finalisez les prix et organisez la livraison en direct avec le vendeur.</p>
+              <strong>Messagerie et suivi intégrés</strong>
+              <p style={{ margin: '2px 0 0 0', fontSize: '0.78rem', color: '#64748b' }}>Échangez avec le vendeur, gardez l'historique et préparez la commande depuis Vendoscity.</p>
             </div>
           </div>
         </aside>

@@ -6,11 +6,11 @@ import ProductCard from '../components/ProductCard';
 import { getApiBaseUrl, fetchWithTimeout } from '../core/api';
 
 const HERO_ROTATING_TITLES = [
-  'Vendoscity - Marketplace de Mise en Relation Directe',
+  'Vendoscity - Marketplace intégrée pour le commerce local',
   'Vendoscity - Achetez et vendez près de chez vous',
-  'Vendoscity - Des offres locales, simple et rapide',
-  'Vendoscity - Contact direct, sans prise de tête',
-  'Vendoscity - Publiez un article en 1 minute'
+  'Vendoscity - Des offres locales, simples et rapides',
+  'Vendoscity - Commandes, messages et suivi au même endroit',
+  'Vendoscity - Des catalogues enrichis bientôt importés automatiquement'
 ];
 
 export default function HomePage() {
@@ -112,13 +112,13 @@ export default function HomePage() {
 
   return (
     <>
-      {/* Temu-like Hero Section */}
+      {/* Homepage hero */}
       <section className="temu-hero-section">
         <h1 id="hero-title" style={{ transition: 'opacity 0.25s ease-in-out', opacity: titleFade ? 0 : 1 }}>{heroTitleText}</h1>
-        <p>Achetez et vendez près de chez vous au Cameroun. Zéro frais de mise en relation.</p>
+        <p>Achetez, vendez et suivez vos échanges sur Vendoscity. La plateforme évolue vers une gestion complète des commandes, produits, vidéos et paiements.</p>
       </section>
 
-      {/* Pink Header: Meilleurs choix (Trending shelf) */}
+      {/* Meilleurs choix */}
       <div className="temu-pink-header">
         Meilleurs choix
       </div>
@@ -135,7 +135,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pink Header orange: Nouveautés */}
+      {/* Nouveautés */}
       <div className="temu-pink-header orange">
         Nouveautés
       </div>

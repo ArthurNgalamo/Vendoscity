@@ -256,7 +256,7 @@ export default function OrdersSection({ authFetch, showToast }) {
             <div class="header">
               <div>
                 <div class="logo">VENDOSCITY</div>
-                <div style="font-size: 12px; color: #64748b;">Mise en relation direct & Séquestre</div>
+                <div style="font-size: 12px; color: #64748b;">Commande suivie & paiement sécurisé</div>
               </div>
               <div class="title">
                 <h2 style="margin: 0; color: #0f172a;">FACTURE VENDEUR</h2>
@@ -270,7 +270,7 @@ export default function OrdersSection({ authFetch, showToast }) {
                 <strong>De (Vendeur) :</strong>
                 <div>${seller?.shop_name || 'Ma Boutique'}</div>
                 <div>Nom : ${seller?.first_name || ''} ${seller?.last_name || ''}</div>
-                <div>WhatsApp : ${seller?.phone || ''}</div>
+                <div>Téléphone : ${seller?.phone || ''}</div>
               </div>
               <div class="details-block">
                 <strong>À (Client) :</strong>
@@ -306,7 +306,7 @@ export default function OrdersSection({ authFetch, showToast }) {
             </div>
 
             <div class="footer">
-              <p>Vendoscity Marketplace - Arthur Romi Ngalamo Kekenou</p>
+              <p>Vendoscity Marketplace - Paiement sécurisé</p>
               <p>Facture électronique certifiée conforme après déverrouillage sécurisé par code unique de livraison.</p>
             </div>
             <script>
@@ -425,7 +425,7 @@ export default function OrdersSection({ authFetch, showToast }) {
                     )}
                   </td>
                   <td style={{ padding: '12px 8px' }}>
-                    <div style={{ fontWeight: '600' }}>{order.buyer_phone_payeur || 'WhatsApp Direct'}</div>
+                    <div style={{ fontWeight: '600' }}>{order.buyer_phone_payeur || 'Commande directe'}</div>
                     {order.is_distribution && (
                       <div style={{ fontSize: '0.72rem', color: '#475569', marginTop: '4px' }}>
                         📍 Point: <strong>{order.distribution_point_name}</strong>

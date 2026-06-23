@@ -24,7 +24,7 @@ export async function copyToClipboard(text) {
 export async function shareLink({ title, text, url }) {
   const shareUrl = url || (typeof window !== 'undefined' ? window.location.href : '');
   const shareTitle = title || 'Vendoscity';
-  const shareText = text || `${shareTitle}\n\nCommande directe via WhatsApp. Plateforme au Cameroun.`;
+  const shareText = text || `${shareTitle}\n\nDécouvrez cet élément sur Vendoscity, marketplace intégrée au Cameroun.`;
 
   const shareData = {
     title: shareTitle,

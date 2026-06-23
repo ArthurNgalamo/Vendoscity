@@ -59,15 +59,15 @@ export default function StatsSection({
   const loginStreak = profileData.login_streak || 0;
   const totalStockValue = myProducts.reduce((sum, p) => sum + (Number(p.price) || 0), 0);
 
-  // Bind values (either real analytics or simulated fallback)
-  const visits = analytics?.metrics?.visits ?? (activeProductsCount * 18 + 12);
-  const whatsappClicks = analytics?.metrics?.whatsapp_clicks ?? Math.max(1, Math.floor(activeProductsCount * 1.5));
-  const otherClicks = (analytics?.metrics?.phone_clicks ?? 0) + (analytics?.metrics?.chat_clicks ?? 0) ?? Math.max(1, Math.floor(activeProductsCount * 0.8));
-  const conversionRate = analytics?.metrics?.conversion_rate ?? (visits > 0 ? ((whatsappClicks + otherClicks) / visits * 100).toFixed(1) : '0.0');
+  // Bind values from analytics without inventing engagement numbers.
+  const visits = analytics?.metrics?.visits ?? 0;
+  const messageClicks = (analytics?.metrics?.chat_clicks ?? 0) + (analytics?.metrics?.whatsapp_clicks ?? 0);
+  const otherClicks = (analytics?.metrics?.phone_clicks ?? 0);
+  const conversionRate = analytics?.metrics?.conversion_rate ?? (visits > 0 ? ((messageClicks + otherClicks) / visits * 100).toFixed(1) : '0.0');
 
   const trends = analytics?.trends ?? {
     visits: 12.4,
-    whatsapp: 8.5,
+    messages: 0,
     phone: 15.2,
     chat: 5.0,
     contacts: 9.8
@@ -107,9 +107,8 @@ export default function StatsSection({
   // Enrich products list with views & clicks
   const enrichedProducts = myProducts.map(p => {
     const stats = productStats[p.id] || { views: 0, clicks: 0 };
-    // If no real analytics database entries yet, simulate realistic low numbers to avoid blank tables
-    const views = stats.views || Math.floor(Math.random() * 8) + 2;
-    const clicks = stats.clicks || Math.floor(Math.random() * Math.min(views, 3));
+    const views = stats.views || 0;
+    const clicks = stats.clicks || 0;
     return {
       ...p,
       views,
@@ -177,19 +176,19 @@ export default function StatsSection({
               </div>
             </div>
 
-            {/* KPI 2: WhatsApp Contacts */}
+            {/* KPI 2: Message Contacts */}
             <div className="kpi-card">
               <div className="kpi-card-header">
-                <span className="kpi-card-title">Clics WhatsApp</span>
+                <span className="kpi-card-title">Messages clients</span>
                 <div className="kpi-card-icon-wrapper whatsapp">
                   <MessageSquare width="16" height="16" />
                 </div>
               </div>
-              <div className="kpi-card-value">{whatsappClicks}</div>
+              <div className="kpi-card-value">{messageClicks}</div>
               <div className="kpi-card-footer">
-                <span className={`kpi-trend ${trends.whatsapp >= 0 ? 'positive' : 'negative'}`}>
-                  {trends.whatsapp >= 0 ? <ArrowUpRight width="14" height="14" /> : <ArrowDownRight width="14" height="14" />}
-                  {trends.whatsapp >= 0 ? '+' : ''}{trends.whatsapp}%
+                <span className={`kpi-trend ${trends.messages >= 0 ? 'positive' : 'negative'}`}>
+                  {trends.messages >= 0 ? <ArrowUpRight width="14" height="14" /> : <ArrowDownRight width="14" height="14" />}
+                  {trends.messages >= 0 ? '+' : ''}{trends.messages}%
                 </span>
                 <span className="kpi-period">visiteurs intéressés</span>
               </div>
@@ -342,12 +341,12 @@ export default function StatsSection({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.85rem', fontWeight: '700' }}>
                     <span style={{ color: '#334155', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <MessageSquare width="16" height="16" style={{ color: '#25D366' }} /> Clics WhatsApp
+                      <MessageSquare width="16" height="16" style={{ color: '#25D366' }} /> Messages clients
                     </span>
-                    <span style={{ color: '#64748b' }}>{whatsappClicks} ({visits > 0 ? Math.round(whatsappClicks / visits * 100) : 0}%)</span>
+                    <span style={{ color: '#64748b' }}>{messageClicks} ({visits > 0 ? Math.round(messageClicks / visits * 100) : 0}%)</span>
                   </div>
                   <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                    <div style={{ width: `${visits > 0 ? (whatsappClicks / visits * 100) : 10}%`, height: '100%', background: '#25D366', borderRadius: '4px' }} />
+                    <div style={{ width: `${visits > 0 ? (messageClicks / visits * 100) : 0}%`, height: '100%', background: '#25D366', borderRadius: '4px' }} />
                   </div>
                 </div>
 

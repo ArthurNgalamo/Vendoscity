@@ -276,7 +276,7 @@ export default function AboutPage() {
       <main style={{ backgroundColor: '#f4f7f6', minHeight: '100vh', paddingBottom: '60px' }}>
         <div className="about-hero">
           <h1>À Propos de Vendoscity</h1>
-          <p>Mise en relation directe acheteur-vendeur, basée à Yaoundé</p>
+          <p>Marketplace intégrée basée à Yaoundé, pensée pour le commerce local et les catalogues fournisseurs.</p>
         </div>
 
         <div className="about-container">
@@ -286,13 +286,13 @@ export default function AboutPage() {
               <BookOpen width="24" height="24" /> Notre Histoire
             </h2>
             <p>
-              Vendoscity a été fondée le <strong>10 janvier 2026</strong> à Yaoundé, au Cameroun, avec une mission simple : <strong>mettre en relation directe vendeurs et acheteurs</strong> pour leur permettre de négocier et de conclure des transactions sans commission.
+              Vendoscity a été fondée le <strong>10 janvier 2026</strong> à Yaoundé, au Cameroun, avec une mission simple : <strong>rendre le commerce en ligne plus accessible, suivi et crédible</strong> pour les vendeurs, acheteurs et fournisseurs.
             </p>
             <p>
-              Notre approche est pragmatique : la plateforme facilite la découverte des produits et la mise en relation, mais <strong>n'intervient pas dans les processus sensibles</strong> comme la séquestre du paiement ou la livraison par défaut. Les deux parties discutent en direct sur WhatsApp pour convenir des modalités.
+              Notre approche est pragmatique : la plateforme facilite déjà la découverte des produits, la messagerie et les commandes. Elle évolue maintenant vers une gestion complète sur Vendoscity : paiement sécurisé, suivi de livraison, import d'articles et vidéos depuis des fournisseurs comme Alibaba, AliExpress et 1688.
             </p>
             <p>
-              Notre vision s’articule autour de trois piliers majeurs : <strong>l’accessibilité universelle</strong> pour les petits commerçants, <strong>la rapidité de publication</strong>, et <strong>la confiance directe</strong> par la négociation humaine.
+              Notre vision s’articule autour de trois piliers majeurs : <strong>l’accessibilité universelle</strong> pour les petits commerçants, <strong>la rapidité de publication</strong>, et <strong>la confiance</strong> grâce à des parcours suivis et vérifiables.
             </p>
           </section>
 
@@ -333,11 +333,11 @@ export default function AboutPage() {
             <div className="values-grid">
               <div className="value-card">
                 <h4>Confiance</h4>
-                <p>La mise en relation directe sur WhatsApp redonne de l'humain et du dialogue au commerce en ligne.</p>
+                <p>La messagerie intégrée garde l'humain au cœur de l'achat tout en conservant un historique utile en cas de suivi ou de litige.</p>
               </div>
               <div className="value-card">
                 <h4>Innovation</h4>
-                <p>Développement de solutions adaptées aux contraintes techniques locales (PWA, caching, WhatsApp-first).</p>
+                <p>Développement de solutions adaptées aux contraintes techniques locales : PWA, caching, paiement sécurisé et import automatisé de catalogues.</p>
               </div>
               <div className="value-card">
                 <h4>Accessibilité</h4>
@@ -370,11 +370,11 @@ export default function AboutPage() {
               </div>
               <div className="timeline-item">
                 <div className="timeline-year">Avril 2026</div>
-                <div className="timeline-text">Intégration du système de panier WhatsApp-first pour regrouper les commandes par vendeur.</div>
+                <div className="timeline-text">Intégration du panier par vendeur et des premiers parcours de commande suivie.</div>
               </div>
               <div className="timeline-item">
                 <div className="timeline-year">Présent</div>
-                <div className="timeline-text">Migration complète du frontend vers Next.js pour une vitesse de chargement accrue.</div>
+                <div className="timeline-text">Migration complète du frontend vers Next.js et préparation des imports catalogues Alibaba, AliExpress et 1688.</div>
               </div>
             </div>
           </section>
@@ -395,7 +395,7 @@ export default function AboutPage() {
                   <div className="role">Fondateur & Développeur</div>
                   <p>
                     <strong>Email :</strong> <a href="mailto:arthurngalamo7@gmail.com">arthurngalamo7@gmail.com</a><br />
-                    <strong>Téléphone / WhatsApp :</strong> <a href="tel:+237681570075">+237 681 570 075</a>
+                    <strong>Téléphone :</strong> <a href="tel:+237681570075">+237 681 570 075</a>
                   </p>
                 </div>
               </div>
@@ -422,7 +422,7 @@ export default function AboutPage() {
               </div>
               <div className="stat-card">
                 <div className="stat-num">Direct</div>
-                <div className="stat-lbl">Canal de négociation</div>
+                <div className="stat-lbl">Parcours de commande</div>
               </div>
             </div>
           </div>
@@ -448,7 +448,7 @@ export default function AboutPage() {
           {/* Call to action */}
           <div className="cta-box">
             <h2>Rejoignez l'Aventure Vendoscity !</h2>
-            <p>Achetez ou vendez en direct sans frais et en toute simplicité.</p>
+            <p>Achetez, vendez et suivez vos commandes depuis une plateforme simple et évolutive.</p>
             <Link href="/boutique" className="cta-btn">
               Découvrir la Boutique
             </Link>

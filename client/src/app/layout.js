@@ -16,18 +16,18 @@ import './style.css';
 import './boutique.css';
 
 export const metadata = {
-  title: 'Vendoscity - Services & Boutique en Ligne | Découvrez',
+  title: 'Vendoscity - Marketplace intégrée au Cameroun',
   description:
-    'Bienvenue sur Vendoscity, votre portail de services et boutique en ligne. Découvrez nos produits et services de qualité. Commandez en direct sans commission, paiement et livraison hors plateforme.',
+    'Vendoscity centralise la découverte de produits, la messagerie, les commandes et le paiement sécurisé pour le commerce local au Cameroun.',
   manifest: '/manifest.json',
   keywords: 'vendoscity, boutique en ligne, services, plateforme, e-commerce, achats en ligne, Yaoundé, Cameroun',
   metadataBase: new URL('https://vendoscity.vercel.app'),
   openGraph: {
     type: 'website',
     url: 'https://vendoscity.vercel.app',
-    title: 'Vendoscity - Vos Services & Boutique en Ligne',
+    title: 'Vendoscity - Marketplace intégrée au Cameroun',
     description:
-      'Découvrez Vendoscity : votre plateforme complète de services et shopping en direct. Paiement et livraison hors plateforme.',
+      'Découvrez Vendoscity : produits locaux, vendeurs certifiés, messagerie intégrée, commandes suivies et paiement sécurisé.',
     images: [
       {
         url: '/assets/images/og-image.jpg',
@@ -39,9 +39,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Vendoscity - Services & Boutique en Ligne',
+    title: 'Vendoscity - Marketplace intégrée au Cameroun',
     description:
-      'Vendoscity : marketplace de mise en relation directe acheteur-vendeur, basée à Yaoundé. Paiement et livraison se discutent entre les parties.',
+      'Vendoscity : marketplace camerounaise pour découvrir, commander et suivre ses achats depuis une plateforme intégrée.',
     images: ['/assets/images/twitter-image.jpg']
   }
 };

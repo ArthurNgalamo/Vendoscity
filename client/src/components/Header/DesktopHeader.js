@@ -167,7 +167,7 @@ export default function DesktopHeader({
               })}
               <hr className="menu-divider" style={{ margin: '6px 0' }} />
               <p className="menu-desc" style={{ fontSize: '11px', color: '#777', margin: 0, padding: '0 4px', lineHeight: '1.3' }}>
-                Livraison locale rapide via WhatsApp.
+                Livraison locale et suivi des commandes sur Vendoscity.
               </p>
             </div>
           </div>
@@ -325,9 +325,9 @@ export default function DesktopHeader({
           </div>
 
           {/* Brand primary links */}
-          <Link href="/boutique" className="nav-main-link">Fabricants Verified</Link>
+          <Link href="/boutique" className="nav-main-link">Fabricants certifiés</Link>
           <Link href="/boutique?sort=recommended" className="nav-main-link">
-            <ShieldCheck width="14" height="14" className="link-icon" /> Trade Assurance
+            <ShieldCheck width="14" height="14" className="link-icon" /> Achat sécurisé
           </Link>
         </div>
 
@@ -373,11 +373,11 @@ export default function DesktopHeader({
                 className={`search-tab-item ${activeSearchTab === 'sellers' ? 'active' : ''}`}
                 onClick={() => handleTabClick('sellers')}
               >
-                Fabricants <span className="tab-badge-verified">Verified</span>
+                Fabricants <span className="tab-badge-verified">Certifiés</span>
               </button>
             </div>
 
-            {/* Alibaba Search Box */}
+            {/* Search box */}
             <form onSubmit={handleSearchSubmit} className="alibaba-search-box-form">
               <div className="search-image-btn" onClick={handleImageSearchClick} style={{ cursor: 'pointer' }}>
                 <Camera width="18" height="18" className="camera-icon" />

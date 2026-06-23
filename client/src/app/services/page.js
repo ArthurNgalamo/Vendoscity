@@ -19,15 +19,15 @@ import {
 } from 'lucide-react';
 
 const SERVICES = [
-  { icon: ShoppingBasket, title: "Marketplace d'Achat", desc: "Explorez des produits et contactez le vendeur directement. La discussion (prix, disponibilité, remise) se fait en direct." },
-  { icon: Package, title: "Vente Simplifiée", desc: "Publiez vos annonces et répondez aux acheteurs. Vous gardez le contrôle du processus (paiement, livraison, conditions)." },
-  { icon: Truck, title: "Livraison (Optionnelle)", desc: "La plateforme n'intervient pas par défaut. Si le vendeur le souhaite, Vendoscity peut aider à organiser une livraison avec un prix discutable au cas par cas." },
-  { icon: Handshake, title: "Paiement Entre Parties", desc: "Vous commandez sur Vendoscity, puis vous payez hors plateforme directement au vendeur (Mobile Money, cash, virement, etc.) selon ce que vous convenez." },
+  { icon: ShoppingBasket, title: "Marketplace d'Achat", desc: "Explorez des produits locaux et des catalogues enrichis avec images, vidéos et fiches détaillées." },
+  { icon: Package, title: "Vente Simplifiée", desc: "Publiez vos annonces, gérez votre catalogue et répondez aux acheteurs depuis un espace vendeur centralisé." },
+  { icon: Truck, title: "Livraison Suivie", desc: "Préparez la livraison, le retrait ou l'expédition depuis le parcours de commande, avec une meilleure traçabilité pour l'acheteur." },
+  { icon: Handshake, title: "Paiement Sécurisé", desc: "Vendoscity évolue vers des transactions gérées sur la plateforme, avec blocage et libération des fonds après validation." },
   { icon: Star, title: "Système d'Évaluation", desc: "Notes et avis pour aider la communauté à identifier des vendeurs fiables et des annonces de qualité." },
-  { icon: Shield, title: "Médiation (Sur Demande)", desc: "En cas de problème, nous pouvons faciliter la communication si le vendeur et l'acheteur le souhaitent." },
+  { icon: Shield, title: "Confiance & Médiation", desc: "Badges de certification, historique des échanges et assistance en cas de problème sur une commande." },
   { icon: MessageSquare, title: "Support Client", desc: "Support par email et téléphone pour les questions sur la plateforme et les annonces." },
-  { icon: BarChart2, title: "Tableaux de bord", desc: "Un espace vendeur pour gérer vos produits, suivre vos demandes et organiser votre activité." },
-  { icon: Globe, title: "Présence Locale", desc: "Entreprise située à Yaoundé, avec une approche pragmatique : mise en relation, discussion directe et solutions locales." }
+  { icon: BarChart2, title: "Tableaux de bord", desc: "Un espace vendeur pour gérer les produits, commandes, performances et demandes clients." },
+  { icon: Globe, title: "Import Fournisseurs", desc: "Préparation d'intégrations avec Alibaba, AliExpress et 1688 pour importer articles, images et vidéos." }
 ];
 
 const ADD_SERVICES = [
@@ -43,7 +43,7 @@ export default function ServicesPage() {
       <div className="services-hero">
         <h1 style={{ margin: 0, fontSize: '2.4rem', fontWeight: '800' }}>Nos Services</h1>
         <p style={{ margin: '8px 0 0 0', opacity: 0.95 }}>
-          Une marketplace de mise en relation directe entre acheteurs et vendeurs, basée à Yaoundé.
+          Une marketplace camerounaise qui centralise produits, commandes, messagerie, paiement et catalogues fournisseurs.
         </p>
       </div>
 

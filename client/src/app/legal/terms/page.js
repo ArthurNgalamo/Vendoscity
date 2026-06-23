@@ -71,7 +71,7 @@ export default function TermsPage() {
 
           <h2>2. Définitions</h2>
           <ul>
-            <li><strong>Vendoscity :</strong> La plateforme de mise en relation directe de shopping en ligne et de services.</li>
+            <li><strong>Vendoscity :</strong> La plateforme de shopping en ligne, de services, de messagerie, de commandes et de paiement sécurisé.</li>
             <li><strong>Utilisateur :</strong> Toute personne accédant au Site.</li>
             <li><strong>Vendeur :</strong> Utilisateur créant un compte pour proposer ses produits ou services.</li>
             <li><strong>Acheteur / Client :</strong> Utilisateur achetant ou soumettant une demande de commande.</li>
@@ -81,11 +81,11 @@ export default function TermsPage() {
           <p>L'utilisation du Site implique l'acceptation pleine et entière des présentes CGU. Si vous n'acceptez pas ces termes, vous devez cesser immédiatement d'utiliser la plateforme.</p>
 
           <h2>4. Rôle de Vendoscity</h2>
-          <p>Vendoscity agit exclusivement comme <strong>plateforme technique de mise en relation directe</strong>. Nous ne sommes pas partie prenante aux ventes, nous ne percevons aucune commission sur les transactions, et nous ne traitons aucun paiement.</p>
+          <p>Vendoscity agit comme <strong>plateforme technique de commerce en ligne</strong>. Selon les fonctionnalités disponibles, la plateforme peut faciliter la mise en relation, la commande, la messagerie, le paiement sécurisé et le suivi de livraison.</p>
           <p>Par conséquent, Vendoscity ne peut être tenu responsable :</p>
           <ul>
             <li>De la qualité, de la conformité, ou de la sécurité des produits vendus.</li>
-            <li>Des litiges de livraison ou de paiement survenant entre les utilisateurs.</li>
+            <li>Des litiges de livraison ou de paiement lorsque les utilisateurs choisissent un arrangement hors plateforme.</li>
             <li>De la véracité des informations publiées par les vendeurs.</li>
           </ul>
 
@@ -94,7 +94,7 @@ export default function TermsPage() {
           <ul>
             <li>Fournir des informations exactes et conformes à la réalité.</li>
             <li>Ne pas publier de contrefaçons, d'articles interdits par la loi, ou de contenus trompeurs.</li>
-            <li>Respecter les accords conclus avec les acheteurs sur WhatsApp (prix, livraison).</li>
+            <li>Respecter les accords conclus avec les acheteurs dans la messagerie, le suivi de commande ou tout canal de contact accepté pendant la transition.</li>
           </ul>
 
           <h2>6. Obligations des Acheteurs</h2>

@@ -423,7 +423,7 @@ export default function MonEspacePage() {
                   <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <User width="18" height="18" style={{ color: '#ef4444' }} />
                   </div>
-                  <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Mon Profil / WhatsApp</span>
+                  <span style={{ fontWeight: '600', fontSize: '0.95rem', color: '#1e293b' }}>Mon profil / Contact</span>
                 </div>
                 <ArrowRight width="16" height="16" style={{ color: '#cbd5e1' }} />
               </Link>

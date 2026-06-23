@@ -28,7 +28,7 @@ export default function CheckoutPage() {
   const { authFetch } = useAuth();
   const { removeFromCart } = useCart();
   const [checkoutData, setCheckoutData] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState(''); // 'whatsapp' or 'escrow'
+  const [paymentMethod, setPaymentMethod] = useState(''); // direct transition mode or 'escrow'
   const [operator, setOperator] = useState('mtn'); // 'mtn' or 'orange'
   const [buyerPhone, setBuyerPhone] = useState('');
   const [loading, setLoading] = useState(false);
@@ -115,8 +115,8 @@ export default function CheckoutPage() {
   }
   const totalAmount = Math.max(0, subtotal + actualShippingCost - discount);
 
-  // Traditional WhatsApp Checkout
-  const handleProceedWhatsApp = async () => {
+  // Transitional direct checkout
+  const handleProceedDirectOrder = async () => {
     setLoading(true);
     const orderId = `VC-${Date.now().toString().slice(-6)}-${Math.floor(1000 + Math.random() * 9000)}`;
     const selectedHub = DISTRIBUTION_HUBS.find(h => h.id === selectedHubId);
@@ -128,7 +128,7 @@ export default function CheckoutPage() {
         price: it.price
       }));
 
-      // Create order in DB first (Direct WhatsApp payment mode)
+      // Create order in DB first. The payment_method value is kept for backend compatibility.
       await authFetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -169,7 +169,7 @@ export default function CheckoutPage() {
       }
       lines.push(`*TOTAL À PAYER : ${totalAmount.toLocaleString('fr-FR')} FCFA*`);
       lines.push(`=========================`);
-      lines.push(`Méthode de paiement : Négociation en direct WhatsApp`);
+      lines.push(`Méthode de paiement : Commande directe assistée`);
       lines.push(`Acheteur sur Vendoscity.com`);
    
       const waUrl = `https://wa.me/${sellerWhatsApp.replace(/\D/g, '')}?text=${encodeURIComponent(lines.join('\n'))}`;
@@ -181,7 +181,7 @@ export default function CheckoutPage() {
       });
       localStorage.removeItem('checkout_data');
 
-      showToast("Redirection vers WhatsApp...");
+      showToast("Commande créée. Ouverture du contact vendeur...");
       setTimeout(() => {
         window.location.href = '/commandes';
       }, 1000);
@@ -261,7 +261,7 @@ export default function CheckoutPage() {
             if (target.escrow_status === 'held') {
               setPaymentStatus('success');
               setPollingActive(false);
-              showToast("Paiement séquestre validé !");
+              showToast("Paiement sécurisé validé !");
               
               // Clean Cart
               items.forEach(item => {
@@ -316,7 +316,7 @@ export default function CheckoutPage() {
           sender: buyerPhone,
           amount: targetVal,
           transaction_ref: ref,
-          raw_sms: `Paiement Mobile Money de ${targetVal} FCFA recu avec succes de ${buyerPhone} pour Arthur Romi Ngalamo Kekenou. Ref: ${ref}.`
+          raw_sms: `Paiement Mobile Money de ${targetVal} FCFA recu avec succes de ${buyerPhone} pour Vendoscity. Ref: ${ref}.`
         })
       });
 
@@ -346,7 +346,7 @@ export default function CheckoutPage() {
     return (
       <div style={{ maxWidth: '800px', margin: '80px auto', padding: '0 20px', textAlign: 'center' }}>
         <h2>Votre panier est vide</h2>
-        <p>Veuillez d'abord ajouter des articles au panier avant de procéder au paiement.</p>
+          <p>Veuillez d'abord ajouter des articles au panier avant de procéder à la commande.</p>
         <Link href="/panier" className="btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', marginTop: '20px', textDecoration: 'none', color: '#ff6a00', fontWeight: 'bold' }}>
           <ArrowLeft width="16" height="16" /> Retour au panier
         </Link>
@@ -440,7 +440,7 @@ export default function CheckoutPage() {
                   <PaymentMethodSelector
                     paymentMethod={paymentMethod}
                     setPaymentMethod={setPaymentMethod}
-                    handleProceedWhatsApp={handleProceedWhatsApp}
+                    handleProceedDirectOrder={handleProceedDirectOrder}
                   />
 
                   {paymentMethod === 'escrow' && (

@@ -151,7 +151,7 @@ export default function ProfileSection({
 
         <div className="form-group">
           <label htmlFor="phone">
-            {isSellerApproved ? 'WhatsApp (commandes) *' : 'Numéro de téléphone (optionnel)'}
+            {isSellerApproved ? 'Téléphone professionnel *' : 'Numéro de téléphone (optionnel)'}
             {!isSellerApproved && <span className="field-hint"> (ex: 681570075)</span>}
           </label>
           {isEditingProfile ? (

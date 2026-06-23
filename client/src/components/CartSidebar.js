@@ -33,7 +33,7 @@ export default function CartSidebar() {
   const handleCheckout = (e) => {
     e.preventDefault();
     if (!clientWhatsApp.trim()) {
-      alert('Veuillez entrer votre numéro WhatsApp.');
+      alert('Veuillez entrer votre numéro de téléphone.');
       return;
     }
     // Save to localStorage for future checkout speed
@@ -150,7 +150,7 @@ export default function CartSidebar() {
             <form onSubmit={handleCheckout}>
               <div className="whatsapp-input-group">
                 <label htmlFor="whatsapp-input" style={{ fontSize: '0.85rem', color: '#555', fontWeight: '600', display: 'block', marginBottom: '6px' }}>
-                  Votre WhatsApp (avec indicatif ex: 237681570075)
+                  Votre téléphone (avec indicatif ex: 237681570075)
                 </label>
                 <input
                   type="tel"
@@ -171,7 +171,7 @@ export default function CartSidebar() {
               </div>
 
               <button type="submit" className="btn-checkout pressable">
-                Commander via WhatsApp
+                Créer la commande
               </button>
             </form>
           </div>
@@ -228,7 +228,7 @@ export default function CartSidebar() {
               </button>
             </div>
             <p className="order-confirmation-subtitle" style={{ color: '#555', fontSize: '0.9rem', marginBottom: '20px', lineHeight: '1.5' }}>
-              Nous avons regroupé vos articles par vendeur. Si une fenêtre WhatsApp ne s&apos;est pas ouverte automatiquement, veuillez cliquer sur les boutons ci-dessous pour lancer la discussion.
+              Nous avons regroupé vos articles par vendeur. Vous pouvez poursuivre avec chaque vendeur depuis les options ci-dessous pendant la transition vers un parcours entièrement intégré.
             </p>
             <div className="order-confirmation-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '20px' }}>
               {checkoutOrders.map(({ order, link }, idx) => (
@@ -272,7 +272,7 @@ export default function CartSidebar() {
                         fontSize: '0.8rem'
                       }}
                     >
-                      <MessageCircle width="14" height="14" /> WhatsApp
+                      <MessageCircle width="14" height="14" /> Contacter
                     </a>
                   ) : (
                     <button

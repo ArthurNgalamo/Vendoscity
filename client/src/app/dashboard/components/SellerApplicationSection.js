@@ -72,7 +72,7 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!shopName.trim() || !whatsapp.trim()) {
-      alert("Veuillez remplir le nom de l'entreprise et le numéro WhatsApp.");
+      alert("Veuillez remplir le nom de l'entreprise et le téléphone professionnel.");
       return;
     }
 
@@ -486,9 +486,9 @@ export default function SellerApplicationSection({ profile, onApprovalSuccess, s
                   </div>
                 </div>
 
-                {/* WhatsApp */}
+                {/* Professional phone */}
                 <div>
-                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>WhatsApp professionnel *</label>
+                  <label className="form-label" style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: '600', marginBottom: '6px' }}>Téléphone professionnel *</label>
                   <div style={{ position: 'relative' }}>
                     <Store width="16" height="16" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
                     <input 

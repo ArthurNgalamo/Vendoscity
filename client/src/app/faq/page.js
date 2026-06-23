@@ -14,7 +14,7 @@ const FAQ_ITEMS = [
              <ul>
                <li>Votre adresse email</li>
                <li>Un mot de passe sécurisé</li>
-               <li>Vos informations personnelles (nom, numéro WhatsApp)</li>
+               <li>Vos informations personnelles (nom, téléphone de contact)</li>
              </ul>
              <p>Après validation, votre compte sera immédiatement actif et vous pourrez commencer à publier ou à commander.</p>`
   },
@@ -25,45 +25,46 @@ const FAQ_ITEMS = [
              <ol>
                <li>Connectez-vous à votre compte vendeur.</li>
                <li>Accédez à votre "Tableau de Bord".</li>
-               <li>Modifiez vos informations (nom de boutique, numéro WhatsApp, quartier, description).</li>
+               <li>Modifiez vos informations (nom de boutique, téléphone, quartier, description).</li>
                <li>Cliquez sur "Enregistrer les modifications".</li>
              </ol>`
   },
   {
     category: 'order',
     question: 'Comment suivre ma commande?',
-    answer: `<p>Les commandes sur Vendoscity s'effectuent en direct via WhatsApp. Pour suivre votre commande :</p>
+    answer: `<p>Vendoscity évolue vers un suivi de commande entièrement intégré. Pour suivre votre commande :</p>
              <ol>
-               <li>Consultez votre historique de discussion WhatsApp avec le vendeur.</li>
-               <li>Écrivez directement au vendeur avec la référence de la commande (ex: VC-XXXX-XXXX) reçue lors de la commande.</li>
+               <li>Consultez la page "Commandes" depuis votre espace.</li>
+               <li>Écrivez au vendeur dans la messagerie Vendoscity avec la référence de commande (ex: VC-XXXX-XXXX).</li>
+               <li>Lorsque la commande utilise le paiement sécurisé, suivez aussi l'état de validation et de livraison.</li>
              </ol>
-             <p><strong>Note :</strong> Vendoscity est une plateforme de mise en relation directe, le suivi s'effectue donc directement entre vous et le vendeur.</p>`
+             <p><strong>Note :</strong> les anciens parcours peuvent encore utiliser un contact externe pendant la transition, mais l'objectif est de tout centraliser sur la plateforme.</p>`
   },
   {
     category: 'order',
     question: 'Puis-je annuler ma commande?',
-    answer: `<p>Vous pouvez annuler ou modifier votre demande directement auprès du vendeur sur WhatsApp tant que le produit n'a pas été livré ou expédié.</p>
-             <p>Étant donné que le paiement s'effectue hors plateforme, vous n'avez aucun frais d'annulation sur la plateforme.</p>`
+    answer: `<p>Vous pouvez demander l'annulation depuis la messagerie Vendoscity tant que le produit n'a pas été livré ou expédié.</p>
+             <p>Lorsque le paiement sécurisé est utilisé, le remboursement ou la libération des fonds dépend de l'état de validation de la commande.</p>`
   },
   {
     category: 'payment',
     question: 'Quels modes de paiement acceptez-vous?',
-    answer: `<p>Vendoscity ne collecte pas votre paiement. Vous payez directement le vendeur selon les modalités convenues d'un commun accord :</p>
+    answer: `<p>Vendoscity prépare une gestion complète du paiement sur la plateforme. Les modes prévus ou disponibles selon le vendeur sont :</p>
              <ul>
-               <li>Mobile Money (Orange Money, MTN Mobile Money)</li>
-               <li>Paiement en espèces lors de la remise en main propre</li>
-               <li>Virement ou versement bancaire</li>
+               <li>Paiement sécurisé Mobile Money avec validation de livraison.</li>
+               <li>Paiement local à la remise, lorsque le vendeur le propose.</li>
+               <li>Modes additionnels à intégrer selon les partenaires et fournisseurs.</li>
              </ul>
-             <p><strong>Conseil :</strong> Clarifiez toujours le prix total et le moyen de paiement sur WhatsApp avant de procéder à la transaction.</p>`
+             <p><strong>Conseil :</strong> privilégiez les commandes et échanges conservés dans Vendoscity afin de garder un historique clair.</p>`
   },
   {
     category: 'payment',
     question: 'Je veux payer. Comment ça se passe?',
-    answer: `<p>Le paiement se fait hors plateforme directement entre vous et le vendeur.</p>
+    answer: `<p>Le paiement sécurisé Vendoscity permet de créer une commande, bloquer le montant et libérer les fonds après validation de la livraison.</p>
              <ul>
-               <li>Ajoutez les articles au panier et cliquez sur "Commander via WhatsApp".</li>
-               <li>Envoyez le message automatique généré pour initier la discussion avec le vendeur.</li>
-               <li>Mettez-vous d'accord sur le mode de paiement (MOMO, cash) et de livraison.</li>
+               <li>Ajoutez les articles au panier et validez la commande.</li>
+               <li>Choisissez le paiement sécurisé lorsque l'option est disponible.</li>
+               <li>Suivez les étapes de livraison et de confirmation dans votre espace.</li>
                <li><strong>Pour votre sécurité :</strong> vérifiez le produit et l'identité du vendeur lors de la remise.</li>
              </ul>`
   },
@@ -80,7 +81,7 @@ const FAQ_ITEMS = [
   {
     category: 'shipping',
     question: "Livrez-vous à l'international?",
-    answer: `<p>Les vendeurs présents sur la plateforme livrent principalement au Cameroun, mais certains peuvent expédier dans la sous-région (Côte d'Ivoire, Sénégal, Mali, Burkina Faso) par agence de transport. Veuillez clarifier ce point directement avec eux sur WhatsApp.</p>`
+    answer: `<p>Les vendeurs présents sur la plateforme livrent principalement au Cameroun, mais certains peuvent expédier dans la sous-région (Côte d'Ivoire, Sénégal, Mali, Burkina Faso) par agence de transport. Les modalités doivent être confirmées dans la messagerie ou le suivi de commande.</p>`
   },
   {
     category: 'return',
@@ -88,13 +89,13 @@ const FAQ_ITEMS = [
     answer: `<p>Les retours et remboursements sont gérés au cas par cas directement avec le vendeur :</p>
              <ul>
                <li>Vérifiez l'état du produit immédiatement à la livraison/remise.</li>
-               <li>Entendez-vous sur les conditions de retour (délai, état de l'article) par écrit sur WhatsApp avant de finaliser l'achat.</li>
+               <li>Entendez-vous sur les conditions de retour (délai, état de l'article) par écrit dans la messagerie Vendoscity avant de finaliser l'achat.</li>
              </ul>`
   },
   {
     category: 'return',
     question: 'Comment demander un remboursement?',
-    answer: `<p>Contactez directement le vendeur sur WhatsApp pour lui expliquer le problème (non-conformité, défaut). Si le vendeur accepte le remboursement, convenez ensemble des modalités de retour de l'article et du transfert des fonds (généralement via Mobile Money).</p>`
+    answer: `<p>Contactez le vendeur dans la messagerie Vendoscity pour expliquer le problème (non-conformité, défaut). Si la commande utilise le paiement sécurisé, la résolution doit passer par l'état de commande et la validation de livraison.</p>`
   },
   {
     category: 'all',
@@ -102,7 +103,7 @@ const FAQ_ITEMS = [
     answer: `<p>Vous pouvez joindre notre équipe d'assistance par :</p>
              <ul>
                <li><strong>Email :</strong> <a href="mailto:arthurngalamo7@gmail.com">arthurngalamo7@gmail.com</a></li>
-               <li><strong>Téléphone / WhatsApp :</strong> <a href="tel:+237681570075">+237 681 570 075</a></li>
+               <li><strong>Téléphone :</strong> <a href="tel:+237681570075">+237 681 570 075</a></li>
                <li><strong>Formulaire :</strong> <a href="/contacts">Page de contact</a></li>
              </ul>
              <p>Nous répondons généralement sous 24h ouvrées.</p>`
@@ -346,7 +347,7 @@ export default function FAQPage() {
           <h1>
             <HelpCircle width="30" height="30" /> Foire Aux Questions
           </h1>
-          <p>Vendoscity met en relation directe acheteurs et vendeurs. Voici les points essentiels.</p>
+          <p>Vendoscity centralise progressivement les produits, les commandes, la messagerie et le paiement sécurisé. Voici les points essentiels.</p>
         </div>
 
         <div className="faq-container">

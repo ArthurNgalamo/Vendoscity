@@ -301,19 +301,15 @@ export default function SellerPublicPage({ params }) {
 
           {contactPhone && (
             <div className="seller-contact-section">
-              <h4>Contact Direct</h4>
+              <h4>Contacter la boutique</h4>
               <div className="seller-contact-list">
-                <a
-                  href={`https://wa.me/${contactPhone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                    `Bonjour ${shopName}, j'ai visité votre boutique en ligne sur Vendoscity et je souhaiterais échanger avec vous.`
-                  )}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={`/messagerie?seller=${seller.id}`}
                   className="seller-contact-link whatsapp"
-                  onClick={() => logAnalyticsEvent('whatsapp_click', seller.id)}
+                  onClick={() => logAnalyticsEvent('chat_click', seller.id)}
                 >
-                  <MessageSquare width="16" height="16" fill="white" /> WhatsApp direct
-                </a>
+                  <MessageSquare width="16" height="16" fill="white" /> Écrire un message
+                </Link>
                 <a
                   href={`tel:${contactPhone.replace(/\D/g, '')}`}
                   className="seller-contact-link phone"
@@ -622,7 +618,7 @@ export default function SellerPublicPage({ params }) {
               </div>
 
               <div>
-                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '6px', textAlign: 'left' }}>WhatsApp (commandes) <span style={{ fontWeight: 'normal', color: '#94a3b8' }}>(ex: 681570075)</span></label>
+                <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: '700', color: '#475569', marginBottom: '6px', textAlign: 'left' }}>Téléphone professionnel <span style={{ fontWeight: 'normal', color: '#94a3b8' }}>(ex: 681570075)</span></label>
                 <input
                   type="tel"
                   placeholder="ex: +237681570075 ou 681570075"

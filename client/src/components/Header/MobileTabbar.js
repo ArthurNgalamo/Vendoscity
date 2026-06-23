@@ -67,7 +67,7 @@ export default function MobileTabbar({
             <User width="20" height="20" />
           )}
         </div>
-        <span>Mon babana</span>
+        <span>Mon espace</span>
       </Link>
     </div>
   );

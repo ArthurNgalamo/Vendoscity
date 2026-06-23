@@ -291,7 +291,7 @@ export function CartProvider({ children }) {
     lines.push('');
     lines.push('Je souhaite passer une commande sur Vendoscity.');
     lines.push(`Référence : ${order.orderId}`);
-    lines.push(`Mon WhatsApp : +${order.clientWhatsApp}`);
+    lines.push(`Mon téléphone : +${order.clientWhatsApp}`);
     lines.push('');
     lines.push('Articles :');
     for (const item of order.items) {
@@ -336,7 +336,7 @@ export function CartProvider({ children }) {
 
     const clientWhatsApp = normalizeWhatsApp(rawClientWhatsApp);
     if (!clientWhatsApp || clientWhatsApp.length < 9) {
-      showToast('Numéro WhatsApp client invalide.');
+      showToast('Numéro de téléphone client invalide.');
       return;
     }
 

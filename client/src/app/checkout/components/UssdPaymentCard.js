@@ -35,7 +35,7 @@ export default function UssdPaymentCard({
         Paiement en attente
       </h3>
       <p style={{ fontSize: '0.85rem', color: '#475569', lineHeight: 1.5 }}>
-        Composez le code USSD ci-dessous sur votre téléphone. La plateforme Arthur Romi Ngalamo Kekenou écoute automatiquement les SMS du réseau pour valider votre commande.
+        Composez le code USSD ci-dessous sur votre téléphone. Vendoscity attend la confirmation de transfert pour valider votre commande.
       </p>
 
       <div className="ussd-card">
@@ -67,7 +67,7 @@ export default function UssdPaymentCard({
       {/* Developer Mock SMS Gateway Simulator - Visible ONLY on localhost for security */}
       {isLocalhost && (
         <div className="simulator-panel">
-          <div className="simulator-title">🛠️ Simulateur Gateway SMS (Tests locaux)</div>
+          <div className="simulator-title">🛠️ Simulateur de confirmation paiement (tests locaux)</div>
           <p style={{ margin: '0 0 12px 0', fontSize: '0.72rem', color: '#64748b', lineHeight: 1.4 }}>
             Simulez le SMS Mobile Money reçu sur le téléphone de la plateforme pour valider automatiquement la commande.
           </p>

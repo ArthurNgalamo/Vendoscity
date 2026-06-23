@@ -59,19 +59,6 @@ function ProductCard({ product }) {
   // Discount badge calculation
   const discountPercent = oldPrice > price ? Math.round(((oldPrice - price) / oldPrice) * 100) : 0;
 
-  // Safe numeric hash from UUID/string ID to prevent NaN in sold count
-  const getNumericId = (id) => {
-    if (!id) return 1;
-    if (typeof id === 'number') return id;
-    let hash = 0;
-    for (let i = 0; i < id.length; i++) {
-      hash = (hash << 5) - hash + id.charCodeAt(i);
-      hash |= 0;
-    }
-    return Math.abs(hash);
-  };
-  const numericId = getNumericId(product?.id);
-
   // Auto slides images on hover
   useEffect(() => {
     if (isHovered && images.length > 1) {
@@ -95,7 +82,7 @@ function ProductCard({ product }) {
     
     const res = await shareLink({
       title: sellerName,
-      text: `Découvrez la boutique ${sellerName} sur Vendoscity ! Commande directe WhatsApp.`,
+      text: `Découvrez la boutique ${sellerName} sur Vendoscity.`,
       url: shopUrl
     });
 
@@ -253,7 +240,7 @@ function ProductCard({ product }) {
           <Link href={`/product/${product.id}`} onClick={handleProductClick} style={{ color: '#222', textDecoration: 'none' }}>{title}</Link>
         </h3>
 
-        {/* Price & Sales row (Temu Style) */}
+        {/* Price row */}
         <div style={{ display: 'flex', alignItems: 'baseline', gap: '4px', marginTop: '2px', flexWrap: 'wrap' }}>
           {oldPrice > price ? (
             <>
@@ -294,19 +281,20 @@ function ProductCard({ product }) {
               {Math.round(price).toLocaleString('fr-FR')} FCFA
             </span>
           )}
-          <span style={{ fontSize: '0.68rem', color: '#777' }}>
-            {((numericId % 45) + 5) * 12}+ sold
-          </span>
         </div>
 
         {/* Star Rating, Location & Cart Button row */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '2px', gap: '4px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '3px', flexWrap: 'wrap', minWidth: 0 }}>
-            <div className="product-rating-mini" style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.68rem' }}>
-              <Star width="8" height="8" fill="var(--color-yellow)" color="var(--color-yellow)" />
-              <span style={{ fontWeight: '700', color: '#333' }}>{reviewsCount > 0 ? rating.toFixed(1) : '5.0'}</span>
-              <span style={{ color: '#777' }}>({reviewsCount > 0 ? reviewsCount : ((numericId % 15) + 3)})</span>
-            </div>
+            {reviewsCount > 0 ? (
+              <div className="product-rating-mini" style={{ display: 'flex', alignItems: 'center', gap: '2px', fontSize: '0.68rem' }}>
+                <Star width="8" height="8" fill="var(--color-yellow)" color="var(--color-yellow)" />
+                <span style={{ fontWeight: '700', color: '#333' }}>{rating.toFixed(1)}</span>
+                <span style={{ color: '#777' }}>({reviewsCount})</span>
+              </div>
+            ) : (
+              <span style={{ fontSize: '0.68rem', color: '#64748b' }}>Nouveau</span>
+            )}
             {locationLabel && (
               <span style={{ fontSize: '0.65rem', color: '#555', backgroundColor: '#f1f5f9', padding: '1px 4px', borderRadius: '3px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '60px' }} title={locationLabel}>
                 {locationLabel.split(' ')[0]}

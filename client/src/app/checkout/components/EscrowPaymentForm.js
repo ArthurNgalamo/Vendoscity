@@ -48,7 +48,7 @@ export default function EscrowPaymentForm({
         />
 
         <div style={{ background: '#f8fafc', padding: '14px', borderRadius: '8px', border: '1px solid #e2e8f0', marginBottom: '20px', fontSize: '0.78rem', color: '#475569', lineHeight: 1.4 }}>
-          📌 <strong>Arthur Romi Ngalamo Kekenou</strong> est le gestionnaire de séquestre désigné. Les fonds seront transférés sur ses comptes officiels temporairement pour votre sécurité.
+          📌 Le paiement sécurisé Vendoscity bloque les fonds jusqu'à la validation de la livraison. Les informations de paiement sont affichées uniquement pour finaliser cette commande.
         </div>
 
         <button 

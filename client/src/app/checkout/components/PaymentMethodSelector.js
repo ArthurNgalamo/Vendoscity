@@ -2,7 +2,7 @@
 import React from 'react';
 import { DollarSign, Send } from 'lucide-react';
 
-export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod, handleProceedWhatsApp }) {
+export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod, handleProceedDirectOrder }) {
   return (
     <div className="check-card">
       <h3 className="check-card-title">
@@ -22,8 +22,8 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod,
           className="method-radio"
         />
         <div className="method-desc">
-          <h4>Négociation & Paiement direct sur WhatsApp (De gré à gré)</h4>
-          <p>Idéal pour les remises locales immédiates. Vous convenez du prix et du lieu avec le vendeur directement sans intermédiaire.</p>
+          <h4>Commande directe assistée</h4>
+          <p>Mode de transition pour les vendeurs locaux. La commande est créée sur Vendoscity, puis l&apos;échange peut encore être finalisé avec le vendeur.</p>
         </div>
       </div>
 
@@ -39,15 +39,15 @@ export default function PaymentMethodSelector({ paymentMethod, setPaymentMethod,
           className="method-radio"
         />
         <div className="method-desc">
-          <h4>Séquestre Sécurisé Vendoscity (Mobile Money)</h4>
-          <p>Recommandé si vous devez envoyer de l'argent. L'argent est bloqué par la plateforme et libéré uniquement lors du scan du QR de livraison.</p>
+          <h4>Paiement sécurisé Vendoscity (Mobile Money)</h4>
+          <p>Recommandé pour gérer la transaction sur la plateforme. L&apos;argent est bloqué et libéré uniquement après validation de la livraison.</p>
         </div>
       </div>
 
       {paymentMethod === 'whatsapp' && (
         <div style={{ marginTop: '20px' }}>
-          <button onClick={handleProceedWhatsApp} className="checkout-btn" style={{ background: 'var(--color-green)' }}>
-            <Send width="16" height="16" /> Valider et ouvrir sur WhatsApp
+          <button onClick={handleProceedDirectOrder} className="checkout-btn" style={{ background: 'var(--color-green)' }}>
+            <Send width="16" height="16" /> Valider la commande
           </button>
         </div>
       )}
