@@ -244,6 +244,12 @@ export default function MobileHeader({
             </Link>
           </li>
           <li>
+            <Link href="/imports" className={pathname?.startsWith('/imports') ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600', color: pathname?.startsWith('/imports') ? '#8b5cf6' : undefined }}>
+              🌍 Imports AliExpress / Alibaba
+              <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontSize: '0.6rem', fontWeight: '800', padding: '1px 5px', borderRadius: '8px' }}>NOUVEAU</span>
+            </Link>
+          </li>
+          <li>
             <Link href="/messagerie" className={pathname === '/messagerie' ? 'active' : ''} style={{ fontWeight: 'bold', color: pathname === '/messagerie' ? 'var(--primary-blue)' : '#ff6a00', display: 'flex', alignItems: 'center', gap: '6px' }}>
               Messagerie
               {unreadCount > 0 && (
