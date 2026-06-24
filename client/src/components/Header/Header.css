@@ -152,8 +152,7 @@
     
     /* Hide non-essential rows in sticky mobile mode to keep it compact */
     .alibaba-global-header.is-sticky-mobile .mobile-shortcuts-row,
-    .alibaba-global-header.is-sticky-mobile .mobile-promo-row,
-    .alibaba-global-header.is-sticky-mobile .mobile-filters-row {
+    .alibaba-global-header.is-sticky-mobile .mobile-promo-row {
         display: none !important;
     }
 }

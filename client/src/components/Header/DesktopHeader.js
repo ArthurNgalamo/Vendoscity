@@ -333,10 +333,6 @@ export default function DesktopHeader({
           <Link href="/boutique?sort=recommended" className="nav-main-link">
             <ShieldCheck width="14" height="14" className="link-icon" /> Achat sécurisé
           </Link>
-          <Link href="/imports" className={`nav-main-link${pathname === '/imports' || pathname?.startsWith('/imports') ? ' active' : ''}`} style={{ display: 'inline-flex', alignItems: 'center', gap: '5px', color: pathname?.startsWith('/imports') ? '#8b5cf6' : undefined }}>
-            <Globe width="13" height="13" className="link-icon" /> Imports
-            <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontSize: '0.6rem', fontWeight: '800', padding: '1px 5px', borderRadius: '8px', letterSpacing: '0.03em' }}>AE</span>
-          </Link>
         </div>
 
         <div className="nav-bar-right">

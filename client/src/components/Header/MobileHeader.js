@@ -136,6 +136,12 @@ export default function MobileHeader({
               </div>
               <span className="mobile-shortcut-text">Flux<br/>vidéos</span>
             </Link>
+            <Link href="/boutique?category=all" className="mobile-shortcut-card">
+              <div className="mobile-shortcut-icon">
+                <GridIcon width="20" height="20" />
+              </div>
+              <span className="mobile-shortcut-text">Trier par<br/>catÃ©gorie</span>
+            </Link>
             <Link href="/ai-mode?message=Je%20souhaite%20demander%20un%20devis%20pour%20les%20produits%20suivants%20%3A%20" className="mobile-shortcut-card">
               <div className="mobile-shortcut-icon">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2">
@@ -189,9 +195,22 @@ export default function MobileHeader({
             </div>
           </div>
 
-          {/* ROW 5: Filters pills (Hidden on homepage) */}
-          {pathname !== '/' && (
+          {/* ROW 5: Filters pills */}
             <div className="mobile-filters-row">
+              <button
+                type="button"
+                className={`mobile-filter-pill ${urlParams.category === 'electronique' ? 'active' : ''}`}
+                onClick={() => router.push('/boutique?category=electronique')}
+              >
+                <span>Electronique</span>
+              </button>
+              <button
+                type="button"
+                className={`mobile-filter-pill ${urlParams.category === 'vetements' ? 'active' : ''}`}
+                onClick={() => router.push('/boutique?category=vetements')}
+              >
+                <span>Mode</span>
+              </button>
               <button 
                 type="button" 
                 className={`mobile-filter-pill ${(!urlParams.sort && !urlParams.custom) ? 'active' : ''}`}
@@ -221,7 +240,6 @@ export default function MobileHeader({
                 <span>Personnalisation</span>
               </button>
             </div>
-          )}
         </>
       )}
 
@@ -244,9 +262,9 @@ export default function MobileHeader({
             </Link>
           </li>
           <li>
-            <Link href="/imports" className={pathname?.startsWith('/imports') ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600', color: pathname?.startsWith('/imports') ? '#8b5cf6' : undefined }}>
-              🌍 Imports AliExpress / Alibaba
-              <span style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', color: '#fff', fontSize: '0.6rem', fontWeight: '800', padding: '1px 5px', borderRadius: '8px' }}>NOUVEAU</span>
+            <Link href="/videos" className={pathname?.startsWith('/videos') ? 'active' : ''} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontWeight: '600', color: pathname?.startsWith('/videos') ? '#8b5cf6' : undefined }}>
+              <Video width="16" height="16" />
+              Flux videos
             </Link>
           </li>
           <li>
